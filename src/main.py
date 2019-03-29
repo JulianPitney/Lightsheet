@@ -13,6 +13,10 @@ import pprint
 SCAN_DEPTH = None
 STEP_SIZE = None
 SCAN_NAME = None
+SERIAL_PORT_PATH = "COM3"
+BAUDRATE = 57600
+EXPOSURE = 10000
+GAIN = 25
 
 
 
@@ -98,52 +102,6 @@ def performScan(cameraController, arduinoController):
 
 
 
-def map_analog_to_discrete_range(value, leftMin, leftMax, rightMin, rightMax):
-
-    leftSpan = leftMax - leftMin
-    rightSpan = rightMax - rightMin
-    valueScaled = float(value - leftMin) / float(leftSpan)
-    return rightMin + (valueScaled * rightSpan)
-
-
-def handle_ps4_event(msg, cameraController, arduinoController):
-
-	button_data = msg[0]
-	axis_data = msg[1]
-	hat_data = msg[2]
-
-	LS_HORIZONTAL = axis_data.get(0)
-	LS_VERTICAL = axis_data.get(1)
-	RS_HORIZONTAL = axis_data.get(2)
-	RS_VERTICAL = axis_data.get(3)
-
-	if(LS_VERTICAL == None):
-		LS_VERTICAL = 0
-	if(RS_VERTICAL == None):
-		RS_VERTICAL = 0
-
-
-
-	if(button_data[3] == True):
-		cameraController.toggle_preview()
-		sleep(1)
-
-	elif(button_data[0] == True):
-		arduinoController.COARSE_JOG = not arduinoController.COARSE_JOG
-		print("COARSE_JOG set to: ",arduinoController.COARSE_JOG)
-		sleep(1)
-
-	elif(LS_VERTICAL > 0.3):
-		arduinoController.move_motor(1,-100)
-
-	elif(LS_VERTICAL < -0.3):
-		arduinoController.move_motor(1,100)
-
-	elif(RS_VERTICAL > 0.3):
-		arduinoController.move_motor(2,-100)
-
-	elif(RS_VERTICAL < -0.3):
-		arduinoController.move_motor(2,100)
 
 """
 	button_data[0]  SQUARE
@@ -169,36 +127,17 @@ def handle_ps4_event(msg, cameraController, arduinoController):
 
 
 
-def handle_gui_event(msg, cameraController, arduinoController):
+def launch_arduino_process(queue, SERIAL_PORT_PATH, BAUDRATE):
 
-	global SCAN_DEPTH, STEP_SIZE, SCAN_NAME
+	ardProc = Process(target=launch_arduino_controller, args=(queue, SERIAL_PORT_PATH, BAUDRATE,))
+	ardProc.start()
+	return ardProc
 
+def launch_camera_process(queue, EXPOSURE, GAIN):
 
-	functionIndex = msg[0]
-	args = msg[1]
-
-	if(functionIndex == 0):
-		arduinoController.move_motor(args[0], args[1])
-	elif(functionIndex == 2):
-		cameraController.toggle_preview()
-	elif(functionIndex == 3):
-		cameraController.EXPOSURE = int(args[0])
-	elif(functionIndex == 4):
-		cameraController.GAIN = int(args[0])
-	elif(functionIndex == 5):
-		SCAN_DEPTH = int(args[0])
-	elif(functionIndex == 6):
-		STEP_SIZE = int(args[0])
-	elif(functionIndex == 7):
-		SCAN_NAME = args[0]
-	elif(functionIndex == 8):
-		performScan(cameraController, arduinoController)
-	elif(functionIndex == 9):
-		arduinoController.toggle_laser()
-	else:
-		print("Invalid function index received from GUI!")
-
-
+	camProc = Process(target=launch_camera, args=(queue, EXPOSURE, GAIN))
+	camProc.start()
+	return camProc
 
 def launch_gui_process(queue):
 
@@ -213,41 +152,61 @@ def launch_ps4_process(queue):
 	return ps4Proc
 
 
+def route_message(msg):
+
+	global cameraQueue, arduinoQueue, ps4Queue, guiQueue
+	proc_index = msg[0]
+
+	if(proc_index == 0):
+		process_msg(msg)
+	elif(proc_index == 1):
+		cameraQueue.put(msg)
+	elif(proc_index == 2):
+		arduinoQueue.put(msg)
+	elif(proc_index == 3):
+		ps4Queue.put(msg)
+	elif(proc_index == 4):
+		guiQueue.put(msg)
 
 
+def process_msg(msg):
+
+	global SCAN_DEPTH, SCAN_STEP_SIZE, SCAN_NAME
+
+	functionIndex = msg[1]
+
+	if(functionIndex == 0):
+		SCAN_DEPTH = msg[2][0]
+	elif(functionIndex == 1):
+		SCAN_STEP_SIZE = msg[2][0]
+	elif(functionIndex == 2):
+		SCAN_NAME = msg[2][0]
+	elif(functionIndex == 3):
+		print("perform scan!")
 
 
+cameraQueue = Queue(0)
+arduinoQueue = Queue(0)
+ps4Queue = Queue(0)
+guiQueue = Queue(0)
 
 def main():
 
-	cameraController = CameraController(50000, 25)
-	arduinoController = ArduinoController("COM3", 9600)
-	while(True):
-		print(arduinoController.serialInterface.readline().decode())
-"""
-	ps4Queue = Queue()
+	global cameraQueue, arduinoQueue, ps4Queue, guiQueue
+	camProc = launch_camera_process(cameraQueue, EXPOSURE, GAIN)
+	ardProc = launch_arduino_process(arduinoQueue, SERIAL_PORT_PATH, BAUDRATE)
 	ps4Proc = launch_ps4_process(ps4Queue)
-
-	guiQueue = Queue()
 	guiProc = launch_gui_process(guiQueue)
 
-
 	while(True):
-
+		if(not cameraQueue.empty()):
+			route_message(cameraQueue.get())
+		if(not arduinoQueue.empty()):
+			route_message(arduinoQueue.get())
 		if(not ps4Queue.empty()):
-			ps4msg = ps4Queue.get()
-			handle_ps4_event(ps4msg, cameraController, arduinoController)
-			while not ps4Queue.empty():
-				ps4Queue.get()
-
-
+			route_message(ps4Queue.get())
 		if(not guiQueue.empty()):
-			guimsg = guiQueue.get()
-			handle_gui_event(guimsg, cameraController, arduinoController)
-			while not guiQueue.empty():
-				guiQueue.get()
-
-"""
+			route_message(guiQueue.get())
 
 
 if __name__ == '__main__':

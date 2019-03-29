@@ -33,40 +33,40 @@ class GUI(object):
 	def gen_widgets(self):
 
 		stageAdjustFrame = Frame(self.master)
-		y_inc = Button(stageAdjustFrame, text="y+", command=lambda: self.button_push_callback(0, [1,self.stepsPerPush_y_inc]))
-		y_dec = Button(stageAdjustFrame, text="y-", command=lambda: self.button_push_callback(0, [1,self.stepsPerPush_y_dec]))
-		x_inc = Button(stageAdjustFrame, text="x+", command=lambda: self.button_push_callback(0, [3,self.stepsPerPush_x_inc]))
-		x_dec = Button(stageAdjustFrame, text="x-", command=lambda: self.button_push_callback(0, [3,self.stepsPerPush_x_dec]))
-		z_inc = Button(stageAdjustFrame, text="z+", command=lambda: self.button_push_callback(0, [2,self.stepsPerPush_z_inc]))
-		z_dec = Button(stageAdjustFrame, text="z-", command=lambda: self.button_push_callback(0, [2,self.stepsPerPush_z_dec]))
+		y_inc = Button(stageAdjustFrame, text="y+", command=lambda: self.button_push_callback(2, 3, [1,self.stepsPerPush_y_inc]))
+		y_dec = Button(stageAdjustFrame, text="y-", command=lambda: self.button_push_callback(2, 3, [1,self.stepsPerPush_y_dec]))
+		x_inc = Button(stageAdjustFrame, text="x+", command=lambda: self.button_push_callback(2, 3, [3,self.stepsPerPush_x_inc]))
+		x_dec = Button(stageAdjustFrame, text="x-", command=lambda: self.button_push_callback(2, 3, [3,self.stepsPerPush_x_dec]))
+		z_inc = Button(stageAdjustFrame, text="z+", command=lambda: self.button_push_callback(2, 3, [2,self.stepsPerPush_z_inc]))
+		z_dec = Button(stageAdjustFrame, text="z-", command=lambda: self.button_push_callback(2, 3, [2,self.stepsPerPush_z_dec]))
 		stepsPerButtonPush = StringVar()
 		stepsPerButtonPush.set("10")
 		SPPEntry = Entry(stageAdjustFrame, textvariable=stepsPerButtonPush, bd=5)
 		setSPP = Button(stageAdjustFrame, text="Set SPP", command=lambda: self.update_steps_per_push(SPPEntry.get()))
-		togglePreview = Button(stageAdjustFrame, text="Toggle Live Preview", command=lambda: self.button_push_callback(2, []))
+		togglePreview = Button(stageAdjustFrame, text="Toggle Live Preview", command=lambda: self.button_push_callback(1, 0, []))
 
 		scanConfigFrame = Frame(self.master)
 		exposure = StringVar()
 		exposure.set("50000")
 		exposureEntry = Entry(scanConfigFrame, textvariable=exposure, bd=5)
-		setExposure = Button(scanConfigFrame, text="Set Exposure", command=lambda: self.button_push_callback(3, [exposureEntry.get()]))
+		setExposure = Button(scanConfigFrame, text="Set Exposure", command=lambda: self.button_push_callback(1, 1, [exposureEntry.get()]))
 		gain = StringVar()
 		gain.set("25")
 		gainEntry = Entry(scanConfigFrame, textvariable=gain, bd=5)
-		setGain = Button(scanConfigFrame, text="Set Gain", command=lambda: self.button_push_callback(4, [gainEntry.get()]))
+		setGain = Button(scanConfigFrame, text="Set Gain", command=lambda: self.button_push_callback(1, 2, [gainEntry.get()]))
 		scanDepth = StringVar()
 		scanDepth.set("50")
 		scanDepthEntry = Entry(scanConfigFrame, textvariable=scanDepth, bd=5)
-		setScanDepth = Button(scanConfigFrame, text="Set Scan Depth", command=lambda: self.button_push_callback(5, [scanDepthEntry.get()]))
+		setScanDepth = Button(scanConfigFrame, text="Set Scan Depth", command=lambda: self.button_push_callback(0, 0, [scanDepthEntry.get()]))
 		stepSize = StringVar()
 		stepSize.set("32")
 		stepSizeEntry = Entry(scanConfigFrame, textvariable=stepSize, bd=5)
-		setStepSize = Button(scanConfigFrame, text="Set Step Size", command=lambda: self.button_push_callback(6, [stepSizeEntry.get()]))
+		setStepSize = Button(scanConfigFrame, text="Set Step Size", command=lambda: self.button_push_callback(0, 1, [stepSizeEntry.get()]))
 		scanName = StringVar()
 		scanNameEntry = Entry(scanConfigFrame, textvariable=scanName, bd=5)
-		setScanName = Button(scanConfigFrame, text="Set Scan Name", command=lambda: self.button_push_callback(7, [scanNameEntry.get()]))
-		scanButton = Button(scanConfigFrame, text="SCAN!", command=lambda: self.button_push_callback(8, []))
-		toggleLaser = Button(scanConfigFrame, text="TOGGLE LASER", command=lambda: self.button_push_callback(9, []))
+		setScanName = Button(scanConfigFrame, text="Set Scan Name", command=lambda: self.button_push_callback(0, 2, [scanNameEntry.get()]))
+		scanButton = Button(scanConfigFrame, text="SCAN!", command=lambda: self.button_push_callback(0, 3, []))
+		toggleLaser = Button(scanConfigFrame, text="TOGGLE LASER", command=lambda: self.button_push_callback(2, 0, []))
 
 		stageAdjustFrame.pack(side=LEFT)
 		y_inc.pack(fill=X, padx=30)
@@ -98,9 +98,9 @@ class GUI(object):
 
 
 
-	def button_push_callback(self, functionIndex, args):
+	def button_push_callback(self, processIndex, functionIndex, args):
 
-		msg = [functionIndex, args]
+		msg = [processIndex, functionIndex, args]
 		self.queue.put(msg)
 
 

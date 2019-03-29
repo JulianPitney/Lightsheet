@@ -1,24 +1,23 @@
 import PySpin
 import cv2
-import os 
+import os
 from multiprocessing import Process, Queue
 
 class TriggerType:
-    SOFTWARE = 1
-    HARDWARE = 2
-CHOSEN_TRIGGER = TriggerType.HARDWARE	
+	SOFTWARE = 1
+	HARDWARE = 2
+CHOSEN_TRIGGER = TriggerType.HARDWARE
 
 
 class CameraController(object):
 
-	
 
-	
-	def __init__(self, EXPOSURE, GAIN):
-		
+	def __init__(self, queue, EXPOSURE, GAIN):
+
+		self.queue = queue
 		self.EXPOSURE = EXPOSURE
 		self.GAIN = GAIN
-		self.displayPreview = False 
+		self.displayPreview = False
 		self.previewProcQueue = Queue()
 		self.previewProc = None
 
@@ -83,7 +82,7 @@ class CameraController(object):
 		nodemap_tldevice = camera.GetTLDeviceNodeMap()
 		camera.Init()
 		nodemap = camera.GetNodeMap()
-		
+
 		# In order to access the node entries, they have to be casted to a pointer type (CEnumerationPtr here)
 		node_acquisition_mode = PySpin.CEnumerationPtr(nodemap.GetNode('AcquisitionMode'))
 		if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(node_acquisition_mode):
@@ -99,7 +98,7 @@ class CameraController(object):
 		node_acquisition_mode.SetIntValue(acquisition_mode_continuous)
 
 		if(configureTrigger):
-			configure_trigger(camera)	
+			configure_trigger(camera)
 
 
 
@@ -187,12 +186,11 @@ class CameraController(object):
 		return result
 
 
-
 	def toggle_preview(self):
 
-			
+
 		self.displayPreview = not self.displayPreview
-			
+
 		if(self.displayPreview):
 			print("Starting preview window!")
 			p = Process(target=self.display_preview, args=(self.previewProcQueue,))
@@ -204,10 +202,10 @@ class CameraController(object):
 			self.previewProc.join()
 			self.previewProc = None
 
-	
-	
-	
-	def display_preview(self, queue):	
+
+
+
+	def display_preview(self, inputQueue):
 
 		keepAlive = "True"
 		camList, system = self.init_spinnaker()
@@ -223,7 +221,7 @@ class CameraController(object):
 			return False
 		else:
 			camera.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
-		
+
 		if camera.ExposureTime.GetAccessMode() != PySpin.RW:
 			print('Unable to set exposure time. Aborting...')
 			return False
@@ -237,8 +235,8 @@ class CameraController(object):
 			print("Unable to disable automatic gain. Aborting...")
 			return false
 		else:
-			camera.GainAuto.SetValue(PySpin.GainAuto_Off)	
-			
+			camera.GainAuto.SetValue(PySpin.GainAuto_Off)
+
 		if camera.Gain.GetAccessMode() != PySpin.RW:
 			print("Unable to set gain. Aborting...")
 			return false
@@ -248,28 +246,56 @@ class CameraController(object):
 			camera.Gain.SetValue(self.GAIN)
 
 
-		camera.BeginAcquisition()	
+		camera.BeginAcquisition()
 		while(keepAlive == "True"):
-	
-			if(not queue.empty()):
-				keepAlive = queue.get()
-			
+
+			if(not inputQueue.empty()):
+				keepAlive = inputQueue.get()
+
 			image_result = camera.GetNextImage()
 			if image_result.IsIncomplete():
 				print('Image incomplete with image status %d ...' % image_result.GetImageStatus())
 			else:
 				image_converted = image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
-				cv2.imshow('image', image_converted.GetNDArray())	
+				cv2.imshow('image', image_converted.GetNDArray())
 				cv2.waitKey(1)
 				image_result.Release()
-	
-	
-		camera.EndAcquisition()		
+
+
+		camera.EndAcquisition()
 		camera.DeInit()
 		del camera
 		camList.Clear()
 		system.ReleaseInstance()
-		return 0	
-	
-	
-	
+		return 0
+
+
+	def set_exposure(self, exposure):
+		self.EXPOSURE = exposure
+
+	def set_gain(self, gain):
+		self.GAIN = gain
+
+	def process_msg(self, msg):
+
+		functionIndex = msg[1]
+
+		if(functionIndex == 0):
+			self.toggle_preview()
+		elif(functionIndex == 1):
+			self.set_exposure(msg[2][0])
+		elif(functionIndex == 2):
+			self.set_gain(msg[2][0])
+
+
+
+	def mainloop(self):
+		while(True):
+			if(not self.queue.empty()):
+				self.process_msg(self.queue.get())
+
+
+def launch_camera(queue, EXPOSURE, GAIN):
+
+	cc = CameraController(queue, EXPOSURE, GAIN)
+	cc.mainloop()

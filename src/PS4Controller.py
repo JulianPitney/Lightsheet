@@ -26,18 +26,32 @@ class PS4Controller(object):
     button_data = None
     hat_data = None
 
+
     def __init__(self, queue):
         """Initialize the joystick components"""
-        
+
         pygame.init()
         pygame.joystick.init()
         self.controller = pygame.joystick.Joystick(0)
         self.controller.init()
         self.queue = queue
+        self.last_axis0_input = 0
+        self.last_axis1_input = 0
+        self.last_axis2_input = 0
+        self.last_axis3_input = 0
+
+
+    def map_analog_to_discrete_range(self, value, leftMin, leftMax, rightMin, rightMax):
+
+        leftSpan = leftMax - leftMin
+        rightSpan = rightMax - rightMin
+        valueScaled = float(value - leftMin) / float(leftSpan)
+        return int(rightMin + (valueScaled * rightSpan))
+
 
     def listen(self):
         """Listen for events to happen"""
-        
+
         if not self.axis_data:
             self.axis_data = {}
 
@@ -54,17 +68,70 @@ class PS4Controller(object):
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.JOYAXISMOTION:
-                    self.axis_data[event.axis] = event.value
+                    self.process_axis_event(event)
                 elif event.type == pygame.JOYBUTTONDOWN:
-                    self.button_data[event.button] = True
+                    self.process_button_down_event(event)
                 elif event.type == pygame.JOYBUTTONUP:
-                    self.button_data[event.button] = False
+                    self.process_button_up_event(event)
                 elif event.type == pygame.JOYHATMOTION:
-                    self.hat_data[event.hat] = event.value
+                    self.process_hat_motion_event(event)
 
+        #    if(self.last_axis0_input > 0.3):
+        #        speed = self.map_analog_to_discrete_range(self.last_axis0_input, 0.3, 1.0, 1, 1600)
+        #        msg = [2, 4, [3, speed, True]]
+        #        print("Writing to ps4 queue")
+        #        self.queue.put(msg)
+        #    elif(self.last_axis0_input < -0.3):
+        #        speed = self.map_analog_to_discrete_range(self.last_axis0_input, -0.3, -1.0, 1, 1600)
+        #        msg = [2, 4, [3, speed, False]]
+        #        print("Writing to ps4 queue")
+        #        self.queue.put(msg)
 
-                msg = [self.button_data, self.axis_data, self.hat_data]			
+            if(self.last_axis1_input > 0.3):
+                speed = self.map_analog_to_discrete_range(self.last_axis1_input, 0.3, 1.0, 500, 1000)
+                msg = [2, 4, [1, speed, True]]
                 self.queue.put(msg)
+            elif(self.last_axis1_input < -0.3):
+                speed = self.map_analog_to_discrete_range(self.last_axis1_input, -0.3, -1.0, 500, 1000)
+                msg = [2, 4, [1, speed, False]]
+                self.queue.put(msg)
+
+            if(self.last_axis3_input > 0.3):
+                speed = self.map_analog_to_discrete_range(self.last_axis3_input, 0.3, 1.0, 500, 1000)
+                msg = [2, 4, [2, speed, True]]
+                self.queue.put(msg)
+            elif(self.last_axis3_input < -0.3):
+                speed = self.map_analog_to_discrete_range(self.last_axis3_input, -0.3, -1.0, 500, 1000)
+                msg = [2, 4, [2, speed, False]]
+                self.queue.put(msg)
+
+            sleep(0.01)
+
+
+
+    def process_axis_event(self, event):
+
+        if(event.axis == 0):
+            self.last_axis0_input = event.value
+        elif(event.axis == 1):
+            self.last_axis1_input = event.value
+        elif(event.axis == 2):
+            self.last_axis2_input = event.value
+        elif(event.axis == 3):
+            self.last_axis3_input = event.value
+
+
+    def process_button_down_event(self, event):
+        return 0
+
+    def process_button_up_event(self, event):
+        return 0
+
+    def process_hat_motion_event(self, event):
+        return 0
+
+
+
 
 def launch_ps4_controller(queue):
 
