@@ -260,7 +260,7 @@ int moveCommand() {
   if(stepperExists)
   {
     moveStepper(stepper, steps, speed);
-    //sendResponse("MOVE:" + command->params[1] + ":" + command->params[2] + ":" + command->params[3]);
+    sendResponse("MOVE:" + command->params[1] + ":" + command->params[2] + ":" + command->params[3]);
     rc = 0;
   }
   else

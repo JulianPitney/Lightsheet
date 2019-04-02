@@ -107,9 +107,7 @@ class PS4Controller(object):
                 msg = [2, 4, [2, speed, False]]
                 self.queue.put(msg)
 
-
-            print("PS4PROC: " + str(self.queue.qsize()))
-            sleep(0.001)
+            sleep(0.05)
 
 
 

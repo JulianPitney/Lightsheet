@@ -192,7 +192,6 @@ guiQueue = Queue(0)
 
 
 def main():
-	ps4msgs = 0
 
 	global cameraQueue, arduinoQueue, ps4Queue, guiQueue
 	camProc = launch_camera_process(cameraQueue, EXPOSURE, GAIN)
@@ -206,14 +205,11 @@ def main():
 		if not arduinoQueue.empty():
 			route_message(arduinoQueue.get())
 		if not ps4Queue.empty():
-			print(str(ps4msgs))
-			ps4msgs += 1
 			route_message(ps4Queue.get())
 		if not guiQueue.empty():
 			route_message(guiQueue.get())
 
-		print("MAINPROC: " + str(ps4Queue.qsize()))
-		sleep(0.001)
+		sleep(0.05)
 
 if __name__ == '__main__':
     main()

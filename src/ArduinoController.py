@@ -13,16 +13,16 @@ class ArduinoController(object):
 		self.SEEK_SPEED = 1600
 		self.SERIAL_PORT_PATH = SERIAL_PORT_PATH
 		self.BAUDRATE = BAUDRATE
-		self.serialInterface = None #serial.Serial(SERIAL_PORT_PATH, BAUDRATE)
+		self.serialInterface = serial.Serial(SERIAL_PORT_PATH, BAUDRATE)
 		self.queue = queue
 		# Wait for Arduino server to say it's ready
-		#confirmation = self.serialInterface.readline().decode()
-		#print(confirmation)
+		confirmation = self.serialInterface.readline().decode()
+		print(confirmation)
 
 
 	def __del__(self):
 		print("destroying arduino proc")
-		#self.serialInterface.__del__()
+		self.serialInterface.__del__()
 
 	def toggle_laser(self):
 
@@ -70,7 +70,7 @@ class ArduinoController(object):
 
 		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(speed) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
-		#response = self.serialInterface.readline().decode()
+		response = self.serialInterface.readline().decode()
 
 
 
@@ -87,8 +87,7 @@ class ArduinoController(object):
 		elif funcIndex == 3:
 			self.move_motor(msg[2][0], msg[2][1])
 		elif funcIndex == 4:
-			print("arduino process launching jog")
-			#self.jog_motor(msg[2][0], msg[2][1], msg[2][2])
+			self.jog_motor(msg[2][0], msg[2][1], msg[2][2])
 
 
 	def mainloop(self):
