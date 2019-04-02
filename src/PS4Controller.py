@@ -66,12 +66,7 @@ class PS4Controller(object):
                 self.hat_data[i] = (0, 0)
 
 
-        iterations = 0
-
-        for iteration in range(0,30):
-
-            print("Movement Simulation Iteration: " + str(iterations))
-            iterations+=1
+        while True:
 
             for event in pygame.event.get():
                 if event.type == pygame.JOYAXISMOTION:
@@ -114,15 +109,6 @@ class PS4Controller(object):
                 msg = [2, 4, [2, speed, False]]
                 self.queue.put(msg)
 
-            for i in range(0, 1000):
-                msg = [2, 4, [1, 500, True]]
-                self.queue.put(msg)
-                sleep(0.05)
-
-            for i in range(0,1000):
-                msg = [2, 4, [1, 500, False]]
-                self.queue.put(msg)
-                sleep(0.05)
 
 			# This delay is preventing deadlock caused by the queues shared by main and ps4process.
 			# No idea why but don't remove it.
@@ -157,5 +143,4 @@ class PS4Controller(object):
 def launch_ps4_controller(queue):
 
     ps4 = PS4Controller(queue)
-    sleep(3)
     ps4.listen()
