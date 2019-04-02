@@ -35,10 +35,10 @@ class PS4Controller(object):
         self.controller = pygame.joystick.Joystick(0)
         self.controller.init()
         self.queue = queue
-        self.last_axis0_input = 0.5
-        self.last_axis1_input = 0.5
-        self.last_axis2_input = 0.5
-        self.last_axis3_input = 0.5
+        self.last_axis0_input = 0
+        self.last_axis1_input = 0
+        self.last_axis2_input = 0
+        self.last_axis3_input = 0
 
 
     def map_analog_to_discrete_range(self, value, leftMin, leftMax, rightMin, rightMax):
