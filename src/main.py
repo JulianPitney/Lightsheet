@@ -62,13 +62,13 @@ def performScan(cameraController, arduinoController):
 		# set gain
 	if camera.GainAuto.GetAccessMode() != PySpin.RW:
 		print("Unable to disable automatic gain. Aborting...")
-		return false
+		return False
 	else:
 		camera.GainAuto.SetValue(PySpin.GainAuto_Off)
 
 	if camera.Gain.GetAccessMode() != PySpin.RW:
 		print("Unable to set gain. Aborting...")
-		return false
+		return False
 	else:
 		cameraController.GAIN = min(camera.Gain.GetMax(), cameraController.GAIN)
 		camera.Gain.SetValue(cameraController.GAIN)
@@ -190,7 +190,9 @@ arduinoQueue = Queue(0)
 ps4Queue = Queue(0)
 guiQueue = Queue(0)
 
+
 def main():
+	ps4msgs = 0
 
 	global cameraQueue, arduinoQueue, ps4Queue, guiQueue
 	camProc = launch_camera_process(cameraQueue, EXPOSURE, GAIN)
@@ -198,16 +200,20 @@ def main():
 	ps4Proc = launch_ps4_process(ps4Queue)
 	guiProc = launch_gui_process(guiQueue)
 
-	while(True):
-		if(not cameraQueue.empty()):
+	while True:
+		if not cameraQueue.empty():
 			route_message(cameraQueue.get())
-		if(not arduinoQueue.empty()):
+		if not arduinoQueue.empty():
 			route_message(arduinoQueue.get())
-		if(not ps4Queue.empty()):
+		if not ps4Queue.empty():
+			print(str(ps4msgs))
+			ps4msgs += 1
 			route_message(ps4Queue.get())
-		if(not guiQueue.empty()):
+		if not guiQueue.empty():
 			route_message(guiQueue.get())
 
+		print("MAINPROC: " + str(ps4Queue.qsize()))
+		sleep(0.001)
 
 if __name__ == '__main__':
     main()

@@ -87,48 +87,52 @@ class PS4Controller(object):
         #        print("Writing to ps4 queue")
         #        self.queue.put(msg)
 
-            if(self.last_axis1_input > 0.3):
+            if self.last_axis1_input > 0.3:
                 speed = self.map_analog_to_discrete_range(self.last_axis1_input, 0.3, 1.0, 500, 1000)
                 msg = [2, 4, [1, speed, True]]
                 self.queue.put(msg)
-            elif(self.last_axis1_input < -0.3):
+
+            elif self.last_axis1_input < -0.3:
                 speed = self.map_analog_to_discrete_range(self.last_axis1_input, -0.3, -1.0, 500, 1000)
                 msg = [2, 4, [1, speed, False]]
                 self.queue.put(msg)
 
-            if(self.last_axis3_input > 0.3):
+            if self.last_axis3_input > 0.3:
                 speed = self.map_analog_to_discrete_range(self.last_axis3_input, 0.3, 1.0, 500, 1000)
                 msg = [2, 4, [2, speed, True]]
                 self.queue.put(msg)
-            elif(self.last_axis3_input < -0.3):
+
+            elif self.last_axis3_input < -0.3 :
                 speed = self.map_analog_to_discrete_range(self.last_axis3_input, -0.3, -1.0, 500, 1000)
                 msg = [2, 4, [2, speed, False]]
                 self.queue.put(msg)
 
-            sleep(0.01)
+
+            print("PS4PROC: " + str(self.queue.qsize()))
+            sleep(0.001)
 
 
 
     def process_axis_event(self, event):
 
-        if(event.axis == 0):
+        if event.axis == 0:
             self.last_axis0_input = event.value
-        elif(event.axis == 1):
+        elif event.axis == 1:
             self.last_axis1_input = event.value
-        elif(event.axis == 2):
+        elif event.axis == 2:
             self.last_axis2_input = event.value
-        elif(event.axis == 3):
+        elif event.axis == 3:
             self.last_axis3_input = event.value
 
 
     def process_button_down_event(self, event):
-        return 0
+        pass
 
     def process_button_up_event(self, event):
-        return 0
+        pass
 
     def process_hat_motion_event(self, event):
-        return 0
+        pass
 
 
 
