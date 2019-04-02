@@ -35,10 +35,10 @@ class PS4Controller(object):
         self.controller = pygame.joystick.Joystick(0)
         self.controller.init()
         self.queue = queue
-        self.last_axis0_input = 0
-        self.last_axis1_input = 0
-        self.last_axis2_input = 0
-        self.last_axis3_input = 0
+        self.last_axis0_input = 0.5
+        self.last_axis1_input = 0.5
+        self.last_axis2_input = 0.5
+        self.last_axis3_input = 0.5
 
 
     def map_analog_to_discrete_range(self, value, leftMin, leftMax, rightMin, rightMax):
@@ -65,7 +65,14 @@ class PS4Controller(object):
             for i in range(self.controller.get_numhats()):
                 self.hat_data[i] = (0, 0)
 
-        while True:
+
+        iterations = 0
+
+        for iteration in range(0,30):
+
+            print("Movement Simulation Iteration: " + str(iterations))
+            iterations+=1
+
             for event in pygame.event.get():
                 if event.type == pygame.JOYAXISMOTION:
                     self.process_axis_event(event)
@@ -107,7 +114,19 @@ class PS4Controller(object):
                 msg = [2, 4, [2, speed, False]]
                 self.queue.put(msg)
 
-            sleep(0.05)
+            for i in range(0, 1000):
+                msg = [2, 4, [1, 500, True]]
+                self.queue.put(msg)
+                sleep(0.05)
+
+            for i in range(0,1000):
+                msg = [2, 4, [1, 500, False]]
+                self.queue.put(msg)
+                sleep(0.05)
+
+			# This delay is preventing deadlock caused by the queues shared by main and ps4process.
+			# No idea why but don't remove it.
+            sleep(0.03)
 
 
 
@@ -138,4 +157,5 @@ class PS4Controller(object):
 def launch_ps4_controller(queue):
 
     ps4 = PS4Controller(queue)
+    sleep(3)
     ps4.listen()

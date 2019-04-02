@@ -13,7 +13,7 @@ import pprint
 SCAN_DEPTH = None
 STEP_SIZE = None
 SCAN_NAME = None
-SERIAL_PORT_PATH = "COM3"
+SERIAL_PORT_PATH = "COM5"
 BAUDRATE = 57600
 EXPOSURE = 10000
 GAIN = 25
@@ -209,7 +209,9 @@ def main():
 		if not guiQueue.empty():
 			route_message(guiQueue.get())
 
-		sleep(0.05)
+		# This delay is preventing deadlock caused by the queues shared by main and ps4process.
+		# No idea why but don't remove it.
+		sleep(0.03)
 
 if __name__ == '__main__':
     main()
