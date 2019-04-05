@@ -233,13 +233,13 @@ class CameraController(object):
 		# set gain
 		if camera.GainAuto.GetAccessMode() != PySpin.RW:
 			print("Unable to disable automatic gain. Aborting...")
-			return false
+			return False
 		else:
 			camera.GainAuto.SetValue(PySpin.GainAuto_Off)
 
 		if camera.Gain.GetAccessMode() != PySpin.RW:
 			print("Unable to set gain. Aborting...")
-			return false
+			return False
 		else:
 			self.GAIN
 			self.GAIN = min(camera.Gain.GetMax(), self.GAIN)
@@ -271,10 +271,10 @@ class CameraController(object):
 
 
 	def set_exposure(self, exposure):
-		self.EXPOSURE = exposure
+		self.EXPOSURE = int(exposure)
 
 	def set_gain(self, gain):
-		self.GAIN = gain
+		self.GAIN = int(gain)
 
 	def process_msg(self, msg):
 

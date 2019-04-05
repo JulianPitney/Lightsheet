@@ -6,33 +6,37 @@ from multiprocessing import Process, Queue
 from time import sleep
 import PySpin
 import os
-import pprint
 
 
 
 SCAN_DEPTH = None
 STEP_SIZE = None
 SCAN_NAME = None
-SERIAL_PORT_PATH = "COM5"
-BAUDRATE = 57600
-EXPOSURE = 10000
+SCAN_STEP_SPEED = 60
+SERIAL_PORT_PATH = "COM3"
+BAUDRATE = 9600
+EXPOSURE = 100000
 GAIN = 25
 
 
 
 
-def performScan(cameraController, arduinoController):
+def performScan():
 
-	global SCAN_DEPTH, STEP_SIZE, SCAN_NAME
+	global SCAN_DEPTH, STEP_SIZE, SCAN_NAME, SCAN_STEP_SPEED
+	global EXPOSURE, GAIN, BAUDRATE, SERIAL_PORT_PATH
+
+	cameraController = CameraController(Queue(), EXPOSURE, GAIN)
+	arduinoController = ArduinoController(Queue(), SERIAL_PORT_PATH, BAUDRATE)
 
 	camList, system = cameraController.init_spinnaker()
 	camera = camList.GetByIndex(0)
 	cameraController.init_camera(camera, False, 'SingleFrame')
 
-	incrementCommand = "MOVE S2 " + str(STEP_SIZE) + "\n"
+	incrementCommand = "MOVE S2 " + str(STEP_SIZE) + " " + str(SCAN_STEP_SPEED) + "\n"
 	incrementCommand = incrementCommand.encode('UTF-8')
 
-	path = os.getcwd() + '\\' + SCAN_NAME
+	path = os.getcwd() + '\\..\\scans\\' + SCAN_NAME
 
 	try:
 		os.mkdir(path)
@@ -93,35 +97,14 @@ def performScan(cameraController, arduinoController):
 		arduinoController.serialInterface.write(incrementCommand)
 		response = arduinoController.serialInterface.readline().decode()
 		print(response)
+		print("WAIT: 0.5s")
+		sleep(0.5)
 
 
 	camera.DeInit()
 	del camera
 	camList.Clear()
 	system.ReleaseInstance()
-
-
-
-
-"""
-	button_data[0]  SQUARE
-	button_data[1]  X
-	button_data[2]  CIRCLE
-	button_data[3]  TRIANGLE
-	button_data[4]  L1
-	button_data[5]  R1
-	button_data[6]  L2
-	button_data[7]  R2
-	button_data[8]  SHARE
-	button_data[9]  OPTIONS
-	button_data[10]  L3
-	button_data[11]  R3
-	button_data[12]  PS
-	button_data[13]  TRACKPAD
-"""
-
-
-
 
 
 
@@ -171,18 +154,22 @@ def route_message(msg):
 
 def process_msg(msg):
 
-	global SCAN_DEPTH, SCAN_STEP_SIZE, SCAN_NAME
+	global SCAN_DEPTH, STEP_SIZE, SCAN_NAME
 
 	functionIndex = msg[1]
 
 	if(functionIndex == 0):
-		SCAN_DEPTH = msg[2][0]
+		SCAN_DEPTH = int(msg[2][0])
+		print("SCAN_DEPTH=" + str(msg[2][0]))
 	elif(functionIndex == 1):
-		SCAN_STEP_SIZE = msg[2][0]
+		STEP_SIZE = int(msg[2][0])
+		print("STEP_SIZE=" + str(msg[2][0]))
 	elif(functionIndex == 2):
 		SCAN_NAME = msg[2][0]
+		print("SCAN_NAME=" + str(msg[2][0]))
 	elif(functionIndex == 3):
-		print("perform scan!")
+		print("Starting scan...")
+		performScan()
 
 
 cameraQueue = Queue(0)
@@ -193,10 +180,10 @@ guiQueue = Queue(0)
 
 def main():
 
-	global cameraQueue, arduinoQueue, ps4Queue, guiQueue
+	global cameraQueue, arduinoQueue, ps4Queue, guiQueue, EXPOSURE, GAIN
 	camProc = launch_camera_process(cameraQueue, EXPOSURE, GAIN)
-	ardProc = launch_arduino_process(arduinoQueue, SERIAL_PORT_PATH, BAUDRATE)
-	ps4Proc = launch_ps4_process(ps4Queue)
+	ardProc = None #launch_arduino_process(arduinoQueue, SERIAL_PORT_PATH, BAUDRATE)
+	ps4Proc = None #slaunch_ps4_process(ps4Queue)
 	guiProc = launch_gui_process(guiQueue)
 
 	while True:
@@ -214,4 +201,4 @@ def main():
 		sleep(0.03)
 
 if __name__ == '__main__':
-    main()
+	main()

@@ -1,1 +1,1 @@
-conda activate LIGHTSHEET && cd C:\Users\CAT\Desktop\Lightsheet\src && python main.py
+conda activate lightsheet && cd C:\Projects\Lightsheet\src && python main.py

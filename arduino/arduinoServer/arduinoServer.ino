@@ -56,7 +56,7 @@ Encoder STEPPER1_ENCODER(2,3);
 void setup() {
 
   // Block until serial connection established
-  Serial.begin(57600);
+  Serial.begin(9600);
   while(!Serial) {
     delay(100);
   }
