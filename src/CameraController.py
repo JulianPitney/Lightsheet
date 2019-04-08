@@ -12,14 +12,21 @@ CHOSEN_TRIGGER = TriggerType.HARDWARE
 class CameraController(object):
 
 
-	def __init__(self, queue, EXPOSURE, GAIN):
+	def __init__(self, queue):
 
 		self.queue = queue
-		self.EXPOSURE = EXPOSURE
-		self.GAIN = GAIN
+		self.EXPOSURE = 30000
+		self.GAIN = 25
 		self.displayPreview = False
 		self.previewProcQueue = Queue()
 		self.previewProc = None
+
+
+	def set_exposure(self, exposure):
+		self.EXPOSURE = int(exposure)
+
+	def set_gain(self, gain):
+		self.GAIN = int(gain)
 
 	def init_spinnaker(self):
 
@@ -270,32 +277,134 @@ class CameraController(object):
 		return 0
 
 
-	def set_exposure(self, exposure):
-		self.EXPOSURE = int(exposure)
 
-	def set_gain(self, gain):
-		self.GAIN = int(gain)
+	def set_camera_gain(self, camera):
+
+		if camera.GainAuto.GetAccessMode() != PySpin.RW:
+			print("Unable to disable automatic gain. Aborting...")
+			return False
+		else:
+			camera.GainAuto.SetValue(PySpin.GainAuto_Off)
+
+		if camera.Gain.GetAccessMode() != PySpin.RW:
+			print("Unable to set gain. Aborting...")
+			return False
+		else:
+			self.GAIN = min(camera.Gain.GetMax(), self.GAIN)
+			camera.Gain.SetValue(self.GAIN)
+
+
+
+	def set_camera_exposure(self, camera):
+
+		if camera.ExposureAuto.GetAccessMode() != PySpin.RW:
+			print('Unable to disable automatic exposure. Aborting...')
+			return False
+		else:
+			camera.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
+
+		if camera.ExposureTime.GetAccessMode() != PySpin.RW:
+			print('Unable to set exposure time. Aborting...')
+			return False
+		else:
+			# Ensure desired exposure time does not exceed the maximum
+			self.EXPOSURE = min(camera.ExposureTime.GetMax(), self.EXPOSURE)
+			camera.ExposureTime.SetValue(self.EXPOSURE)
+
+
+
+	def set_camera_pixel_format(self, nodemap):
+
+		node_pixel_format = PySpin.CEnumerationPtr(nodemap.GetNode('PixelFormat'))
+		if PySpin.IsAvailable(node_pixel_format) and PySpin.IsWritable(node_pixel_format):
+
+			# Retrieve the desired entry node from the enumeration node
+			node_pixel_format_mono12 = PySpin.CEnumEntryPtr(node_pixel_format.GetEntryByName('Mono12p'))
+			if PySpin.IsAvailable(node_pixel_format_mono12) and PySpin.IsReadable(node_pixel_format_mono12):
+
+				# Retrieve the integer value from the entry node
+				pixel_format_mono12 = node_pixel_format_mono12.GetValue()
+				# Set integer as new value for enumeration node
+				node_pixel_format.SetIntValue(pixel_format_mono12)
+				print('Pixel format set to %s...' % node_pixel_format.GetCurrentEntry().GetSymbolic())
+			else:
+				print('Pixel format mono 12p not available...')
+		else:
+			print('Pixel format not available...')
+
+
+
+	def scan(self, SCAN_NAME):
+
+		camList, system = self.init_spinnaker()
+		camera = camList.GetByIndex(0)
+		self.init_camera(camera, False, 'SingleFrame')
+		nodemap = camera.GetNodeMap()
+
+		path = os.getcwd() + '\\..\\scans\\' + SCAN_NAME
+		try:
+			os.mkdir(path)
+		except OSError:
+			print ("Creation of the directory %s failed" % path)
+		else:
+			print ("Successfully created the directory %s " % path)
+
+		self.set_camera_pixel_format(nodemap)
+		self.set_camera_exposure(camera)
+		self.set_camera_gain(camera)
+
+
+		frameNumber = 0
+		while True:
+
+			msg = self.queue.get()
+			print(msg)
+
+			if msg[2][0] == "STOP":
+				camera.DeInit()
+				del camera
+				camList.Clear()
+				system.ReleaseInstance()
+				break
+
+			if msg[2][0] == "CAPTURE":
+
+				camera.BeginAcquisition()
+				image_result = camera.GetNextImage()
+				if image_result.IsIncomplete():
+					print('Image incomplete with image status %d ...' % image_result.GetImageStatus())
+				else:
+					image_converted = image_result.Convert(PySpin.PixelFormat_Mono12p, PySpin.HQ_LINEAR)
+					filename = path + "\\" + str(frameNumber) + ".tif"
+					image_converted.Save(filename, PySpin.TIFF)
+					image_result.Release()
+					frameNumber += 1
+					print("FRAME CAPTURED")
+				camera.EndAcquisition()
+
+
 
 	def process_msg(self, msg):
 
 		functionIndex = msg[1]
 
-		if(functionIndex == 0):
+		if functionIndex == 0:
 			self.toggle_preview()
-		elif(functionIndex == 1):
+		elif functionIndex == 1:
 			self.set_exposure(msg[2][0])
-		elif(functionIndex == 2):
+		elif functionIndex == 2:
 			self.set_gain(msg[2][0])
-
+		elif functionIndex == 3:
+			self.scan(msg[2][0])
 
 
 	def mainloop(self):
-		while(True):
-			if(not self.queue.empty()):
+		while True:
+			if not self.queue.empty():
 				self.process_msg(self.queue.get())
 
 
-def launch_camera(queue, EXPOSURE, GAIN):
+def launch_camera(queue):
 
-	cc = CameraController(queue, EXPOSURE, GAIN)
+	cc = CameraController(queue)
 	cc.mainloop()

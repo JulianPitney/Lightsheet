@@ -112,12 +112,15 @@ class PS4Controller(object):
     def process_button_down_event(self, event):
 
         if event.button == 0:
+            # Tell arduinoController to toggle coarse jog
             self.queue.put([2, 5, []])
         elif event.button == 1:
-            pass
+            self.queue.put([5, 0, []])
         elif event.button == 2:
-            pass
+            # Tell arduinoController to toggle laser
+            self.queue.put([2, 0, []])
         elif event.button == 3:
+            # Tell cameraController to toggle preview window
             self.queue.put([1, 0, []])
 
 

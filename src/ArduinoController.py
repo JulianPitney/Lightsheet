@@ -6,14 +6,16 @@ import serial
 class ArduinoController(object):
 
 
-	def __init__(self, queue, SERIAL_PORT_PATH, BAUDRATE):
+	def __init__(self, queue):
 
 		self.COARSE_JOG = False
-		self.JOG_INCREMENT = 15
 		self.SEEK_SPEED = 1600
-		self.SERIAL_PORT_PATH = SERIAL_PORT_PATH
-		self.BAUDRATE = BAUDRATE
-		self.serialInterface = serial.Serial(SERIAL_PORT_PATH, BAUDRATE)
+		self.JOG_INCREMENT = 10
+		self.JOG_MIN_SPEED = 1000
+		self.JOG_MAX_SPEED = 2000
+		self.SERIAL_PORT_PATH = "COM3"
+		self.BAUDRATE = 57600
+		self.serialInterface = serial.Serial(self.SERIAL_PORT_PATH, self.BAUDRATE)
 		self.queue = queue
 		# Wait for Arduino server to say it's ready
 		confirmation = self.serialInterface.readline().decode()
@@ -33,16 +35,23 @@ class ArduinoController(object):
 
 	def toggle_coarse_jog(self):
 
-		print("toggling jog coarse/fine")
+		if(self.JOG_INCREMENT == 10):
+			self.JOG_INCREMENT = 30
+			print("COARSE JOG=ON")
+		else:
+			self.JOG_INCREMENT = 10
+			print("COARSE JOG=OFF")
 
 	def toggle_laser(self):
 
 		command = "TOGGLE_LASER\n"
+		print(command)
+		"""
 		self.serialInterface.write(command.encode('UTF-8'))
 		print("wrote:",command)
 		response = self.serialInterface.readline().decode()
 		print(response)
-
+		"""
 	def set_motor_speed(self, motorIndex, speed):
 
 		speed = int(speed)
@@ -75,9 +84,9 @@ class ArduinoController(object):
 
 		steps = self.JOG_INCREMENT
 		if(dir):
-			speed = self.map_analog_to_discrete_range(speed, 0.1, 1, 1000, 3000)
+			speed = self.map_analog_to_discrete_range(speed, 0.1, 1, self.JOG_MIN_SPEED, self.JOG_MAX_SPEED)
 		else:
-			speed = self.map_analog_to_discrete_range(speed, -0.1, -1, 1000, 3000)
+			speed = self.map_analog_to_discrete_range(speed, -0.1, -1, self.JOG_MIN_SPEED, self.JOG_MAX_SPEED)
 			steps *= -1
 
 		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(speed) + "\n"
@@ -110,7 +119,7 @@ class ArduinoController(object):
 				self.process_msg(self.queue.get())
 
 
-def launch_arduino_controller(queue, SERIAL_PORT_PATH, BAUDRATE):
+def launch_arduino_controller(queue):
 
-	ac = ArduinoController(queue, SERIAL_PORT_PATH, BAUDRATE)
+	ac = ArduinoController(queue)
 	ac.mainloop()
