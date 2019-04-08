@@ -24,6 +24,17 @@ class ArduinoController(object):
 		print("destroying arduino proc")
 		self.serialInterface.__del__()
 
+	def map_analog_to_discrete_range(self, value, leftMin, leftMax, rightMin, rightMax):
+
+		leftSpan = leftMax - leftMin
+		rightSpan = rightMax - rightMin
+		valueScaled = float(value - leftMin) / float(leftSpan)
+		return int(rightMin + (valueScaled * rightSpan))
+
+	def toggle_coarse_jog(self):
+
+		print("toggling jog coarse/fine")
+
 	def toggle_laser(self):
 
 		command = "TOGGLE_LASER\n"
@@ -64,13 +75,15 @@ class ArduinoController(object):
 
 		steps = self.JOG_INCREMENT
 		if(dir):
-			pass
+			speed = self.map_analog_to_discrete_range(speed, 0.1, 1, 1000, 3000)
 		else:
+			speed = self.map_analog_to_discrete_range(speed, -0.1, -1, 1000, 3000)
 			steps *= -1
 
 		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(speed) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
+		print(response)
 
 
 
@@ -88,7 +101,8 @@ class ArduinoController(object):
 			self.move_motor(msg[2][0], msg[2][1])
 		elif funcIndex == 4:
 			self.jog_motor(msg[2][0], msg[2][1], msg[2][2])
-
+		elif funcIndex == 5:
+			self.toggle_coarse_jog()
 
 	def mainloop(self):
 		while True :

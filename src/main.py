@@ -14,7 +14,7 @@ STEP_SIZE = None
 SCAN_NAME = None
 SCAN_STEP_SPEED = 60
 SERIAL_PORT_PATH = "COM3"
-BAUDRATE = 9600
+BAUDRATE = 57600
 EXPOSURE = 100000
 GAIN = 25
 
@@ -32,7 +32,7 @@ def performScan():
 	camList, system = cameraController.init_spinnaker()
 	camera = camList.GetByIndex(0)
 	cameraController.init_camera(camera, False, 'SingleFrame')
-
+	nodemap = camera.GetNodeMap()
 	incrementCommand = "MOVE S2 " + str(STEP_SIZE) + " " + str(SCAN_STEP_SPEED) + "\n"
 	incrementCommand = incrementCommand.encode('UTF-8')
 
@@ -46,6 +46,26 @@ def performScan():
 		print ("Successfully created the directory %s " % path)
 
 
+	node_pixel_format = PySpin.CEnumerationPtr(nodemap.GetNode('PixelFormat'))
+	if PySpin.IsAvailable(node_pixel_format) and PySpin.IsWritable(node_pixel_format):
+
+		# Retrieve the desired entry node from the enumeration node
+		node_pixel_format_mono12 = PySpin.CEnumEntryPtr(node_pixel_format.GetEntryByName('Mono12p'))
+		if PySpin.IsAvailable(node_pixel_format_mono12) and PySpin.IsReadable(node_pixel_format_mono12):
+
+			# Retrieve the integer value from the entry node
+			pixel_format_mono12 = node_pixel_format_mono12.GetValue()
+
+			# Set integer as new value for enumeration node
+			node_pixel_format.SetIntValue(pixel_format_mono12)
+
+			print('Pixel format set to %s...' % node_pixel_format.GetCurrentEntry().GetSymbolic())
+
+		else:
+			print('Pixel format mono 12p not available...')
+
+	else:
+		print('Pixel format not available...')
 
 
 	# set exposure
@@ -88,9 +108,9 @@ def performScan():
 		if image_result.IsIncomplete():
 			print('Image incomplete with image status %d ...' % image_result.GetImageStatus())
 		else:
-			image_converted = image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
-			filename = path + "\\" + str(i) + ".jpg"
-			image_converted.Save(filename)
+			image_converted = image_result.Convert(PySpin.PixelFormat_Mono16, PySpin.HQ_LINEAR)
+			filename = path + "\\" + str(i) + ".tif"
+			image_converted.Save(filename,PySpin.TIFF)
 			image_result.Release()
 			print("FRAME CAPTURED")
 		camera.EndAcquisition()
@@ -105,8 +125,6 @@ def performScan():
 	del camera
 	camList.Clear()
 	system.ReleaseInstance()
-
-
 
 
 
@@ -182,8 +200,8 @@ def main():
 
 	global cameraQueue, arduinoQueue, ps4Queue, guiQueue, EXPOSURE, GAIN
 	camProc = launch_camera_process(cameraQueue, EXPOSURE, GAIN)
-	ardProc = None #launch_arduino_process(arduinoQueue, SERIAL_PORT_PATH, BAUDRATE)
-	ps4Proc = None #slaunch_ps4_process(ps4Queue)
+	ardProc = launch_arduino_process(arduinoQueue, SERIAL_PORT_PATH, BAUDRATE)
+	ps4Proc = launch_ps4_process(ps4Queue)
 	guiProc = launch_gui_process(guiQueue)
 
 	while True:
