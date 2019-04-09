@@ -7,8 +7,8 @@ class Scanner(object):
     def __init__(self, queue):
 
         self.queue = queue
-        self.Z_STEP_SIZE = 10
-        self.STACK_SIZE = 10
+        self.Z_STEP_SIZE = 100
+        self.STACK_SIZE = 16
         self.SCAN_STEP_SPEED = 50
         self.SCAN_NAME = "default"
         self.SLEEP_DURATION_AFTER_CAPTURE_S = 0.5

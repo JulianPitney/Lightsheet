@@ -32,7 +32,7 @@ const int LASER_ENABLE = 6;
 
 
 // Driver 1 config
-const int DRIVER1_ENA = 4;
+const int DRIVER1_ENA = 9;
 const int DRIVER1_DIR = 8;
 const int DRIVER1_PUL = 7;
 const int STEPPER1_MAX_SPEED = 4000.0;

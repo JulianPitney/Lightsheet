@@ -13,7 +13,7 @@ class ArduinoController(object):
 		self.JOG_INCREMENT = 10
 		self.JOG_MIN_SPEED = 1000
 		self.JOG_MAX_SPEED = 2000
-		self.SERIAL_PORT_PATH = "COM3"
+		self.SERIAL_PORT_PATH = "COM4"
 		self.BAUDRATE = 57600
 		self.serialInterface = serial.Serial(self.SERIAL_PORT_PATH, self.BAUDRATE)
 		self.queue = queue
