@@ -6,17 +6,18 @@ import serial
 class ArduinoController(object):
 
 
-	def __init__(self, queue):
+	def __init__(self, queue, mainQueue):
 
 		self.COARSE_JOG = False
 		self.SEEK_SPEED = 1600
-		self.JOG_INCREMENT = 10
+		self.JOG_INCREMENT = 5
 		self.JOG_MIN_SPEED = 1000
-		self.JOG_MAX_SPEED = 2000
+		self.JOG_MAX_SPEED = 1500
 		self.SERIAL_PORT_PATH = "COM4"
 		self.BAUDRATE = 57600
 		self.serialInterface = serial.Serial(self.SERIAL_PORT_PATH, self.BAUDRATE)
 		self.queue = queue
+		self.mainQueue = mainQueue
 		# Wait for Arduino server to say it's ready
 		confirmation = self.serialInterface.readline().decode()
 		print(confirmation)
@@ -35,11 +36,11 @@ class ArduinoController(object):
 
 	def toggle_coarse_jog(self):
 
-		if(self.JOG_INCREMENT == 10):
-			self.JOG_INCREMENT = 30
+		if(self.JOG_INCREMENT == 5):
+			self.JOG_INCREMENT = 20
 			print("COARSE JOG=ON")
 		else:
-			self.JOG_INCREMENT = 10
+			self.JOG_INCREMENT = 5
 			print("COARSE JOG=OFF")
 
 	def toggle_laser(self):
@@ -119,7 +120,7 @@ class ArduinoController(object):
 				self.process_msg(self.queue.get())
 
 
-def launch_arduino_controller(queue):
+def launch_arduino_controller(queue, mainQueue):
 
-	ac = ArduinoController(queue)
+	ac = ArduinoController(queue, mainQueue)
 	ac.mainloop()

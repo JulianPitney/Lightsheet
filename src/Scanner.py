@@ -4,9 +4,10 @@ from time import sleep
 class Scanner(object):
 
 
-    def __init__(self, queue):
+    def __init__(self, queue, mainQueue):
 
         self.queue = queue
+        self.mainQueue = mainQueue
         self.Z_STEP_SIZE = 100
         self.STACK_SIZE = 16
         self.SCAN_STEP_SPEED = 50
@@ -15,37 +16,43 @@ class Scanner(object):
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.5
 
     def set_z_step_size(self, step_size):
-        self.Z_STEP_SIZE = step_size
+        self.Z_STEP_SIZE = int(step_size)
+        print("Scanner: Z_STEP_SIZE=" + str(step_size))
 
     def set_stack_size(self, stack_size):
-        self.STACK_SIZE = stack_size
+        self.STACK_SIZE = int(stack_size)
+        print("Scanner: STACK_SIZE=" + str(stack_size))
 
     def set_scan_step_speed(self, step_speed):
-        self.SCAN_STEP_SPEED = step_speed
+        self.SCAN_STEP_SPEED = int(step_speed)
+        print("Scanner: SCAN_STEP_SPEED=" + str(step_speed))
 
     def set_scan_name(self, scan_name):
-        self.SCAN_NAME = scan_name
+        self.SCAN_NAME = str(scan_name)
+        print("Scanner: SCAN_NAME=" + str(scan_name))
 
     def set_sleep_duration_after_movement(self, duration_S):
-        self.SLEEP_DURATION_AFTER_MOVEMENT_S = duration_S
+        self.SLEEP_DURATION_AFTER_MOVEMENT_S = int(duration_S)
+        print("Scanner: SLEEP_DURATION_AFTER_MOVEMENT_S=" + str(duration_S))
 
     def set_sleep_duration_after_capture(self, duration_S):
-        self.SLEEP_DURATION_AFTER_CAPTURE_S = duration_S
+        self.SLEEP_DURATION_AFTER_CAPTURE_S = int(duration_S)
+        print("Scanner: SLEEP_DURATION_AFTER_CAPTURE_S=" + str(duration_S))
 
     def scan_stack(self):
 
         # Put camera in scan mode
-        self.queue.put([1, 3, [self.SCAN_NAME]])
+        self.mainQueue.put([1, 3, [self.SCAN_NAME]])
         sleep(5)
 
 
         for i in range(0, self.STACK_SIZE):
-            self.queue.put([1, 4, ["CAPTURE"]])
+            self.mainQueue.put([1, 4, ["CAPTURE"]])
             sleep(self.SLEEP_DURATION_AFTER_CAPTURE_S)
-            self.queue.put([2, 3, [2, self.Z_STEP_SIZE]])
+            self.mainQueue.put([2, 3, [2, self.Z_STEP_SIZE]])
             sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
 
-        self.queue.put([1, 4, ["STOP"]])
+        self.mainQueue.put([1, 4, ["STOP"]])
         #TODO: The process will put the message into it's own queue, then immediately when
         # the function exits, mainloop -> process_msg will read the message back out of it's queue....the
         # sleep function here gives the main process a chance to read the message first (and route it appropriately
@@ -79,7 +86,7 @@ class Scanner(object):
         elif funcIndex == 6:
             self.set_sleep_duration_after_capture(msg[2][0])
 
-def launch_scanner(queue):
+def launch_scanner(queue, mainQueue):
 
-    scanner = Scanner(queue)
+    scanner = Scanner(queue, mainQueue)
     scanner.mainloop()

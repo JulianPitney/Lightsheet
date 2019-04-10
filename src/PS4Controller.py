@@ -27,7 +27,7 @@ class PS4Controller(object):
     hat_data = None
 
 
-    def __init__(self, queue):
+    def __init__(self, queue, mainQueue):
         """Initialize the joystick components"""
 
         pygame.init()
@@ -35,6 +35,7 @@ class PS4Controller(object):
         self.controller = pygame.joystick.Joystick(0)
         self.controller.init()
         self.queue = queue
+        self.mainQueue = mainQueue
         self.last_axis0_input = 0
         self.last_axis1_input = 0
         self.last_axis2_input = 0
@@ -71,29 +72,29 @@ class PS4Controller(object):
 
         #    if(self.last_axis0_input > 0.1):
         #        msg = [2, 4, [3, self.last_axis0_input, True]]
-        #        self.queue.put(msg)
+        #        self.mainQueue.put(msg)
         #    elif(self.last_axis0_input < -0.1):
         #        msg = [2, 4, [3, self.last_axis0_input, False]]
-        #        self.queue.put(msg)
+        #        self.mainQueue.put(msg)
 
             if self.last_axis1_input > 0.1:
                 msg = [2, 4, [1, self.last_axis1_input, True]]
-                self.queue.put(msg)
+                self.mainQueue.put(msg)
             elif self.last_axis1_input < -0.1:
                 msg = [2, 4, [1, self.last_axis1_input, False]]
-                self.queue.put(msg)
+                self.mainQueue.put(msg)
 
             if self.last_axis3_input > 0.1:
                 msg = [2, 4, [2, self.last_axis3_input, True]]
-                self.queue.put(msg)
+                self.mainQueue.put(msg)
             elif self.last_axis3_input < -0.1:
                 msg = [2, 4, [2, self.last_axis3_input, False]]
-                self.queue.put(msg)
+                self.mainQueue.put(msg)
 
 
 			# This delay is preventing deadlock caused by the queues shared by main and ps4process.
 			# No idea why but don't remove it.
-            sleep(0.03)
+            sleep(0.02)
 
 
 
@@ -113,15 +114,15 @@ class PS4Controller(object):
 
         if event.button == 0:
             # Tell arduinoController to toggle coarse jog
-            self.queue.put([2, 5, []])
+            self.mainQueue.put([2, 5, []])
         elif event.button == 1:
-            self.queue.put([5, 0, []])
+            self.mainQueue.put([5, 0, []])
         elif event.button == 2:
             # Tell arduinoController to toggle laser
-            self.queue.put([2, 0, []])
+            self.mainQueue.put([2, 0, []])
         elif event.button == 3:
             # Tell cameraController to toggle preview window
-            self.queue.put([1, 0, []])
+            self.mainQueue.put([1, 0, []])
 
 
     def process_button_up_event(self, event):
@@ -133,7 +134,7 @@ class PS4Controller(object):
 
 
 
-def launch_ps4_controller(queue):
+def launch_ps4_controller(queue, mainQueue):
 
-    ps4 = PS4Controller(queue)
+    ps4 = PS4Controller(queue, mainQueue)
     ps4.listen()

@@ -1,7 +1,5 @@
 from tkinter import *
-from multiprocessing import Process, Queue
-import os
-import PySpin
+from multiprocessing import Queue
 
 
 
@@ -20,9 +18,10 @@ class GUI(object):
 	previewProcQueue = Queue()
 
 
-	def __init__(self, queue):
+	def __init__(self, queue, mainQueue):
 
 		self.queue = queue
+		self.mainQueue = mainQueue
 		self.master = Tk()
 		self.gen_widgets()
 
@@ -101,7 +100,7 @@ class GUI(object):
 	def button_push_callback(self, processIndex, functionIndex, args):
 
 		msg = [processIndex, functionIndex, args]
-		self.queue.put(msg)
+		self.mainQueue.put(msg)
 
 
 	def update_steps_per_push(self, steps):
@@ -115,7 +114,7 @@ class GUI(object):
 		print("SPP set to: ", steps)
 
 
-def launch_gui(queue):
+def launch_gui(queue, mainQueue):
 
-	gui = GUI(queue)
+	gui = GUI(queue, mainQueue)
 	gui.master.mainloop()

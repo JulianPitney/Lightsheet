@@ -12,9 +12,10 @@ CHOSEN_TRIGGER = TriggerType.HARDWARE
 class CameraController(object):
 
 
-	def __init__(self, queue):
+	def __init__(self, queue, mainQueue):
 
 		self.queue = queue
+		self.mainQueue = mainQueue
 		self.EXPOSURE = 30000
 		self.GAIN = 25
 		self.displayPreview = False
@@ -404,7 +405,7 @@ class CameraController(object):
 				self.process_msg(self.queue.get())
 
 
-def launch_camera(queue):
+def launch_camera(queue, mainQueue):
 
-	cc = CameraController(queue)
+	cc = CameraController(queue, mainQueue)
 	cc.mainloop()
