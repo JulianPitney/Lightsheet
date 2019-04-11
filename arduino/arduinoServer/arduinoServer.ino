@@ -30,6 +30,7 @@ const int LED = 13;
 // Laser Enable
 const int LASER_ENABLE = 6;
 
+bool STEPPERS_ON = false;
 
 // Driver 1 config
 const int DRIVER1_ENA = 9;
@@ -72,14 +73,12 @@ void setup() {
   STEPPER1.setAcceleration(STEPPER1_ACCELERATION);
   STEPPER1.setEnablePin(DRIVER1_ENA);
   STEPPER1.setPinsInverted(false,false,true);
-  STEPPER1.enableOutputs();
   // Setup STEPPER2
   STEPPER2.setMaxSpeed(STEPPER2_MAX_SPEED);
   STEPPER2.setSpeed(STEPPER2_SPEED);
   STEPPER2.setAcceleration(STEPPER2_ACCELERATION);
   STEPPER2.setEnablePin(DRIVER2_ENA);
   STEPPER2.setPinsInverted(false,false,true);
-  STEPPER2.enableOutputs();
 }
 
 
@@ -444,13 +443,23 @@ void loop() {
 
   // New command received (0), Parse error (-1), Listening timed out (1)
   int rc = listenForCommandWithTimeout();
+
   switch(rc)
   {
     case 0:
+      if(!STEPPERS_ON)
+      {
+        STEPPER1.enableOutputs();
+        STEPPER2.enableOutputs();
+        STEPPERS_ON = true;
+      }
       runCommand();
       break;
     case 1:
-      // listening timeout
+      STEPPER1.disableOutputs();
+      STEPPER2.disableOutputs();
+      STEPPERS_ON = false;
+      digitalWrite(LASER_ENABLE, LOW);
       break;
     case -1:
       // parse error

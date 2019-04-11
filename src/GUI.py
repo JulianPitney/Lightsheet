@@ -1,22 +1,7 @@
 from tkinter import *
-from multiprocessing import Queue
-
 
 
 class GUI(object):
-
-	SCAN_DEPTH = 50
-	SCAN_STEP_SIZE = 10
-	SCAN_NAME = "default"
-	stepsPerPush_y_inc = 10
-	stepsPerPush_y_dec = -10
-	stepsPerPush_x_inc = 10
-	stepsPerPush_x_dec = -10
-	stepsPerPush_z_inc = 10
-	stepsPerPush_z_dec = -10
-	displayPreview = False
-	previewProcQueue = Queue()
-
 
 	def __init__(self, queue, mainQueue):
 
@@ -24,20 +9,17 @@ class GUI(object):
 		self.mainQueue = mainQueue
 		self.master = Tk()
 		self.gen_widgets()
-
-
-
-
+		self.stepsPerPush = 10
 
 	def gen_widgets(self):
 
 		stageAdjustFrame = Frame(self.master)
-		y_inc = Button(stageAdjustFrame, text="y+", command=lambda: self.button_push_callback(2, 3, [1,self.stepsPerPush_y_inc]))
-		y_dec = Button(stageAdjustFrame, text="y-", command=lambda: self.button_push_callback(2, 3, [1,self.stepsPerPush_y_dec]))
-		x_inc = Button(stageAdjustFrame, text="x+", command=lambda: self.button_push_callback(2, 3, [3,self.stepsPerPush_x_inc]))
-		x_dec = Button(stageAdjustFrame, text="x-", command=lambda: self.button_push_callback(2, 3, [3,self.stepsPerPush_x_dec]))
-		z_inc = Button(stageAdjustFrame, text="z+", command=lambda: self.button_push_callback(2, 3, [2,self.stepsPerPush_z_inc]))
-		z_dec = Button(stageAdjustFrame, text="z-", command=lambda: self.button_push_callback(2, 3, [2,self.stepsPerPush_z_dec]))
+		y_inc = Button(stageAdjustFrame, text="y+", command=lambda: self.button_push_callback(2, 3, [1,self.stepsPerPush, False]))
+		y_dec = Button(stageAdjustFrame, text="y-", command=lambda: self.button_push_callback(2, 3, [1,-self.stepsPerPush, False]))
+		x_inc = Button(stageAdjustFrame, text="x+", command=lambda: self.button_push_callback(2, 3, [3,self.stepsPerPush, False]))
+		x_dec = Button(stageAdjustFrame, text="x-", command=lambda: self.button_push_callback(2, 3, [3,-self.stepsPerPush, False]))
+		z_inc = Button(stageAdjustFrame, text="z+", command=lambda: self.button_push_callback(2, 3, [2,self.stepsPerPush, False]))
+		z_dec = Button(stageAdjustFrame, text="z-", command=lambda: self.button_push_callback(2, 3, [2,-self.stepsPerPush, False]))
 		stepsPerButtonPush = StringVar()
 		stepsPerButtonPush.set("10")
 		SPPEntry = Entry(stageAdjustFrame, textvariable=stepsPerButtonPush, bd=5)
@@ -94,24 +76,14 @@ class GUI(object):
 
 
 
-
-
-
 	def button_push_callback(self, processIndex, functionIndex, args):
 
 		msg = [processIndex, functionIndex, args]
 		self.mainQueue.put(msg)
 
-
 	def update_steps_per_push(self, steps):
 
-		self.stepsPerPush_y_inc = int(steps)
-		self.stepsPerPush_y_dec = -int(steps)
-		self.stepsPerPush_x_inc = int(steps)
-		self.stepsPerPush_x_dec = -int(steps)
-		self.stepsPerPush_z_inc = int(steps)
-		self.stepsPerPush_z_dec = -int(steps)
-		print("SPP set to: ", steps)
+		self.stepsPerPush = int(steps)
 
 
 def launch_gui(queue, mainQueue):

@@ -72,16 +72,15 @@ class ArduinoController(object):
 		print(response)
 
 
-	def move_motor(self, motorIndex, steps):
+	def move_motor(self, motorIndex, steps, scanMode):
 
-		start = time()
+
 		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(self.SEEK_SPEED) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
-		print("wrote:",command)
 		response = self.serialInterface.readline().decode()
-		print(response)
-		end = time()
-		print("STEPPING TOOK: " + str(end-start))
+
+		if scanMode:
+			self.mainQueue.put([5, -1, [2]])
 
 	def jog_motor(self, motorIndex, speed, dir):
 
@@ -110,7 +109,7 @@ class ArduinoController(object):
 		elif funcIndex == 2:
 			self.set_motor_acceleration(msg[2][0], msg[2][1])
 		elif funcIndex == 3:
-			self.move_motor(msg[2][0], msg[2][1])
+			self.move_motor(msg[2][0], msg[2][1], msg[2][2])
 		elif funcIndex == 4:
 			self.jog_motor(msg[2][0], msg[2][1], msg[2][2])
 		elif funcIndex == 5:

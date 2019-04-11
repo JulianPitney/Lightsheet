@@ -130,8 +130,6 @@ class CameraController(object):
 			# When an image is retrieved, it is plucked from the stream.
 
 			if CHOSEN_TRIGGER == TriggerType.SOFTWARE:
-				# Get user input
-				print("soft trigger")
 
 				# Execute software trigger
 				node_softwaretrigger_cmd = PySpin.CCommandPtr(nodemap.GetNode('TriggerSoftware'))
@@ -260,8 +258,6 @@ class CameraController(object):
 				return False
 
 			node_trigger_mode.SetIntValue(node_trigger_mode_off.GetValue())
-
-			print('Trigger mode disabled...')
 
 		except PySpin.SpinnakerException as ex:
 			print('Error: %s' % ex)
@@ -435,14 +431,14 @@ class CameraController(object):
 
 		keepAlive = True
 		frames = []
+		self.mainQueue.put([5, -1, [1]])
 
 		while keepAlive:
 
 			msg = self.queue.get()
-			print(msg)
 
 			if msg[2][0] == "CAPTURE":
-				start = time()
+
 				self.grab_next_image_by_trigger(nodemap, camera)
 				image_result = camera.GetNextImage()
 
@@ -450,9 +446,9 @@ class CameraController(object):
 					print('Image incomplete with image status %d ...' % image_result.GetImageStatus())
 				else:
 					frames.append(image_result)
-					print("FRAME CAPTURED")
-				end = time()
-				print("capture took: " + str(end - start))
+
+					self.mainQueue.put([5, -1, [1]])
+
 			elif msg[2][0] == "STOP":
 				keepAlive = False
 

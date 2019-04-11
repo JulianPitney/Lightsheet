@@ -12,7 +12,6 @@ class Scanner(object):
         self.STACK_SIZE = 16
         self.SCAN_STEP_SPEED = 50
         self.SCAN_NAME = "default"
-        self.SLEEP_DURATION_AFTER_CAPTURE_S = 0.1
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.5
 
     def set_z_step_size(self, step_size):
@@ -35,28 +34,41 @@ class Scanner(object):
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = int(duration_S)
         print("Scanner: SLEEP_DURATION_AFTER_MOVEMENT_S=" + str(duration_S))
 
-    def set_sleep_duration_after_capture(self, duration_S):
-        self.SLEEP_DURATION_AFTER_CAPTURE_S = int(duration_S)
-        print("Scanner: SLEEP_DURATION_AFTER_CAPTURE_S=" + str(duration_S))
+
+
+    def wait_for_confirmation(self, procIndex):
+
+        while True:
+            if not self.queue.empty():
+                msg = self.queue.get()
+                if msg[2][0] == procIndex:
+                    break
+                else:
+                    pass
+
 
     def scan_stack(self):
 
+        print("Scanning...")
         start = time()
 
         # Put camera in scan mode
         self.mainQueue.put([1, 3, [self.SCAN_NAME]])
-        sleep(2)
+        self.wait_for_confirmation(1)
 
         for i in range(0, self.STACK_SIZE):
+
             self.mainQueue.put([1, 4, ["CAPTURE"]])
-            sleep(self.SLEEP_DURATION_AFTER_CAPTURE_S)
-            self.mainQueue.put([2, 3, [2, self.Z_STEP_SIZE]])
+            self.wait_for_confirmation(1)
+
+            self.mainQueue.put([2, 3, [2, self.Z_STEP_SIZE, True]])
+            self.wait_for_confirmation(2)
             sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
 
         self.mainQueue.put([1, 4, ["STOP"]])
 
         end = time()
-        print("ELAPSED SCAN TIME: " + str(end - start))
+        print("Elapsed Scan Time: " + str(end - start))
 
 
     def mainloop(self):
