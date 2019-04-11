@@ -74,12 +74,20 @@ class Scanner(object):
 
         for i in range(0,self.TIMELAPSE_N):
             start = time()
+
+            # Turn laser on
+            self.mainQueue.put([2, 0, []])
             self.scan_stack(timelapseScanName + str(i))
+            # Turn laser off
+            self.mainQueue.put([2, 0, []])
+
+            # Move back to top of stack
             UNDO_Z_STEPPING = -(self.STACK_SIZE * self.Z_STEP_SIZE)
             self.mainQueue.put([2, 3, [2, UNDO_Z_STEPPING, True]])
             self.wait_for_confirmation(2)
-            end = time()
 
+            # Sleep til next stack is due
+            end = time()
             timeUntilNextStackDue = self.TIMELAPSE_INTERVAL_S - (end - start)
             if timeUntilNextStackDue <= 0:
                 print("ERROR: " + "The time it takes to scan 1 stack is greater than the set time interval between stacks!")

@@ -76,7 +76,7 @@ def main():
 
 		# This delay is preventing deadlock caused by the queues shared by main and ps4process.
 		# No idea why but don't remove it.
-		sleep(0.01)
+		sleep(0.02)
 
 if __name__ == '__main__':
 	main()
