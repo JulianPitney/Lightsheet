@@ -45,6 +45,7 @@ class GUI(object):
 		var = DoubleVar()
 		scale = Scale(scanConfigFrame, variable=var, orient=HORIZONTAL, label="		Exposure(ms)", length=200,from_=5000,to=100000, resolution=5000, command=self.update_scale_bar_exposure)
 		scanButton = Button(scanConfigFrame, text="SCAN!", command=lambda: self.button_push_callback(5, 0, []))
+		scanTimelapseButton = Button(scanConfigFrame, text="SCAN TIMELAPSE!", command=lambda: self.button_push_callback(5, 7, []))
 
 
 		stageAdjustFrame.pack(side=LEFT)
@@ -69,6 +70,7 @@ class GUI(object):
 		setScanName.pack()
 		scale.pack()
 		scanButton.pack(pady=10)
+		scanTimelapseButton.pack(pady=10)
 
 
 	def button_push_callback(self, processIndex, functionIndex, args):

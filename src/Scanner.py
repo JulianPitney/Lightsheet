@@ -13,6 +13,8 @@ class Scanner(object):
         self.SCAN_STEP_SPEED = 50
         self.SCAN_NAME = "default"
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.5
+        self.TIMELAPSE_N = 5
+        self.TIMELAPSE_INTERVAL_S = 10
 
     def set_z_step_size(self, step_size):
         self.Z_STEP_SIZE = int(step_size)
@@ -47,13 +49,10 @@ class Scanner(object):
                     pass
 
 
-    def scan_stack(self):
-
-        print("Scanning...")
-        start = time()
+    def scan_stack(self, scanName):
 
         # Put camera in scan mode
-        self.mainQueue.put([1, 3, [self.SCAN_NAME]])
+        self.mainQueue.put([1, 3, [scanName]])
         self.wait_for_confirmation(1)
 
         for i in range(0, self.STACK_SIZE):
@@ -66,10 +65,22 @@ class Scanner(object):
             sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
 
         self.mainQueue.put([1, 4, ["STOP"]])
+        print("Stack Scan Complete!")
 
-        end = time()
-        print("Elapsed Scan Time: " + str(end - start))
+    def scan_timelapse(self):
 
+        timelapseScanName = self.SCAN_NAME + "_timelapse"
+
+        for i in range(0,self.TIMELAPSE_N):
+
+            self.scan_stack(timelapseScanName + str(i))
+
+            UNDO_Z_STEPPING = -(self.STACK_SIZE * self.Z_STEP_SIZE)
+            self.mainQueue.put([2, 3, [2, UNDO_Z_STEPPING, True]])
+            self.wait_for_confirmation(2)
+            sleep(self.TIMELAPSE_INTERVAL_S)
+
+        print("Timelapse Scan Complete!")
 
     def mainloop(self):
         while True:
@@ -82,7 +93,7 @@ class Scanner(object):
         funcIndex = msg[1]
 
         if funcIndex == 0:
-            self.scan_stack()
+            self.scan_stack(self.SCAN_NAME)
         elif funcIndex == 1:
             self.set_z_step_size(msg[2][0])
         elif funcIndex == 2:
@@ -95,6 +106,8 @@ class Scanner(object):
             self.set_sleep_duration_after_movement(msg[2][0])
         elif funcIndex == 6:
             self.set_sleep_duration_after_capture(msg[2][0])
+        elif funcIndex == 7:
+            self.scan_timelapse()
 
 def launch_scanner(queue, mainQueue):
 
