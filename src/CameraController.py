@@ -47,14 +47,14 @@ class CameraController(object):
 
 		# Get current library version
 		version = system.GetLibraryVersion()
-		print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
+		#print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
 
 		# Retrieve list of cameras from the system
 		camList = system.GetCameras()
 
 		num_cameras = camList.GetSize()
 
-		print('Number of cameras detected: %d' % num_cameras)
+		#print('Number of cameras detected: %d' % num_cameras)
 
 		# Finish if there are no cameras
 		if num_cameras == 0:
@@ -169,12 +169,12 @@ class CameraController(object):
 		"""
 		result = True
 
-		print('*** CONFIGURING TRIGGER ***\n')
+		#print('*** CONFIGURING TRIGGER ***\n')
 
 		if CHOSEN_TRIGGER == TriggerType.SOFTWARE:
-			print('Software trigger chosen ...')
+			pass
 		elif CHOSEN_TRIGGER == TriggerType.HARDWARE:
-			print('Hardware trigger chose ...')
+			pass
 
 		try:
 			# Ensure trigger mode off
@@ -192,8 +192,6 @@ class CameraController(object):
 				# return False
 
 			node_trigger_mode.SetIntValue(node_trigger_mode_off.GetValue())
-
-			print('Trigger mode disabled...')
 
 			# Select trigger source
 			# The trigger source must be set to hardware or software while trigger
@@ -228,7 +226,6 @@ class CameraController(object):
 				return False
 
 			node_trigger_mode.SetIntValue(node_trigger_mode_on.GetValue())
-			print('Trigger mode turned back on...')
 
 		except PySpin.SpinnakerException as ex:
 			print('Error: %s' % ex)
@@ -415,7 +412,7 @@ class CameraController(object):
 				pixel_format_mono12 = node_pixel_format_mono12.GetValue()
 				# Set integer as new value for enumeration node
 				node_pixel_format.SetIntValue(pixel_format_mono12)
-				print('Pixel format set to %s...' % node_pixel_format.GetCurrentEntry().GetSymbolic())
+				#print('Pixel format set to %s...' % node_pixel_format.GetCurrentEntry().GetSymbolic())
 			else:
 				print('Pixel format mono 12p not available...')
 		else:
@@ -436,7 +433,8 @@ class CameraController(object):
 		except OSError:
 			print ("Creation of the directory %s failed" % path)
 		else:
-			print ("Successfully created the directory %s " % path)
+			#print ("Successfully created the directory %s " % path)
+			pass
 
 		self.set_camera_pixel_format(nodemap)
 		self.set_camera_exposure(camera)

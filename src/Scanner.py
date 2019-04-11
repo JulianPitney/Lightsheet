@@ -67,18 +67,25 @@ class Scanner(object):
         self.mainQueue.put([1, 4, ["STOP"]])
         print("Stack Scan Complete!")
 
+
     def scan_timelapse(self):
 
         timelapseScanName = self.SCAN_NAME + "_timelapse"
 
         for i in range(0,self.TIMELAPSE_N):
-
+            start = time()
             self.scan_stack(timelapseScanName + str(i))
-
             UNDO_Z_STEPPING = -(self.STACK_SIZE * self.Z_STEP_SIZE)
             self.mainQueue.put([2, 3, [2, UNDO_Z_STEPPING, True]])
             self.wait_for_confirmation(2)
-            sleep(self.TIMELAPSE_INTERVAL_S)
+            end = time()
+
+            timeUntilNextStackDue = self.TIMELAPSE_INTERVAL_S - (end - start)
+            if timeUntilNextStackDue <= 0:
+                print("ERROR: " + "The time it takes to scan 1 stack is greater than the set time interval between stacks!")
+            else:
+                print("Time Until Next Stack Scan: " + str(timeUntilNextStackDue)) + "s"
+                sleep(timeUntilNextStackDue)
 
         print("Timelapse Scan Complete!")
 
