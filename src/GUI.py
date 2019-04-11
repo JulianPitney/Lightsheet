@@ -43,7 +43,7 @@ class GUI(object):
 		scanNameEntry = Entry(scanConfigFrame, textvariable=scanName, bd=5)
 		setScanName = Button(scanConfigFrame, text="Set Scan Name", command=lambda: self.button_push_callback(5, 3, [scanNameEntry.get()]))
 		var = DoubleVar()
-		scale = Scale(scanConfigFrame, variable=var, orient=HORIZONTAL, label="		Exposure(ms)", length=200,from_=5000,to=100000, resolution=5000, command=self.update_scale_bar_exposure)
+		scale = Scale(scanConfigFrame, variable=var, orient=HORIZONTAL, label="		Exposure(ms)", length=200,from_=5,to=100, resolution=5, command=self.update_scale_bar_exposure)
 		scanButton = Button(scanConfigFrame, text="SCAN!", command=lambda: self.button_push_callback(5, 0, []))
 		scanTimelapseButton = Button(scanConfigFrame, text="SCAN TIMELAPSE!", command=lambda: self.button_push_callback(5, 7, []))
 
@@ -83,8 +83,7 @@ class GUI(object):
 		self.stepsPerPush = int(steps)
 
 	def update_scale_bar_exposure(self, exposure):
-		print("updating exposure")
-		self.button_push_callback(1, 1, [exposure])
+		self.button_push_callback(1, 1, [exposure * 1000])
 
 def launch_gui(queue, mainQueue):
 
