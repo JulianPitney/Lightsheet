@@ -2,7 +2,6 @@ import PySpin
 import cv2
 import os
 from multiprocessing import Process, Queue
-from time import *
 
 class TriggerType:
 	SOFTWARE = 1
@@ -26,6 +25,7 @@ class CameraController(object):
 
 	def set_exposure(self, exposure):
 		self.EXPOSURE = int(exposure)
+		self.previewProcQueue.put([-1, -1, [self.EXPOSURE]])
 
 	def set_gain(self, gain):
 		self.GAIN = int(gain)
@@ -274,12 +274,14 @@ class CameraController(object):
 
 		if(self.displayPreview):
 			print("Starting preview window!")
+			while not self.previewProcQueue.empty():
+				self.previewProcQueue.get()
 			p = Process(target=self.display_preview, args=(self.previewProcQueue,))
 			p.start()
 			self.previewProc = p
 		else:
 			print("Closing preview window!")
-			self.previewProcQueue.put(["False"])
+			self.previewProcQueue.put([-1, -1, ["False"]])
 			self.previewProc.join()
 			self.previewProc = None
 
@@ -331,7 +333,20 @@ class CameraController(object):
 		while(keepAlive == "True"):
 
 			if(not inputQueue.empty()):
-				keepAlive = inputQueue.get()
+				msg = inputQueue.get()
+
+				if msg[2][0] == "False":
+					break
+				else:
+					self.EXPOSURE = int(msg[2][0])
+
+					if camera.ExposureTime.GetAccessMode() != PySpin.RW:
+						print('Unable to set exposure time. Aborting...')
+						return False
+					else:
+						# Ensure desired exposure time does not exceed the maximum
+						self.EXPOSURE = min(camera.ExposureTime.GetMax(), self.EXPOSURE)
+						camera.ExposureTime.SetValue(self.EXPOSURE)
 
 			image_result = camera.GetNextImage()
 			if image_result.IsIncomplete():

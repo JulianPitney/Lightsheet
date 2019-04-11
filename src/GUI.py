@@ -27,10 +27,6 @@ class GUI(object):
 		togglePreview = Button(stageAdjustFrame, text="Toggle Live Preview", command=lambda: self.button_push_callback(1, 0, []))
 
 		scanConfigFrame = Frame(self.master)
-		exposure = StringVar()
-		exposure.set("50000")
-		exposureEntry = Entry(scanConfigFrame, textvariable=exposure, bd=5)
-		setExposure = Button(scanConfigFrame, text="Set Exposure", command=lambda: self.button_push_callback(1, 1, [exposureEntry.get()]))
 		gain = StringVar()
 		gain.set("25")
 		gainEntry = Entry(scanConfigFrame, textvariable=gain, bd=5)
@@ -46,8 +42,10 @@ class GUI(object):
 		scanName = StringVar()
 		scanNameEntry = Entry(scanConfigFrame, textvariable=scanName, bd=5)
 		setScanName = Button(scanConfigFrame, text="Set Scan Name", command=lambda: self.button_push_callback(5, 3, [scanNameEntry.get()]))
+		var = DoubleVar()
+		scale = Scale(scanConfigFrame, variable=var, orient=HORIZONTAL, label="		Exposure(ms)", length=200,from_=5000,to=100000, resolution=5000, command=self.update_scale_bar_exposure)
 		scanButton = Button(scanConfigFrame, text="SCAN!", command=lambda: self.button_push_callback(5, 0, []))
-		toggleLaser = Button(scanConfigFrame, text="TOGGLE LASER", command=lambda: self.button_push_callback(2, 0, []))
+
 
 		stageAdjustFrame.pack(side=LEFT)
 		y_inc.pack(fill=X, padx=30)
@@ -61,8 +59,6 @@ class GUI(object):
 		togglePreview.pack(fill=X, padx=30)
 
 		scanConfigFrame.pack(side=RIGHT,padx=50)
-		exposureEntry.pack()
-		setExposure.pack()
 		gainEntry.pack()
 		setGain.pack()
 		scanDepthEntry.pack()
@@ -71,9 +67,8 @@ class GUI(object):
 		setStepSize.pack()
 		scanNameEntry.pack()
 		setScanName.pack()
+		scale.pack()
 		scanButton.pack(pady=10)
-		toggleLaser.pack()
-
 
 
 	def button_push_callback(self, processIndex, functionIndex, args):
@@ -85,6 +80,9 @@ class GUI(object):
 
 		self.stepsPerPush = int(steps)
 
+	def update_scale_bar_exposure(self, exposure):
+		print("updating exposure")
+		self.button_push_callback(1, 1, [exposure])
 
 def launch_gui(queue, mainQueue):
 
