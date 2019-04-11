@@ -1,4 +1,4 @@
-from time import sleep
+from time import *
 
 
 class Scanner(object):
@@ -12,7 +12,7 @@ class Scanner(object):
         self.STACK_SIZE = 16
         self.SCAN_STEP_SPEED = 50
         self.SCAN_NAME = "default"
-        self.SLEEP_DURATION_AFTER_CAPTURE_S = 0.5
+        self.SLEEP_DURATION_AFTER_CAPTURE_S = 0.1
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.5
 
     def set_z_step_size(self, step_size):
@@ -41,10 +41,11 @@ class Scanner(object):
 
     def scan_stack(self):
 
+        start = time()
+
         # Put camera in scan mode
         self.mainQueue.put([1, 3, [self.SCAN_NAME]])
-        sleep(5)
-
+        sleep(2)
 
         for i in range(0, self.STACK_SIZE):
             self.mainQueue.put([1, 4, ["CAPTURE"]])
@@ -53,12 +54,9 @@ class Scanner(object):
             sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
 
         self.mainQueue.put([1, 4, ["STOP"]])
-        #TODO: The process will put the message into it's own queue, then immediately when
-        # the function exits, mainloop -> process_msg will read the message back out of it's queue....the
-        # sleep function here gives the main process a chance to read the message first (and route it appropriately
-        # to the camera process. I didn't know about this behavior with interprocess queues.....find a less hacky
-        # solution to this.....NOTE: This might explain the deadlock between main and ps4Proc...investigate...
-        sleep(3)
+
+        end = time()
+        print("ELAPSED SCAN TIME: " + str(end - start))
 
 
     def mainloop(self):

@@ -1,5 +1,5 @@
 import serial
-
+from time import *
 
 
 
@@ -74,12 +74,14 @@ class ArduinoController(object):
 
 	def move_motor(self, motorIndex, steps):
 
+		start = time()
 		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(self.SEEK_SPEED) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		print("wrote:",command)
 		response = self.serialInterface.readline().decode()
 		print(response)
-
+		end = time()
+		print("STEPPING TOOK: " + str(end-start))
 
 	def jog_motor(self, motorIndex, speed, dir):
 

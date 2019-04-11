@@ -2,11 +2,12 @@ import PySpin
 import cv2
 import os
 from multiprocessing import Process, Queue
+from time import *
 
 class TriggerType:
 	SOFTWARE = 1
 	HARDWARE = 2
-CHOSEN_TRIGGER = TriggerType.HARDWARE
+CHOSEN_TRIGGER = TriggerType.SOFTWARE
 
 
 class CameraController(object):
@@ -106,7 +107,51 @@ class CameraController(object):
 		node_acquisition_mode.SetIntValue(acquisition_mode_continuous)
 
 		if(configureTrigger):
-			configure_trigger(camera)
+			self.configure_trigger(camera)
+
+	def grab_next_image_by_trigger(self, nodemap, cam):
+		"""
+        This function acquires an image by executing the trigger node.
+
+        :param cam: Camera to acquire images from.
+        :param nodemap: Device nodemap.
+        :type cam: CameraPtr
+        :type nodemap: INodeMap
+        :return: True if successful, False otherwise.
+        :rtype: bool
+        """
+		try:
+			result = True
+			# Use trigger to capture image
+			# The software trigger only feigns being executed by the Enter key;
+			# what might not be immediately apparent is that there is not a
+			# continuous stream of images being captured; in other examples that
+			# acquire images, the camera captures a continuous stream of images.
+			# When an image is retrieved, it is plucked from the stream.
+
+			if CHOSEN_TRIGGER == TriggerType.SOFTWARE:
+				# Get user input
+				print("soft trigger")
+
+				# Execute software trigger
+				node_softwaretrigger_cmd = PySpin.CCommandPtr(nodemap.GetNode('TriggerSoftware'))
+				if not PySpin.IsAvailable(node_softwaretrigger_cmd) or not PySpin.IsWritable(node_softwaretrigger_cmd):
+					print('Unable to execute trigger. Aborting...')
+					return False
+
+				node_softwaretrigger_cmd.Execute()
+
+			# TODO: Blackfly and Flea3 GEV cameras need 2 second delay after software trigger
+
+			elif CHOSEN_TRIGGER == TriggerType.HARDWARE:
+				print('Use the hardware to trigger image acquisition.')
+
+		except PySpin.SpinnakerException as ex:
+			print('Error: %s' % ex)
+			return False
+
+		return result
+
 
 
 
@@ -192,6 +237,38 @@ class CameraController(object):
 			return False
 
 		return result
+
+	def reset_trigger(self, nodemap):
+		"""
+        This function returns the camera to a normal state by turning off trigger mode.
+
+        :param nodemap: Transport layer device nodemap.
+        :type nodemap: INodeMap
+        :returns: True if successful, False otherwise.
+        :rtype: bool
+        """
+		try:
+			result = True
+			node_trigger_mode = PySpin.CEnumerationPtr(nodemap.GetNode('TriggerMode'))
+			if not PySpin.IsAvailable(node_trigger_mode) or not PySpin.IsReadable(node_trigger_mode):
+				print('Unable to disable trigger mode (node retrieval). Aborting...')
+				return False
+
+			node_trigger_mode_off = node_trigger_mode.GetEntryByName('Off')
+			if not PySpin.IsAvailable(node_trigger_mode_off) or not PySpin.IsReadable(node_trigger_mode_off):
+				print('Unable to disable trigger mode (enum entry retrieval). Aborting...')
+				return False
+
+			node_trigger_mode.SetIntValue(node_trigger_mode_off.GetValue())
+
+			print('Trigger mode disabled...')
+
+		except PySpin.SpinnakerException as ex:
+			print('Error: %s' % ex)
+			result = False
+
+		return result
+
 
 
 	def toggle_preview(self):
@@ -339,7 +416,7 @@ class CameraController(object):
 
 		camList, system = self.init_spinnaker()
 		camera = camList.GetByIndex(0)
-		self.init_camera(camera, False, 'SingleFrame')
+		self.init_camera(camera, True, 'Continuous')
 		nodemap = camera.GetNodeMap()
 
 		path = os.getcwd() + '\\..\\scans\\' + SCAN_NAME
@@ -353,36 +430,45 @@ class CameraController(object):
 		self.set_camera_pixel_format(nodemap)
 		self.set_camera_exposure(camera)
 		self.set_camera_gain(camera)
+		camera.BeginAcquisition()
 
 
-		frameNumber = 0
-		while True:
+		keepAlive = True
+		frames = []
+
+		while keepAlive:
 
 			msg = self.queue.get()
 			print(msg)
 
-			if msg[2][0] == "STOP":
-				camera.DeInit()
-				del camera
-				camList.Clear()
-				system.ReleaseInstance()
-				break
-
 			if msg[2][0] == "CAPTURE":
-
-				camera.BeginAcquisition()
+				start = time()
+				self.grab_next_image_by_trigger(nodemap, camera)
 				image_result = camera.GetNextImage()
+
 				if image_result.IsIncomplete():
 					print('Image incomplete with image status %d ...' % image_result.GetImageStatus())
 				else:
-					image_converted = image_result.Convert(PySpin.PixelFormat_Mono12p, PySpin.HQ_LINEAR)
-					filename = path + "\\" + str(frameNumber) + ".tif"
-					image_converted.Save(filename, PySpin.TIFF)
-					image_result.Release()
-					frameNumber += 1
+					frames.append(image_result)
 					print("FRAME CAPTURED")
-				camera.EndAcquisition()
+				end = time()
+				print("capture took: " + str(end - start))
+			elif msg[2][0] == "STOP":
+				keepAlive = False
 
+
+		for i in range(0, len(frames)):
+			image_converted = frames[i].Convert(PySpin.PixelFormat_Mono12p, PySpin.HQ_LINEAR)
+			filename = path + "\\" + str(i) + ".tif"
+			image_converted.Save(filename, PySpin.TIFF)
+			frames[i].Release()
+
+		camera.EndAcquisition()
+		self.reset_trigger(nodemap)
+		camera.DeInit()
+		del camera
+		camList.Clear()
+		system.ReleaseInstance()
 
 
 	def process_msg(self, msg):
