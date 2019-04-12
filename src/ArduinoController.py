@@ -46,13 +46,11 @@ class ArduinoController(object):
 	def toggle_laser(self):
 
 		command = "TOGGLE_LASER\n"
-		print(command)
-		"""
 		self.serialInterface.write(command.encode('UTF-8'))
 		print("wrote:",command)
 		response = self.serialInterface.readline().decode()
 		print(response)
-		"""
+
 	def set_motor_speed(self, motorIndex, speed):
 
 		speed = int(speed)

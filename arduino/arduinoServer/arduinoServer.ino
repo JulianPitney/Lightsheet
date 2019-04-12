@@ -28,7 +28,7 @@ uint32_t cmdParserTimeout = 10000;
 // Arduino LED
 const int LED = 13;
 // Laser Enable
-const int LASER_ENABLE = 6;
+const int LASER_ENABLE = 3;
 
 bool STEPPERS_ON = false;
 
