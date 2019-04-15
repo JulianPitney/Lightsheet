@@ -94,7 +94,7 @@ class PS4Controller(object):
 
 			# This delay is preventing deadlock caused by the queues shared by main and ps4process.
 			# No idea why but don't remove it.
-            sleep(0.02)
+            sleep(0.03)
 
 
 
