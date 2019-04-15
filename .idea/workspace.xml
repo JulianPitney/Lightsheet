@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f5686c8e-07ad-49ff-9056-a03209307a70" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/arduino/arduinoServer/arduinoServer.ino" beforeDir="false" afterPath="$PROJECT_DIR$/arduino/arduinoServer/arduinoServer.ino" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ArduinoController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ArduinoController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Deconvolver.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Deconvolver.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CameraController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/CameraController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GUI.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scanner.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Scanner.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -26,23 +26,14 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/CameraController.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1692">
-              <caret line="70" selection-start-line="70" selection-end-line="70" />
+            <state relative-caret-position="546">
+              <caret line="314" lean-forward="true" selection-start-line="314" selection-end-line="314" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://C:/Tools/spinnaker_python-1.20.0.15-cp36-cp36m-win_amd64/Examples/Python3/Trigger.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6993">
-              <caret line="334" column="17" selection-start-line="305" selection-end-line="334" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -80,8 +71,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/GUI.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="567">
-              <caret line="27" selection-start-line="27" selection-end-line="27" />
+            <state relative-caret-position="337">
+              <caret line="65" column="27" lean-forward="true" selection-start-line="65" selection-start-column="27" selection-end-line="65" selection-end-column="27" />
             </state>
           </provider>
         </entry>
@@ -89,17 +80,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Scanner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="231">
-              <caret line="89" column="24" selection-start-line="89" selection-start-column="24" selection-end-line="89" selection-end-column="24" />
+            <state relative-caret-position="2163">
+              <caret line="103" column="24" lean-forward="true" selection-start-line="103" selection-start-column="24" selection-end-line="103" selection-end-column="24" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Deconvolver.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="735">
-              <caret line="35" selection-start-line="35" selection-end-line="35" />
+            <state relative-caret-position="189">
+              <caret line="12" selection-start-line="12" selection-end-line="12" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -121,6 +112,7 @@
       <find>configure</find>
       <find>self.queue</find>
       <find>Number</find>
+      <find>set_camera_exposure</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -132,17 +124,17 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/scans/scan1/psf.json" />
         <option value="$PROJECT_DIR$/src/PS4Controller.py" />
-        <option value="$PROJECT_DIR$/src/CameraController.py" />
         <option value="$PROJECT_DIR$/src/main.py" />
-        <option value="$PROJECT_DIR$/src/GUI.py" />
-        <option value="$PROJECT_DIR$/src/Scanner.py" />
         <option value="$PROJECT_DIR$/arduino/arduinoServer/arduinoServer.ino" />
         <option value="$PROJECT_DIR$/src/ArduinoController.py" />
         <option value="$PROJECT_DIR$/src/Deconvolver.py" />
+        <option value="$PROJECT_DIR$/src/Scanner.py" />
+        <option value="$PROJECT_DIR$/src/GUI.py" />
+        <option value="$PROJECT_DIR$/src/CameraController.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="953" />
     <option name="width" value="974" />
     <option name="height" value="1047" />
@@ -303,13 +295,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/Tools/spinnaker_python-1.20.0.15-cp36-cp36m-win_amd64/Examples/Python3/Trigger.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6993">
-          <caret line="334" column="17" selection-start-line="305" selection-end-line="334" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scans/scan1/psf.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="21">
@@ -327,34 +312,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/CameraController.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1692">
-          <caret line="70" selection-start-line="70" selection-end-line="70" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/GUI.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="567">
-          <caret line="27" selection-start-line="27" selection-end-line="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/PS4Controller.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1401">
           <caret line="96" column="23" selection-start-line="96" selection-start-column="23" selection-end-line="96" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Scanner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
-          <caret line="89" column="24" selection-start-line="89" selection-start-column="24" selection-end-line="89" selection-end-column="24" />
         </state>
       </provider>
     </entry>
@@ -375,12 +336,57 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://C:/Tools/spinnaker_python-1.20.0.15-cp36-cp36m-win_amd64/Examples/Python3/Trigger.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1638">
+          <caret line="313" column="7" lean-forward="true" selection-start-line="313" selection-start-column="7" selection-end-line="313" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Deconvolver.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="735">
-          <caret line="35" selection-start-line="35" selection-end-line="35" />
+        <state relative-caret-position="189">
+          <caret line="12" selection-start-line="12" selection-end-line="12" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Scanner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2163">
+          <caret line="103" column="24" lean-forward="true" selection-start-line="103" selection-start-column="24" selection-end-line="103" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/GUI.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="337">
+          <caret line="65" column="27" lean-forward="true" selection-start-line="65" selection-start-column="27" selection-end-line="65" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Tools/spinnaker_python-1.20.0.15-cp36-cp36m-win_amd64/Examples/Python3/Exposure_QuickSpin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-6096">
+          <caret line="13" column="44" lean-forward="true" selection-start-line="13" selection-start-column="44" selection-end-line="13" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Tools/spinnaker_python-1.20.0.15-cp36-cp36m-win_amd64/Examples/Python3/Acquisition.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-6705">
+          <caret line="12" column="39" lean-forward="true" selection-start-line="12" selection-start-column="39" selection-end-line="12" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/CameraController.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="546">
+          <caret line="314" lean-forward="true" selection-start-line="314" selection-end-line="314" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>

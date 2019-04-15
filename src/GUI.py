@@ -83,7 +83,9 @@ class GUI(object):
 		self.stepsPerPush = int(steps)
 
 	def update_scale_bar_exposure(self, exposure):
-		self.button_push_callback(1, 1, [exposure * 1000])
+		# convert to microseconds for Spinnaker
+		exposure = int(exposure) * 1000
+		self.button_push_callback(1, 1, [exposure])
 
 def launch_gui(queue, mainQueue):
 

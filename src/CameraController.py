@@ -18,6 +18,7 @@ class CameraController(object):
 		self.mainQueue = mainQueue
 		self.EXPOSURE = 30000
 		self.GAIN = 25
+		self.FPS = 60.00
 		self.displayPreview = False
 		self.previewProcQueue = Queue()
 		self.previewProc = None
@@ -26,9 +27,11 @@ class CameraController(object):
 	def set_exposure(self, exposure):
 		self.EXPOSURE = int(exposure)
 		self.previewProcQueue.put([-1, -1, [self.EXPOSURE]])
+		print("CAMERA_PROCESS: EXPOSURE=" + str(self.EXPOSURE) + "us")
 
 	def set_gain(self, gain):
 		self.GAIN = int(gain)
+		print("CAMERA_PROCESS: GAIN=" + str(self.GAIN) + "dB")
 
 	def init_spinnaker(self):
 
@@ -291,6 +294,22 @@ class CameraController(object):
 		camList, system = self.init_spinnaker()
 		camera = camList.GetByIndex(0)
 		self.init_camera(camera, False, 'Continuous')
+		nodemap = camera.GetNodeMap()
+
+		# Boolean node
+		enableAcquisitionFrameRateNode = PySpin.CBooleanPtr(nodemap.GetNode("AcquisitionFrameRateEnable"))
+		if enableAcquisitionFrameRateNode.GetAccessMode() != PySpin.RW:
+			print("Unable to enable Acquistion Frame Rate control. Aborting...")
+		else:
+			enableAcquisitionFrameRateNode.SetValue(True)
+
+		frameRateNode = PySpin.CFloatPtr(nodemap.GetNode("AcquisitionFrameRate"))
+		if frameRateNode.GetAccessMode() != PySpin.RW:
+			print("Unable to set Acquisition Frame Rate. Aborting...")
+		else:
+			frameRateNode.SetValue(self.FPS)
+
+
 		cv2.namedWindow('image',cv2.WINDOW_NORMAL)
 		cv2.resizeWindow('image',1440,1080)
 
@@ -380,7 +399,6 @@ class CameraController(object):
 			camera.Gain.SetValue(self.GAIN)
 
 
-
 	def set_camera_exposure(self, camera):
 
 		if camera.ExposureAuto.GetAccessMode() != PySpin.RW:
@@ -399,6 +417,7 @@ class CameraController(object):
 
 
 
+
 	def set_camera_pixel_format(self, nodemap):
 
 		node_pixel_format = PySpin.CEnumerationPtr(nodemap.GetNode('PixelFormat'))
@@ -412,7 +431,7 @@ class CameraController(object):
 				pixel_format_mono12 = node_pixel_format_mono12.GetValue()
 				# Set integer as new value for enumeration node
 				node_pixel_format.SetIntValue(pixel_format_mono12)
-				#print('Pixel format set to %s...' % node_pixel_format.GetCurrentEntry().GetSymbolic())
+				print('CAMERA_PROCESS: PIXEL_FORMAT=' + '%s' % node_pixel_format.GetCurrentEntry().GetSymbolic())
 			else:
 				print('Pixel format mono 12p not available...')
 		else:

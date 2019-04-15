@@ -62,6 +62,7 @@ class Scanner(object):
 
             self.mainQueue.put([2, 3, [2, self.Z_STEP_SIZE, True]])
             self.wait_for_confirmation(2)
+
             sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
 
         self.mainQueue.put([1, 4, ["STOP"]])
@@ -71,12 +72,12 @@ class Scanner(object):
     def scan_timelapse(self):
 
         timelapseScanName = self.SCAN_NAME + "_timelapse"
+        # Turn laser on
+        self.mainQueue.put([2, 0, []])
 
         for i in range(0,self.TIMELAPSE_N):
             start = time()
 
-            # Turn laser on
-            self.mainQueue.put([2, 0, []])
             self.scan_stack(timelapseScanName + str(i))
             # Turn laser off
             self.mainQueue.put([2, 0, []])
@@ -86,16 +87,23 @@ class Scanner(object):
             self.mainQueue.put([2, 3, [2, UNDO_Z_STEPPING, True]])
             self.wait_for_confirmation(2)
 
-            # Sleep til next stack is due
+            # Sleep til next stack is due. Laser on 1s before next stack. Error
+            # if stack scan takes longer than requested time duration between stacks.
             end = time()
             timeUntilNextStackDue = self.TIMELAPSE_INTERVAL_S - (end - start)
             if timeUntilNextStackDue <= 0:
                 print("ERROR: " + "The time it takes to scan 1 stack is greater than the set time interval between stacks!")
+            elif i == self.TIMELAPSE_N - 1:
+                self.mainQueue.put([2, 0, []])
+                print("Timelapse Scan Complete!")
             else:
-                print("Time Until Next Stack Scan: " + str(timeUntilNextStackDue)) + "s"
-                sleep(timeUntilNextStackDue)
+                print("Time Until Next Stack Scan: " + str(timeUntilNextStackDue) + "s")
+                sleep(timeUntilNextStackDue - 1)
+                # Turn laser on
+                self.mainQueue.put([2, 0, []])
+                sleep(1)
 
-        print("Timelapse Scan Complete!")
+
 
     def mainloop(self):
         while True:
