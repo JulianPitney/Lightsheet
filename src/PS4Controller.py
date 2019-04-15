@@ -70,12 +70,14 @@ class PS4Controller(object):
                 elif event.type == pygame.JOYHATMOTION:
                     self.process_hat_motion_event(event)
 
-        #    if(self.last_axis0_input > 0.1):
-        #        msg = [2, 4, [3, self.last_axis0_input, True]]
-        #        self.mainQueue.put(msg)
-        #    elif(self.last_axis0_input < -0.1):
-        #        msg = [2, 4, [3, self.last_axis0_input, False]]
-        #        self.mainQueue.put(msg)
+            # TODO: Add this when we get x-axis motor. Right now the arduino
+            # TODO: isn't set up to handle x-axis and will crash if it gets requests for it.
+            #if(self.last_axis0_input > 0.1):
+            #    msg = [2, 4, [3, self.last_axis0_input, True]]
+            #    self.mainQueue.put(msg)
+            #elif(self.last_axis0_input < -0.1):
+            #    msg = [2, 4, [3, self.last_axis0_input, False]]
+            #    self.mainQueue.put(msg)
 
             if self.last_axis1_input > 0.1:
                 msg = [2, 4, [1, self.last_axis1_input, True]]
@@ -92,8 +94,9 @@ class PS4Controller(object):
                 self.mainQueue.put(msg)
 
 
-			# This delay is preventing deadlock caused by the queues shared by main and ps4process.
-			# No idea why but don't remove it.
+			# Delay this process to control the number of messages being sent by the PS4 controller.
+            # (The controller can spit out messages much faster than the arduino/motors can process/execute those
+            # messages).
             sleep(0.03)
 
 
@@ -116,6 +119,7 @@ class PS4Controller(object):
             # Tell arduinoController to toggle coarse jog
             self.mainQueue.put([2, 5, []])
         elif event.button == 1:
+            # Tell the scanner to scan a stack
             self.mainQueue.put([5, 0, []])
         elif event.button == 2:
             # Tell arduinoController to toggle laser

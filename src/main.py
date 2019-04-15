@@ -4,7 +4,7 @@ from GUI import *
 from PS4Controller import *
 from Scanner import *
 from multiprocessing import Process, Queue
-
+from time import sleep
 
 def launch_system_processes():
 
@@ -32,7 +32,6 @@ def main():
 
 			msg = queues[0].get()
 			queues[msg[0]].put(msg)
-
 
 
 

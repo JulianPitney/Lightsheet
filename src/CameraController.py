@@ -441,6 +441,11 @@ class CameraController(object):
 
 	def scan(self, SCAN_NAME):
 
+		# If the preview window is open, close it.
+		if(self.displayPreview):
+			self.toggle_preview()
+
+
 		camList, system = self.init_spinnaker()
 		camera = camList.GetByIndex(0)
 		self.init_camera(camera, True, 'Continuous')
@@ -463,6 +468,7 @@ class CameraController(object):
 
 		keepAlive = True
 		frames = []
+		# Tell the scanner the camera is ready to go
 		self.mainQueue.put([5, -1, [1]])
 
 		while keepAlive:

@@ -1,6 +1,4 @@
 import serial
-from time import *
-
 
 
 class ArduinoController(object):
