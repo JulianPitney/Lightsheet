@@ -8,17 +8,17 @@ class Scanner(object):
 
         self.queue = queue
         self.mainQueue = mainQueue
-        self.Z_STEP_SIZE = 100
-        self.STACK_SIZE = 16
+        self.Z_STEP_SIZE_um = 0.15625
+        self.STACK_SIZE = 5
         self.SCAN_STEP_SPEED = 50
         self.SCAN_NAME = "default"
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.5
         self.TIMELAPSE_N = 5
         self.TIMELAPSE_INTERVAL_S = 10
 
-    def set_z_step_size(self, step_size):
-        self.Z_STEP_SIZE = int(step_size)
-        print("Scanner: Z_STEP_SIZE=" + str(step_size))
+    def set_z_step_size(self, step_size_um):
+        self.Z_STEP_SIZE_um = float(step_size_um)
+        print("Scanner: Z_STEP_SIZE=" + str(step_size_um))
 
     def set_stack_size(self, stack_size):
         self.STACK_SIZE = int(stack_size)
@@ -61,7 +61,7 @@ class Scanner(object):
             self.mainQueue.put([1, 4, ["CAPTURE"]])
             self.wait_for_confirmation(1)
             # Move motor down z
-            self.mainQueue.put([2, 3, [2, self.Z_STEP_SIZE, True]])
+            self.mainQueue.put([2, 6, [2, self.Z_STEP_SIZE_um, True]])
             self.wait_for_confirmation(2)
             # Wait for motor vibration to settle
             sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
@@ -87,7 +87,7 @@ class Scanner(object):
             # Turn laser off
             self.mainQueue.put([2, 0, []])
             # Move back to top of stack
-            self.mainQueue.put([2, 3, [2, -(self.STACK_SIZE * self.Z_STEP_SIZE), True]])
+            self.mainQueue.put([2, 6, [2, -(self.STACK_SIZE * self.Z_STEP_SIZE_um), True]])
             # Wait for confirmation from arduino that we've returned to top of the stack
             self.wait_for_confirmation(2)
             end = time()

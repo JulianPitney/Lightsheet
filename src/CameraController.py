@@ -26,11 +26,12 @@ class CameraController(object):
 
 	def set_exposure(self, exposure):
 		self.EXPOSURE = int(exposure)
-		self.previewProcQueue.put([-1, -1, [self.EXPOSURE]])
+		self.previewProcQueue.put([-1, -1, ["EXPOSURE",self.EXPOSURE]])
 		print("CAMERA_PROCESS: EXPOSURE=" + str(self.EXPOSURE) + "us")
 
 	def set_gain(self, gain):
 		self.GAIN = int(gain)
+		self.previewProcQueue.put([-1, -1, ["GAIN",self.GAIN]])
 		print("CAMERA_PROCESS: GAIN=" + str(self.GAIN) + "dB")
 
 	def init_spinnaker(self):
@@ -353,8 +354,8 @@ class CameraController(object):
 
 				if msg[2][0] == "False":
 					break
-				else:
-					self.EXPOSURE = int(msg[2][0])
+				elif msg[2][0] == "EXPOSURE":
+					self.EXPOSURE = int(msg[2][1])
 
 					if camera.ExposureTime.GetAccessMode() != PySpin.RW:
 						print('Unable to set exposure time. Aborting...')
@@ -363,6 +364,17 @@ class CameraController(object):
 						# Ensure desired exposure time does not exceed the maximum
 						self.EXPOSURE = min(camera.ExposureTime.GetMax(), self.EXPOSURE)
 						camera.ExposureTime.SetValue(self.EXPOSURE)
+
+				elif msg[2][0] == "GAIN":
+					self.GAIN = int(msg[2][1])
+
+					if camera.Gain.GetAccessMode() != PySpin.RW:
+						print("Unable to set gain. Aborting...")
+						return False
+					else:
+						self.GAIN
+						self.GAIN = min(camera.Gain.GetMax(), self.GAIN)
+						camera.Gain.SetValue(self.GAIN)
 
 			image_result = camera.GetNextImage()
 			if image_result.IsIncomplete():

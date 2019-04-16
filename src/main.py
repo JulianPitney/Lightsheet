@@ -4,7 +4,6 @@ from GUI import *
 from PS4Controller import *
 from Scanner import *
 from multiprocessing import Process, Queue
-from time import sleep
 
 def launch_system_processes():
 
@@ -19,21 +18,15 @@ def launch_system_processes():
 
 	for process in processes:
 		process.start()
-
 	return processes, queues
-
 
 def main():
 
 	processes, queues = launch_system_processes()
-
 	while True:
 		if not queues[0].empty():
-
 			msg = queues[0].get()
 			queues[msg[0]].put(msg)
-
-
 
 if __name__ == '__main__':
 	main()

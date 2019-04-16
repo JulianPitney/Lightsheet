@@ -1,6 +1,5 @@
 from tkinter import *
 
-
 class GUI(object):
 
 	def __init__(self, queue, mainQueue):
@@ -27,25 +26,24 @@ class GUI(object):
 		togglePreview = Button(stageAdjustFrame, text="Toggle Live Preview", command=lambda: self.button_push_callback(1, 0, []))
 
 		scanConfigFrame = Frame(self.master)
-		gain = StringVar()
-		gain.set("25")
-		gainEntry = Entry(scanConfigFrame, textvariable=gain, bd=5)
-		setGain = Button(scanConfigFrame, text="Set Gain", command=lambda: self.button_push_callback(1, 2, [gainEntry.get()]))
-		scanDepth = StringVar()
-		scanDepth.set("50")
-		scanDepthEntry = Entry(scanConfigFrame, textvariable=scanDepth, bd=5)
-		setScanDepth = Button(scanConfigFrame, text="Set Scan Depth", command=lambda: self.button_push_callback(5, 2, [scanDepthEntry.get()]))
-		stepSize = StringVar()
-		stepSize.set("32")
-		stepSizeEntry = Entry(scanConfigFrame, textvariable=stepSize, bd=5)
-		setStepSize = Button(scanConfigFrame, text="Set Step Size", command=lambda: self.button_push_callback(5, 1, [stepSizeEntry.get()]))
+		gain = IntVar()
+		gainScale = Scale(scanConfigFrame, variable=gain, orient=HORIZONTAL, showvalue=0, label="Gain", length=200,from_=1,to=40, resolution=1, command=self.update_scale_bar_gain)
+		self.gainLabel = Label(scanConfigFrame, text="1dB")
+		exposure = DoubleVar()
+		exposureScale = Scale(scanConfigFrame, variable=exposure, orient=HORIZONTAL, showvalue=0, label="Exposure(ms)", length=200,from_=5,to=100, resolution=5, command=self.update_scale_bar_exposure)
+		self.exposureLabel = Label(scanConfigFrame, text="5ms")
+		scanDepth = IntVar()
+		scanDepthScale = Scale(scanConfigFrame, variable=scanDepth, orient=HORIZONTAL, showvalue=0, label="Slices Per Stack", length=200,from_=10,to=1500, resolution=10, command=self.update_scale_bar_scan_depth)
+		self.scanDepthLabel = Label(scanConfigFrame, text="10 Slices")
+		stepSize = IntVar()
+		stepSizeScale = Scale(scanConfigFrame, variable=stepSize, orient=HORIZONTAL, showvalue=0, label="Step Size(um)", length=200,from_=1,to=64, resolution=1, command=self.update_scale_bar_step_size)
+		self.stepSizeLabel = Label(scanConfigFrame, text="0.15625um")
 		scanName = StringVar()
+		scanName.set("default")
 		scanNameEntry = Entry(scanConfigFrame, textvariable=scanName, bd=5)
 		setScanName = Button(scanConfigFrame, text="Set Scan Name", command=lambda: self.button_push_callback(5, 3, [scanNameEntry.get()]))
-		var = DoubleVar()
-		scale = Scale(scanConfigFrame, variable=var, orient=HORIZONTAL, label="		Exposure(ms)", length=200,from_=5,to=100, resolution=5, command=self.update_scale_bar_exposure)
-		scanButton = Button(scanConfigFrame, text="SCAN!", command=lambda: self.button_push_callback(5, 0, []))
-		scanTimelapseButton = Button(scanConfigFrame, text="SCAN TIMELAPSE!", command=lambda: self.button_push_callback(5, 7, []))
+		scanButton = Button(scanConfigFrame, text="Scam Stack", command=lambda: self.button_push_callback(5, 0, []))
+		scanTimelapseButton = Button(scanConfigFrame, text="Scan Timelapse", command=lambda: self.button_push_callback(5, 7, []))
 
 
 		stageAdjustFrame.pack(side=LEFT)
@@ -60,17 +58,18 @@ class GUI(object):
 		togglePreview.pack(fill=X, padx=30)
 
 		scanConfigFrame.pack(side=RIGHT,padx=50)
-		gainEntry.pack()
-		setGain.pack()
-		scanDepthEntry.pack()
-		setScanDepth.pack()
-		stepSizeEntry.pack()
-		setStepSize.pack()
-		scanNameEntry.pack()
-		setScanName.pack()
-		scale.pack()
-		scanButton.pack(pady=10)
-		scanTimelapseButton.pack(pady=10)
+		gainScale.pack()
+		self.gainLabel.pack()
+		exposureScale.pack()
+		self.exposureLabel.pack()
+		scanDepthScale.pack()
+		self.scanDepthLabel.pack()
+		stepSizeScale.pack()
+		self.stepSizeLabel.pack()
+		scanNameEntry.pack(pady=(10,0))
+		setScanName.pack(pady=(0,10))
+		scanButton.pack()
+		scanTimelapseButton.pack()
 
 
 	def button_push_callback(self, processIndex, functionIndex, args):
@@ -82,10 +81,31 @@ class GUI(object):
 
 		self.stepsPerPush = int(steps)
 
+	def update_scale_bar_gain(self, gain):
+
+		self.gainLabel.config(text=str(gain) + "dB")
+		self.button_push_callback(1, 2, [gain])
+
 	def update_scale_bar_exposure(self, exposure):
+
+		self.exposureLabel.config(text=str(exposure) + "ms")
 		# convert to microseconds for Spinnaker
 		exposure = int(exposure) * 1000
 		self.button_push_callback(1, 1, [exposure])
+
+	def update_scale_bar_scan_depth(self, scanDepth):
+
+		self.scanDepthLabel.config(text=str(scanDepth) + " Slices")
+		self.button_push_callback(5, 2, [scanDepth])
+
+	def update_scale_bar_step_size(self, stepSize):
+
+		stepSize = int(stepSize) * 0.15625
+		self.stepSizeLabel.config(text=str(stepSize) + "um")
+		self.button_push_callback(5, 1, [stepSize])
+
+
+
 
 def launch_gui(queue, mainQueue):
 

@@ -11,6 +11,7 @@ class ArduinoController(object):
 		self.JOG_INCREMENT = 5
 		self.JOG_MIN_SPEED = 1000
 		self.JOG_MAX_SPEED = 1500
+		self.MICROMETERS_PER_STEP = 0.15625
 		self.SERIAL_PORT_PATH = "COM4"
 		self.BAUDRATE = 57600
 		self.serialInterface = serial.Serial(self.SERIAL_PORT_PATH, self.BAUDRATE)
@@ -24,6 +25,17 @@ class ArduinoController(object):
 	def __del__(self):
 		print("destroying arduino proc")
 		self.serialInterface.__del__()
+
+
+	def convert_um_to_steps(self, um):
+
+		# ensure request is a whole number multiple of <MICROMETERS_PER_STEP>
+		if um % self.MICROMETERS_PER_STEP != 0:
+			print("ERROR: Motor can only provide movement in whole number multiples of <MICROMETERS_PER_STEP>!")
+			return 0
+		else:
+			steps = um / self.MICROMETERS_PER_STEP
+			return steps
 
 	def map_analog_to_discrete_range(self, value, leftMin, leftMax, rightMin, rightMax):
 
@@ -68,7 +80,15 @@ class ArduinoController(object):
 		print(response)
 
 
-	def move_motor(self, motorIndex, steps, scanMode):
+	def move_motor_micrometers(self, motorIndex, um, scanMode):
+
+		steps = self.convert_um_to_steps(um)
+		if(steps == 0):
+			return 0
+		else:
+			self.move_motor_steps(motorIndex, steps, scanMode)
+
+	def move_motor_steps(self, motorIndex, steps, scanMode):
 
 
 		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(self.SEEK_SPEED) + "\n"
@@ -105,11 +125,13 @@ class ArduinoController(object):
 		elif funcIndex == 2:
 			self.set_motor_acceleration(msg[2][0], msg[2][1])
 		elif funcIndex == 3:
-			self.move_motor(msg[2][0], msg[2][1], msg[2][2])
+			self.move_motor_steps(msg[2][0], msg[2][1], msg[2][2])
 		elif funcIndex == 4:
 			self.jog_motor(msg[2][0], msg[2][1], msg[2][2])
 		elif funcIndex == 5:
 			self.toggle_coarse_jog()
+		elif funcIndex == 6:
+			self.move_motor_micrometers(msg[2][0], msg[2][1], msg[2][2])
 
 	def mainloop(self):
 		while True :
