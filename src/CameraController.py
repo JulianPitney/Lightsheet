@@ -19,6 +19,8 @@ class CameraController(object):
 		self.EXPOSURE = 30000
 		self.GAIN = 25
 		self.FPS = 60.00
+		self.WIDTH = 1440
+		self.HEIGHT = 1080
 		self.displayPreview = False
 		self.previewProcQueue = Queue()
 		self.previewProc = None
@@ -312,7 +314,7 @@ class CameraController(object):
 
 
 		cv2.namedWindow('image',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('image',1440,1080)
+		cv2.resizeWindow('image',640,480)
 
 
 		# set exposure
@@ -381,7 +383,12 @@ class CameraController(object):
 				print('Image incomplete with image status %d ...' % image_result.GetImageStatus())
 			else:
 				image_converted = image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
-				cv2.imshow('image', image_converted.GetNDArray())
+				cvMatOriginalFrame = image_converted.GetNDArray()
+				cvMatPaintedFrame = cvMatOriginalFrame.copy()
+				#TODO: Replace the rectanlge bounds with Rayleigh bounding box once we have that info
+				cv2.rectangle(cvMatPaintedFrame,(520,340),(920,740),150,3)
+				cv2.addWeighted(cvMatPaintedFrame, 0.1, cvMatOriginalFrame, 1, 0, cvMatOriginalFrame)
+				cv2.imshow('image', cvMatOriginalFrame)
 				cv2.waitKey(1)
 				image_result.Release()
 

@@ -42,7 +42,7 @@ class GUI(object):
 		scanName.set("default")
 		scanNameEntry = Entry(scanConfigFrame, textvariable=scanName, bd=5)
 		setScanName = Button(scanConfigFrame, text="Set Scan Name", command=lambda: self.button_push_callback(5, 3, [scanNameEntry.get()]))
-		scanButton = Button(scanConfigFrame, text="Scam Stack", command=lambda: self.button_push_callback(5, 0, []))
+		scanButton = Button(scanConfigFrame, text="Scan Stack", command=lambda: self.button_push_callback(5, 0, []))
 		scanTimelapseButton = Button(scanConfigFrame, text="Scan Timelapse", command=lambda: self.button_push_callback(5, 7, []))
 
 

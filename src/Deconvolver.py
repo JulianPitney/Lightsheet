@@ -9,7 +9,11 @@ import tensorflow as tf
 from flowdec.restoration import RichardsonLucyDeconvolver
 from skimage import io
 import operator
+import os
+from flowdec import psf as fd_psf
 
+
+#os.system("echo {""na"": 0.75, ""wavelength"": 0.425, ""size_z"": 32, ""size_x"": 64, ""size_y"": 64} > ../scans/psf.json")
 
 
 def cropND(img, bounding):
@@ -28,14 +32,38 @@ def deconv(chunk):
 
 
 # Load data and define chunk size
-imageStack = io.imread('../scans/scan1/scan1.tif')
-psfStack = io.imread('../scans/scan1/PSF_BW_Z55.tif')
+imageStack = io.imread('../scans/scan1/scan1_cropped.tif')
+psf = fd_psf.GibsonLanni.load('../scans/psf.json')
+psfStack = psf.generate()
+#psfStack = io.imread('../scans/scan1/PSF_BW_Z55.tif')
+
+# Crop Image Stack
+#croppedImageStack = cropND(imageStack, (20, 700, 700))
+
+algo = RichardsonLucyDeconvolver(imageStack.ndim).initialize()
+resultStack = algo.run(fd_data.Acquisition(data=imageStack, kernel=psfStack), niter=40).data
+
+io.imsave('../scans/ORIGINAL.tif', imageStack)
+io.imsave('../scans/DECONVOLVED.tif', resultStack)
+
+
+
+
+
+
+
+
+
+
+
+"""
+    This block is for chunking. Doesn't work right yet. Leaving for later.
+
+
 chunkSize = (55,250,250)
 padding = (20,40,40)
 
 
-# Crop Image Stack
-croppedImageStack = cropND(imageStack, (110, 500, 500))
 # Chunk array using dask
 chunkedImageStack = da.from_array(croppedImageStack, chunks=chunkSize)
 # Crop kernel to chunk size
@@ -47,10 +75,9 @@ algo = RichardsonLucyDeconvolver(chunkedImageStack.ndim, pad_mode="LOG2", pad_mi
 # Run chunked deconvolution on GPU
 result_overlap = chunkedImageStack.map_overlap(deconv,depth=padding, boundary='reflect', dtype='int16').compute(num_workers=1)
 
-
 print("DONE!")
 io.imsave('FLOWDEC_200_3.tif', result_overlap)
-
+"""
 
 
 
