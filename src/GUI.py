@@ -12,6 +12,15 @@ class GUI(object):
 
 	def gen_widgets(self):
 
+
+		"""
+		print(self.master.tk.call('tk', 'windowingsystem'))
+		menubar = Menu(self.master)
+		filemenu = Menu(menubar, tearoff=0)
+		filemenu.add_command(label="Quit")
+		"""
+
+
 		stageAdjustFrame = Frame(self.master)
 		y_inc = Button(stageAdjustFrame, text="y+", command=lambda: self.button_push_callback(2, 3, [1,self.stepsPerPush, False]))
 		y_dec = Button(stageAdjustFrame, text="y-", command=lambda: self.button_push_callback(2, 3, [1,-self.stepsPerPush, False]))

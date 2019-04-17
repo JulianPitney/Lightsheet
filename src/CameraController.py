@@ -2,6 +2,8 @@ import PySpin
 import cv2
 import os
 from multiprocessing import Process, Queue
+import tifffile as tif
+import numpy as np
 
 class TriggerType:
 	SOFTWARE = 1
@@ -443,16 +445,16 @@ class CameraController(object):
 		if PySpin.IsAvailable(node_pixel_format) and PySpin.IsWritable(node_pixel_format):
 
 			# Retrieve the desired entry node from the enumeration node
-			node_pixel_format_mono12 = PySpin.CEnumEntryPtr(node_pixel_format.GetEntryByName('Mono12p'))
-			if PySpin.IsAvailable(node_pixel_format_mono12) and PySpin.IsReadable(node_pixel_format_mono12):
+			node_pixel_format_mono16 = PySpin.CEnumEntryPtr(node_pixel_format.GetEntryByName('Mono16'))
+			if PySpin.IsAvailable(node_pixel_format_mono16) and PySpin.IsReadable(node_pixel_format_mono16):
 
 				# Retrieve the integer value from the entry node
-				pixel_format_mono12 = node_pixel_format_mono12.GetValue()
+				pixel_format_mono16 = node_pixel_format_mono16.GetValue()
 				# Set integer as new value for enumeration node
-				node_pixel_format.SetIntValue(pixel_format_mono12)
+				node_pixel_format.SetIntValue(pixel_format_mono16)
 				print('CAMERA_PROCESS: PIXEL_FORMAT=' + '%s' % node_pixel_format.GetCurrentEntry().GetSymbolic())
 			else:
-				print('Pixel format mono 12p not available...')
+				print('Pixel format mono 16 not available...')
 		else:
 			print('Pixel format not available...')
 
@@ -510,11 +512,27 @@ class CameraController(object):
 				keepAlive = False
 
 
+		imageStack = []
 		for i in range(0, len(frames)):
-			image_converted = frames[i].Convert(PySpin.PixelFormat_Mono12p, PySpin.HQ_LINEAR)
-			filename = path + "\\" + str(i) + ".tif"
-			image_converted.Save(filename, PySpin.TIFF)
+			imageConverted = frames[i].Convert(PySpin.PixelFormat_Mono16, PySpin.HQ_LINEAR)
+			imageStack.append(imageConverted.GetNDArray())
 			frames[i].Release()
+
+		filename = path + "\\" + SCAN_NAME + ".tif"
+		imageStack = np.asarray(imageStack)
+		tif.imwrite(filename, imageStack, imagej=True, metadata = {'spacing': 3.947368, 'unit': 'um', 'title': 'jeff'})
+
+		"""
+		snippet for reading metadata back out of imagej tiff stacks 
+		
+		with tif.TiffFile(filename) as stack:
+			imagejHyperstack = stack.asarray()
+			imagejMetadata = stack.imagej_metadata
+			print(imagejHyperstack.shape)
+			print(imagejMetadata['title'])
+		"""
+
+
 
 		camera.EndAcquisition()
 		self.reset_trigger(nodemap)

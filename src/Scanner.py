@@ -9,12 +9,12 @@ class Scanner(object):
         self.queue = queue
         self.mainQueue = mainQueue
         self.Z_STEP_SIZE_um = 0.15625
-        self.STACK_SIZE = 5
+        self.STACK_SIZE = 10
         self.SCAN_STEP_SPEED = 50
         self.SCAN_NAME = "default"
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.5
-        self.TIMELAPSE_N = 5
-        self.TIMELAPSE_INTERVAL_S = 10
+        self.TIMELAPSE_N = 20
+        self.TIMELAPSE_INTERVAL_S = 30
 
     def set_z_step_size(self, step_size_um):
         self.Z_STEP_SIZE_um = float(step_size_um)
