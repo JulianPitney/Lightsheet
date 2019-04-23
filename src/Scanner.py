@@ -51,8 +51,16 @@ class Scanner(object):
 
     def scan_stack(self, scanName):
 
+        # Generate stack metadata
+        metadata = []
+        metadata.append(['z_step-size', self.Z_STEP_SIZE_um])
+        metadata.append(['units', 'um'])
+        metadata.append(['stack_size', self.STACK_SIZE])
+        metadata.append(['motor_step_speed', self.SCAN_STEP_SPEED])
+        metadata.append(['vibration_settle_delay', self.SLEEP_DURATION_AFTER_MOVEMENT_S])
+
         # Put camera in scan mode
-        self.mainQueue.put([1, 3, [scanName]])
+        self.mainQueue.put([1, 3, [scanName, metadata]])
         self.wait_for_confirmation(1)
 
         for i in range(0, self.STACK_SIZE):

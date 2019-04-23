@@ -459,7 +459,6 @@ void loop() {
       STEPPER1.disableOutputs();
       STEPPER2.disableOutputs();
       STEPPERS_ON = false;
-      //digitalWrite(LASER_ENABLE, LOW);
       break;
     case -1:
       // parse error

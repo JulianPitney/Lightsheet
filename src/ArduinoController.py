@@ -108,6 +108,7 @@ class ArduinoController(object):
 			speed = self.map_analog_to_discrete_range(speed, -0.1, -1, self.JOG_MIN_SPEED, self.JOG_MAX_SPEED)
 
 		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(speed) + "\n"
+		print("PYTHON: " + command)
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
 		print(response)

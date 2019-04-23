@@ -4,6 +4,8 @@ import os
 from multiprocessing import Process, Queue
 import tifffile as tif
 import numpy as np
+import time
+
 
 class TriggerType:
 	SOFTWARE = 1
@@ -350,8 +352,14 @@ class CameraController(object):
 			camera.Gain.SetValue(self.GAIN)
 
 
+		fpsCounter = 0
+		start = time.time()
+
+
 		camera.BeginAcquisition()
 		while(keepAlive == "True"):
+
+
 
 			if(not inputQueue.empty()):
 				msg = inputQueue.get()
@@ -368,6 +376,21 @@ class CameraController(object):
 						# Ensure desired exposure time does not exceed the maximum
 						self.EXPOSURE = min(camera.ExposureTime.GetMax(), self.EXPOSURE)
 						camera.ExposureTime.SetValue(self.EXPOSURE)
+
+						# Update FPS too.
+						enableAcquisitionFrameRateNode = PySpin.CBooleanPtr(
+							nodemap.GetNode("AcquisitionFrameRateEnable"))
+						if enableAcquisitionFrameRateNode.GetAccessMode() != PySpin.RW:
+							print("Unable to enable Acquistion Frame Rate control. Aborting...")
+						else:
+							enableAcquisitionFrameRateNode.SetValue(True)
+
+						frameRateNode = PySpin.CFloatPtr(nodemap.GetNode("AcquisitionFrameRate"))
+						if frameRateNode.GetAccessMode() != PySpin.RW:
+							print("Unable to set Acquisition Frame Rate. Aborting...")
+						else:
+							frameRateNode.SetValue(self.FPS)
+
 
 				elif msg[2][0] == "GAIN":
 					self.GAIN = int(msg[2][1])
@@ -393,7 +416,12 @@ class CameraController(object):
 				cv2.imshow('image', cvMatOriginalFrame)
 				cv2.waitKey(1)
 				image_result.Release()
+				fpsCounter += 1
 
+			if ((time.time() - start) >= 1):
+				print("FPS=" + str(fpsCounter))
+				fpsCounter = 0
+				start = time.time()
 
 		camera.EndAcquisition()
 		camera.DeInit()
@@ -460,7 +488,7 @@ class CameraController(object):
 
 
 
-	def scan(self, SCAN_NAME):
+	def scan(self, SCAN_NAME, metadata):
 
 		# If the preview window is open, close it.
 		if(self.displayPreview):
@@ -520,7 +548,11 @@ class CameraController(object):
 
 		filename = path + "\\" + SCAN_NAME + ".tif"
 		imageStack = np.asarray(imageStack)
-		tif.imwrite(filename, imageStack, imagej=True, metadata = {'spacing': 3.947368, 'unit': 'um', 'title': 'jeff'})
+
+		metadata_dict = {}
+		for item in metadata:
+			metadata_dict.update({item[0] : item[1]})
+		tif.imwrite(filename, imageStack, imagej=True, metadata = metadata_dict)
 
 		"""
 		snippet for reading metadata back out of imagej tiff stacks 
@@ -553,7 +585,7 @@ class CameraController(object):
 		elif functionIndex == 2:
 			self.set_gain(msg[2][0])
 		elif functionIndex == 3:
-			self.scan(msg[2][0])
+			self.scan(msg[2][0], msg[2][1])
 
 
 	def mainloop(self):
