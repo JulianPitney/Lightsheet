@@ -1,5 +1,5 @@
 from time import *
-
+import os
 
 class Scanner(object):
 
@@ -13,8 +13,8 @@ class Scanner(object):
         self.SCAN_STEP_SPEED = 50
         self.SCAN_NAME = "default"
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.5
-        self.TIMELAPSE_N = 20
-        self.TIMELAPSE_INTERVAL_S = 30
+        self.TIMELAPSE_N = 1
+        self.TIMELAPSE_INTERVAL_S = 10
 
     def set_z_step_size(self, step_size_um):
         self.Z_STEP_SIZE_um = float(step_size_um)
@@ -36,6 +36,13 @@ class Scanner(object):
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = int(duration_S)
         print("Scanner: SLEEP_DURATION_AFTER_MOVEMENT_S=" + str(duration_S))
 
+    def set_timelapse_n(self, timelapseN):
+        self.TIMELAPSE_N = int(timelapseN)
+        print("Scanner: TIMELAPSE_N=" + str(timelapseN))
+
+    def set_timelapse_interval_s(self, timelapseInterval):
+        self.TIMELAPSE_INTERVAL_S = int(timelapseInterval)
+        print("Scanner: TIMELAPSE_INTERVAL_S=" + str(timelapseInterval))
 
 
     def wait_for_confirmation(self, procIndex):
@@ -49,7 +56,20 @@ class Scanner(object):
                     pass
 
 
-    def scan_stack(self, scanName):
+    def gen_scan_directory(self, scanName):
+
+        path = os.getcwd() + '\\..\\scans\\' + scanName
+        try:
+            os.mkdir(path)
+        except OSError:
+            print("Creation of the directory %s failed" % path)
+        else:
+            print("Successfully created the directory %s " % path)
+            return path
+
+
+
+    def gen_stack_metadata(self):
 
         # Generate stack metadata
         metadata = []
@@ -58,9 +78,15 @@ class Scanner(object):
         metadata.append(['stack_size', self.STACK_SIZE])
         metadata.append(['motor_step_speed', self.SCAN_STEP_SPEED])
         metadata.append(['vibration_settle_delay', self.SLEEP_DURATION_AFTER_MOVEMENT_S])
+        return metadata
+
+    def scan_stack(self, scanName):
+
+        metadata = self.gen_stack_metadata()
+        path = self.gen_scan_directory(scanName)
 
         # Put camera in scan mode
-        self.mainQueue.put([1, 3, [scanName, metadata]])
+        self.mainQueue.put([1, 3, [scanName, metadata, path]])
         self.wait_for_confirmation(1)
 
         for i in range(0, self.STACK_SIZE):
@@ -145,6 +171,11 @@ class Scanner(object):
             self.set_sleep_duration_after_capture(msg[2][0])
         elif funcIndex == 7:
             self.scan_timelapse()
+        elif funcIndex == 8:
+            self.set_timelapse_n(msg[2][0])
+        elif funcIndex == 9:
+            self.set_timelapse_interval_s(msg[2][0])
+
 
 def launch_scanner(queue, mainQueue):
 

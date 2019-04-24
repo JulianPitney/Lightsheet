@@ -21,7 +21,7 @@ class CameraController(object):
 		self.queue = queue
 		self.mainQueue = mainQueue
 		self.EXPOSURE = 30000
-		self.GAIN = 25
+		self.GAIN = 23
 		self.FPS = 60.00
 		self.WIDTH = 1440
 		self.HEIGHT = 1080
@@ -488,7 +488,7 @@ class CameraController(object):
 
 
 
-	def scan(self, SCAN_NAME, metadata):
+	def scan(self, SCAN_NAME, metadata, path):
 
 		# If the preview window is open, close it.
 		if(self.displayPreview):
@@ -500,14 +500,6 @@ class CameraController(object):
 		self.init_camera(camera, True, 'Continuous')
 		nodemap = camera.GetNodeMap()
 
-		path = os.getcwd() + '\\..\\scans\\' + SCAN_NAME
-		try:
-			os.mkdir(path)
-		except OSError:
-			print ("Creation of the directory %s failed" % path)
-		else:
-			#print ("Successfully created the directory %s " % path)
-			pass
 
 		self.set_camera_pixel_format(nodemap)
 		self.set_camera_exposure(camera)
@@ -585,7 +577,7 @@ class CameraController(object):
 		elif functionIndex == 2:
 			self.set_gain(msg[2][0])
 		elif functionIndex == 3:
-			self.scan(msg[2][0], msg[2][1])
+			self.scan(msg[2][0], msg[2][1], msg[2][2])
 
 
 	def mainloop(self):

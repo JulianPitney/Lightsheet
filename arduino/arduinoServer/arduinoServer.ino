@@ -33,9 +33,9 @@ const int LASER_ENABLE = 3;
 bool STEPPERS_ON = false;
 
 // Driver 1 config
-const int DRIVER1_ENA = 9;
-const int DRIVER1_DIR = 8;
-const int DRIVER1_PUL = 7;
+const int DRIVER1_ENA = 6;
+const int DRIVER1_DIR = 5;
+const int DRIVER1_PUL = 4;
 const int STEPPER1_MAX_SPEED = 4000.0;
 const int STEPPER1_SPEED = 20.0;
 const int STEPPER1_ACCELERATION = 400.0;

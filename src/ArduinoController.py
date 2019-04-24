@@ -9,8 +9,8 @@ class ArduinoController(object):
 		self.COARSE_JOG = False
 		self.SEEK_SPEED = 1600
 		self.JOG_INCREMENT = 5
-		self.JOG_MIN_SPEED = 1000
-		self.JOG_MAX_SPEED = 1500
+		self.JOG_MIN_SPEED = 800
+		self.JOG_MAX_SPEED = 1600
 		self.MICROMETERS_PER_STEP = 0.15625
 		self.SERIAL_PORT_PATH = "COM4"
 		self.BAUDRATE = 57600
@@ -47,7 +47,7 @@ class ArduinoController(object):
 	def toggle_coarse_jog(self):
 
 		if(self.JOG_INCREMENT == 5):
-			self.JOG_INCREMENT = 20
+			self.JOG_INCREMENT = 30
 			print("COARSE JOG=ON")
 		else:
 			self.JOG_INCREMENT = 5
@@ -57,7 +57,6 @@ class ArduinoController(object):
 
 		command = "TOGGLE_LASER\n"
 		self.serialInterface.write(command.encode('UTF-8'))
-		print("wrote:",command)
 		response = self.serialInterface.readline().decode()
 		print(response)
 
@@ -66,7 +65,6 @@ class ArduinoController(object):
 		speed = int(speed)
 		command = "SET S" + str(motorIndex) + " " + "SPEED" + " " + str(speed) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
-		print("wrote:",command)
 		response = self.serialInterface.readline().decode()
 		print(response)
 
@@ -75,7 +73,6 @@ class ArduinoController(object):
 		acceleration = int(acceleration)
 		command = "SET S" + str(motorIndex) + " " + "ACCELERATION" + " " + str(acceleration) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
-		print("wrote:",command)
 		response = self.serialInterface.readline().decode()
 		print(response)
 
@@ -108,10 +105,8 @@ class ArduinoController(object):
 			speed = self.map_analog_to_discrete_range(speed, -0.1, -1, self.JOG_MIN_SPEED, self.JOG_MAX_SPEED)
 
 		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(speed) + "\n"
-		print("PYTHON: " + command)
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		print(response)
 
 
 

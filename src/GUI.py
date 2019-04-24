@@ -37,16 +37,27 @@ class GUI(object):
 		scanConfigFrame = Frame(self.master)
 		gain = IntVar()
 		gainScale = Scale(scanConfigFrame, variable=gain, orient=HORIZONTAL, showvalue=0, label="Gain", length=200,from_=1,to=40, resolution=1, command=self.update_scale_bar_gain)
-		self.gainLabel = Label(scanConfigFrame, text="1dB")
+		self.gainLabel = Label(scanConfigFrame, text="23dB")
+		gainScale.set(23)
 		exposure = DoubleVar()
 		exposureScale = Scale(scanConfigFrame, variable=exposure, orient=HORIZONTAL, showvalue=0, label="Exposure(ms)", length=200,from_=5,to=100, resolution=5, command=self.update_scale_bar_exposure)
-		self.exposureLabel = Label(scanConfigFrame, text="5ms")
+		self.exposureLabel = Label(scanConfigFrame, text="30ms")
+		exposureScale.set(30)
 		scanDepth = IntVar()
 		scanDepthScale = Scale(scanConfigFrame, variable=scanDepth, orient=HORIZONTAL, showvalue=0, label="Slices Per Stack", length=200,from_=10,to=1500, resolution=10, command=self.update_scale_bar_scan_depth)
 		self.scanDepthLabel = Label(scanConfigFrame, text="10 Slices")
 		stepSize = IntVar()
 		stepSizeScale = Scale(scanConfigFrame, variable=stepSize, orient=HORIZONTAL, showvalue=0, label="Step Size(um)", length=200,from_=1,to=64, resolution=1, command=self.update_scale_bar_step_size)
 		self.stepSizeLabel = Label(scanConfigFrame, text="0.15625um")
+
+		timelapseN = IntVar()
+		timelapseNScale = Scale(scanConfigFrame, variable=timelapseN, orient=HORIZONTAL, showvalue=0, label="Timelapse Iterations", length=200,from_=1,to=100, resolution=1, command=self.update_scale_bar_timelapse_n)
+		self.timelapseNLabel = Label(scanConfigFrame, text="1 Iterations")
+		timelapseDelayBetweenStacks = IntVar()
+		timelapseDelayBetweenStacksScale = Scale(scanConfigFrame, variable=timelapseDelayBetweenStacks, orient=HORIZONTAL, showvalue=0, label="Timelapse Delay Between Stacks(s)", length=200,from_=10,to=1000, resolution=1, command=self.update_scale_bar_timelapse_delay)
+		self.timelapseDelayBetweenStacksLabel = Label(scanConfigFrame, text="10s")
+
+
 		scanName = StringVar()
 		scanName.set("default")
 		scanNameEntry = Entry(scanConfigFrame, textvariable=scanName, bd=5)
@@ -75,6 +86,13 @@ class GUI(object):
 		self.scanDepthLabel.pack()
 		stepSizeScale.pack()
 		self.stepSizeLabel.pack()
+		timelapseNScale.pack()
+		self.timelapseNLabel.pack()
+		timelapseDelayBetweenStacksScale.pack()
+		self.timelapseDelayBetweenStacksLabel.pack()
+
+
+
 		scanNameEntry.pack(pady=(10,0))
 		setScanName.pack(pady=(0,10))
 		scanButton.pack()
@@ -112,6 +130,16 @@ class GUI(object):
 		stepSize = int(stepSize) * 0.15625
 		self.stepSizeLabel.config(text=str(stepSize) + "um")
 		self.button_push_callback(5, 1, [stepSize])
+
+	def update_scale_bar_timelapse_n(self, timelapseN):
+
+		self.timelapseNLabel.config(text=str(timelapseN) + " Iterations")
+		self.button_push_callback(5, 8, [int(timelapseN)])
+
+	def update_scale_bar_timelapse_delay(self, timelapseDelay):
+
+		self.timelapseDelayBetweenStacksLabel.config(text=timelapseDelay + "s")
+		self.button_push_callback(5, 9, [int(timelapseDelay)])
 
 
 
