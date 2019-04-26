@@ -5,6 +5,7 @@ from PS4Controller import *
 from Scanner import *
 from multiprocessing import Process, Queue
 
+
 def launch_system_processes():
 
 	queues = [Queue(0), Queue(0), Queue(0), Queue(0), Queue(0), Queue(0)]

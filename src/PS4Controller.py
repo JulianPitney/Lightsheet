@@ -12,14 +12,11 @@
 #
 # Distributed under terms of the MIT license.
 
-import os
-import pprint
 import pygame
 from time import sleep
 
 
 class PS4Controller(object):
-    """Class representing the PS4 controller. Pretty straightforward functionality."""
 
     controller = None
     axis_data = None
@@ -28,21 +25,23 @@ class PS4Controller(object):
 
 
     def __init__(self, queue, mainQueue):
-        """Initialize the joystick components"""
 
+        # Process objects
+        self.queue = queue
+        self.mainQueue = mainQueue
+        self.LOG_PREFIX = "PS4Controller: "
+
+        # Controller init
         pygame.init()
         pygame.joystick.init()
         self.controller = pygame.joystick.Joystick(0)
         self.controller.init()
-        self.queue = queue
-        self.mainQueue = mainQueue
         self.last_axis0_input = 0
         self.last_axis1_input = 0
         self.last_axis2_input = 0
         self.last_axis3_input = 0
 
     def listen(self):
-        """Listen for events to happen"""
 
         if not self.axis_data:
             self.axis_data = {}
@@ -141,4 +140,5 @@ class PS4Controller(object):
 def launch_ps4_controller(queue, mainQueue):
 
     ps4 = PS4Controller(queue, mainQueue)
+    print("PS4 Process: Initialization complete")
     ps4.listen()

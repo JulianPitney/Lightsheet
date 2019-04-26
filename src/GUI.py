@@ -4,21 +4,17 @@ class GUI(object):
 
 	def __init__(self, queue, mainQueue):
 
+		# Process objects
 		self.queue = queue
 		self.mainQueue = mainQueue
+		self.LOG_PREFIX = "GUI: "
+
+		# GUI Init
 		self.master = Tk()
 		self.gen_widgets()
 		self.stepsPerPush = 10
 
 	def gen_widgets(self):
-
-
-		"""
-		print(self.master.tk.call('tk', 'windowingsystem'))
-		menubar = Menu(self.master)
-		filemenu = Menu(menubar, tearoff=0)
-		filemenu.add_command(label="Quit")
-		"""
 
 
 		stageAdjustFrame = Frame(self.master)
@@ -147,4 +143,5 @@ class GUI(object):
 def launch_gui(queue, mainQueue):
 
 	gui = GUI(queue, mainQueue)
+	print("GUI Process: Initialization complete")
 	gui.master.mainloop()

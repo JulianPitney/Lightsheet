@@ -3,11 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="f5686c8e-07ad-49ff-9056-a03209307a70" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arduino/arduinoServer/arduinoServer.ino" beforeDir="false" afterPath="$PROJECT_DIR$/arduino/arduinoServer/arduinoServer.ino" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ArduinoController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ArduinoController.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CameraController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/CameraController.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GUI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Scanner.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Scanner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PS4Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/PS4Controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,11 +17,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/CameraController.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="381">
-              <caret line="490" column="44" selection-start-line="490" selection-start-column="40" selection-end-line="490" selection-end-column="44" />
+            <state relative-caret-position="420">
+              <caret line="362" column="25" selection-start-line="362" selection-start-column="25" selection-end-line="362" selection-end-column="25" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -29,13 +29,13 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/Scanner.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="399">
-              <caret line="82" column="35" lean-forward="true" selection-start-line="82" selection-start-column="35" selection-end-line="82" selection-end-column="35" />
+            <state relative-caret-position="483">
+              <caret line="23" column="11" selection-start-line="23" selection-start-column="11" selection-end-line="23" selection-end-column="11" />
               <folding>
-                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#0#30#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -56,6 +56,8 @@
       <find>self.queue</find>
       <find>Number</find>
       <find>set_camera_exposure</find>
+      <find>deinit_spinnaker</find>
+      <find>scan</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -66,29 +68,30 @@
       <list>
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/scans/scan1/psf.json" />
-        <option value="$PROJECT_DIR$/src/main.py" />
         <option value="$PROJECT_DIR$/scans/psf.json" />
         <option value="$PROJECT_DIR$/src/Deconvolver.py" />
         <option value="$PROJECT_DIR$/arduino/arduinoServer/arduinoServer.ino" />
-        <option value="$PROJECT_DIR$/src/PS4Controller.py" />
+        <option value="$PROJECT_DIR$/src/Scanner.py" />
+        <option value="$PROJECT_DIR$/src/main.py" />
+        <option value="$PROJECT_DIR$/src/tests/test_main.py" />
+        <option value="$USER_HOME$/Anaconda3/envs/lightsheet/Lib/site-packages/pygame/__init__.py" />
         <option value="$PROJECT_DIR$/src/ArduinoController.py" />
         <option value="$PROJECT_DIR$/src/GUI.py" />
+        <option value="$PROJECT_DIR$/src/PS4Controller.py" />
         <option value="$PROJECT_DIR$/src/CameraController.py" />
-        <option value="$PROJECT_DIR$/src/Scanner.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-10" />
-    <option name="width" value="1660" />
-    <option name="height" value="1400" />
+    <option name="x" value="-8" />
+    <option name="width" value="1297" />
+    <option name="height" value="1398" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -116,6 +119,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -179,7 +183,7 @@
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="2062" height="1126" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.10458806" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13912186" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -297,53 +301,63 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Scanner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="90" selection-start-line="90" selection-end-line="90" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/test_main.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$USER_HOME$/Anaconda3/envs/lightsheet/Lib/site-packages/pygame/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="717">
+          <caret line="396" column="8" selection-start-line="396" selection-start-column="8" selection-end-line="396" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/GUI.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="294">
+          <caret line="14" column="30" lean-forward="true" selection-start-line="14" selection-start-column="30" selection-end-line="14" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ArduinoController.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="801">
+          <caret line="176" column="17" selection-start-line="176" selection-start-column="17" selection-end-line="176" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/PS4Controller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1386">
+          <caret line="37" column="30" lean-forward="true" selection-start-line="37" selection-start-column="30" selection-end-line="37" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="441">
-          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+        <state relative-caret-position="483">
+          <caret line="23" column="11" selection-start-line="23" selection-start-column="11" selection-end-line="23" selection-end-column="11" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/PS4Controller.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-60">
-          <caret line="84" column="46" selection-start-line="84" selection-start-column="46" selection-end-line="84" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ArduinoController.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="486">
-          <caret line="125" column="46" selection-start-line="125" selection-start-column="46" selection-end-line="125" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/GUI.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="40" column="25" lean-forward="true" selection-start-line="40" selection-start-column="25" selection-end-line="40" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/CameraController.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="381">
-          <caret line="490" column="44" selection-start-line="490" selection-start-column="40" selection-end-line="490" selection-end-column="44" />
+        <state relative-caret-position="420">
+          <caret line="362" column="25" selection-start-line="362" selection-start-column="25" selection-end-line="362" selection-end-column="25" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Scanner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="82" column="35" lean-forward="true" selection-start-line="82" selection-start-column="35" selection-end-line="82" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
