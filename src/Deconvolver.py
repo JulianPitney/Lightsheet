@@ -133,8 +133,17 @@ class Deconvolver(object):
     def deconvolve_DeconvLab2(self):
         pass
 
-    def gen_psf_Flowdec(self):
-        pass
+    def gen_psf_Flowdec(self, numericalAperture, wavelength, size_z, size_x, size_y):
+
+        command = "echo {\"na\": " + str(numericalAperture)
+        command +=  ", \"wavelength\": " + str(wavelength)
+        command += ", \"size_z\": " + str(size_z)
+        command += ", \"size_x\": " + str(size_x)
+        command += ", \"size_y\": " + str(size_y)
+        command += "} > ../config/psf.json"
+        os.system(command)
+        psf = fd_psf.GibsonLanni.load('../config/psf.json')
+        return  psf.generate()
 
     def deconvolve_Flowdec(self):
         pass
@@ -170,7 +179,7 @@ def deconv(chunk):
 
 dc = Deconvolver()
 dc.gen_psf_PSFGenerator(1.5, "Good", 300, 0.9, 370, 500, 1440, 1080, 10, "../scans/")
-
+dc.gen_psf_Flowdec(0.5,530,110,1440,1080)
 
 
 # Load data and define chunk size
