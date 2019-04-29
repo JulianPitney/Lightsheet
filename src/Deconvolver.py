@@ -128,12 +128,11 @@ class Deconvolver(object):
             file.close()
 
         os.system("java -cp ../bin/PSFGenerator.jar PSFGenerator " + self.PSFGenConfigPath)
-        os.rename("../src/PSF BW.tif", scanPath + "psf.tif")
+        os.rename("../src/PSF BW.tif", scanPath + "PSFGenerator_psf.tif")
 
-    def deconvolve_DeconvLab2(self):
-        pass
 
-    def gen_psf_Flowdec(self, numericalAperture, wavelength, size_z, size_x, size_y):
+
+    def gen_psf_Flowdec(self, numericalAperture, wavelength, size_z, size_x, size_y, scanPath):
 
         command = "echo {\"na\": " + str(numericalAperture)
         command +=  ", \"wavelength\": " + str(wavelength)
@@ -143,83 +142,76 @@ class Deconvolver(object):
         command += "} > ../config/psf.json"
         os.system(command)
         psf = fd_psf.GibsonLanni.load('../config/psf.json')
-        return  psf.generate()
-
-    def deconvolve_Flowdec(self):
-        pass
-
-    def crop_volume(self):
-        pass
-
-    def chunk_volume(self):
-        pass
+        psfStack = psf.generate()
+        io.imsave(scanPath + "flowdec_psf.tif", psfStack)
 
 
+    def deconvolve_DeconvLab2(self, imgStackPath, psfStackPath, iterations, scanPath):
+
+        command = "java -jar ../bin/DeconvolutionLab_2.jar Run "
+        command += "-image file " + str(imgStackPath) + " "
+        command += "-psf file " + str(psfStackPath) + " "
+        command += "-algorithm RL " + str(iterations) + " "
+        command += "-out tiff "
+        command += "-path home" + str(scanPath + "DeconvLab2_deconvolved.tif")
+        os.system(command)
+
+    def deconvolve_Flowdec(self, imgStack, psfStack, iterations, scanPath):
+
+        algo = RichardsonLucyDeconvolver(imgStack.ndim).initialize()
+        resultStack = algo.run(fd_data.Acquisition(data=imgStack, kernel=psfStack), niter=iterations).data
+        io.imsave(scanPath + "flowdec_deconvoled.tif", resultStack)
+
+    def crop_volume(self, img, boundingBox):
+
+        start = tuple(map(lambda a, da: a // 2 - da // 2, img.shape, boundingBox))
+        end = tuple(map(operator.add, start, boundingBox))
+        slices = tuple(map(slice, start, end))
+        return img[slices]
 
 
-# Crop around the center of a 3D volume
-def cropND(img, bounding):
+    def load_tiff_stack(self, path):
 
-    start = tuple(map(lambda a, da: a//2-da//2, img.shape, bounding))
-    end = tuple(map(operator.add, start, bounding))
-    slices = tuple(map(slice, start, end))
-    return img[slices]
+        stack = io.imread(path)
+        return stack
 
 
-# Deconvolve a chunk
-def deconv(chunk):
 
-    # note that algo and cropped_kernel are from global scope ... ugly
-    print("chunk shape", chunk.shape)
-    tmp = algo.initialize().run(fd_data.Acquisition(data=chunk, kernel=croppedPSFStack), 200)
-    return tmp.data
+
 
 
 
 
 dc = Deconvolver()
-dc.gen_psf_PSFGenerator(1.5, "Good", 300, 0.9, 370, 500, 1440, 1080, 10, "../scans/")
-dc.gen_psf_Flowdec(0.5,530,110,1440,1080)
 
+# Gen psfs
+dc.gen_psf_PSFGenerator(1.5, "Good", 300, 0.9, 370, 500, 500, 500, 50, "../scans/")
+dc.gen_psf_Flowdec(0.5,530,50,500,500, "../scans/")
 
-# Load data and define chunk size
-#imageStack = io.imread('../scans/FLOWDEC_TESTING/scan1.tif')
-#imageStack = cropND(imageStack, (50,500,500))
-# Gen psf from config
-#psfStack = io.imread('../scans/FLOWDEC_TESTING/PSF_3400XY.tif')
-#psfStack = cropND(psfStack, (50,500,500))
-"""
-os.system("echo {\"na\": 0.5, \"wavelength\": 0.530, \"size_z\": 50, \"size_x\": 500, \"size_y\": 500} > ../scans/FLOWDEC_TESTING/psf.json")
-psf = fd_psf.GibsonLanni.load('../scans/FLOWDEC_TESTING/psf.json')
-psfStack = psf.generate()
-"""
+# load + crop data
+imgStack = io.imread("../scans/scan1/scan1.tif")
+imgStack = dc.crop_volume(imgStack, (50, 500, 500))
+psfStack = io.imread("../scans/PSFGenerator_psf.tif")
 
-# Crop Image Stack
-#croppedImageStack = cropND(imageStack, (20, 700, 700))
-
-
-#algo = RichardsonLucyDeconvolver(imageStack.ndim).initialize()
-#resultStack = algo.run(fd_data.Acquisition(data=imageStack, kernel=psfStack), niter=500).data
-
-
-
-
-
-# save output
-#io.imsave('../scans/FLOWDEC_TESTING/result.tif', resultStack)
-
-
-
-
-
-
-
+# deconvolve
+dc.deconvolve_Flowdec(imgStack, psfStack, 300, "../scans/")
+dc.deconvolve_DeconvLab2("../scans/scan1/scan1.tif", "../scans/PSFGenerator_psf.tif", 2, "../scans/")
 
 
 
 
 """
     This block is for chunking. Doesn't work right yet. Leaving for later.
+
+
+
+
+def deconvChunk(self, chunk):
+
+    # note that algo and cropped_kernel are from global scope ... ugly
+    print("chunk shape", chunk.shape)
+    tmp = algo.initialize().run(fd_data.Acquisition(data=chunk, kernel=croppedPSFStack), 200)
+    return tmp.data
 
 
 chunkSize = (55,250,250)

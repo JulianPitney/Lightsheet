@@ -46,9 +46,17 @@ const int DRIVER2_PUL = 10;
 const int STEPPER2_MAX_SPEED = 4000.0;
 const int STEPPER2_SPEED = 20.0;
 const int STEPPER2_ACCELERATION = 400.0;
+// Driver 3 config
+const int DRIVER3_ENA = 9;
+const int DRIVER3_DIR = 8;
+const int DRIVER3_PUL = 7;
+const int STEPPER3_MAX_SPEED = 4000.0;
+const int STEPPER3_SPEED = 20.0;
+const int STEPPER3_ACCELERATION = 400.0;
 // Steppers
 AccelStepper STEPPER1(AccelStepper::DRIVER, DRIVER1_PUL, DRIVER1_DIR);
 AccelStepper STEPPER2(AccelStepper::DRIVER, DRIVER2_PUL, DRIVER2_DIR);
+AccelStepper STEPPER3(AccelStepper::DRIVER, DRIVER3_PUL, DRIVER3_DIR);
 Encoder STEPPER1_ENCODER(2,3);
 //Encoder STEPPER2_ENCODER(??,??);
 //Encoder STEPPER3_ENCODER(??,??);
@@ -79,6 +87,12 @@ void setup() {
   STEPPER2.setAcceleration(STEPPER2_ACCELERATION);
   STEPPER2.setEnablePin(DRIVER2_ENA);
   STEPPER2.setPinsInverted(false,false,true);
+    // Setup STEPPER3
+  STEPPER3.setMaxSpeed(STEPPER3_MAX_SPEED);
+  STEPPER3.setSpeed(STEPPER3_SPEED);
+  STEPPER3.setAcceleration(STEPPER3_ACCELERATION);
+  STEPPER3.setEnablePin(DRIVER3_ENA);
+  STEPPER3.setPinsInverted(false,false,true);
 }
 
 
@@ -350,6 +364,10 @@ AccelStepper* selectCorrectStepper() {
   {
     return &STEPPER2;
   }
+  else if(command->params[1] == "S3")
+  {
+    return &STEPPER3;
+  }
   else
   {
     return NULL;
@@ -451,6 +469,7 @@ void loop() {
       {
         STEPPER1.enableOutputs();
         STEPPER2.enableOutputs();
+        STEPPER3.enableOutputs();
         STEPPERS_ON = true;
       }
       runCommand();
@@ -458,6 +477,7 @@ void loop() {
     case 1:
       STEPPER1.disableOutputs();
       STEPPER2.disableOutputs();
+      STEPPER3.disableOutputs();
       STEPPERS_ON = false;
       break;
     case -1:
