@@ -70,24 +70,24 @@ class PS4Controller(object):
                     self.process_hat_motion_event(event)
 
 
-            if(self.last_axis0_input > 0.1):
+            if(self.last_axis0_input > 0.3):
                 msg = [2, 4, [3, self.last_axis0_input, True]]
                 self.mainQueue.put(msg)
-            elif(self.last_axis0_input < -0.1):
+            elif(self.last_axis0_input < -0.3):
                 msg = [2, 4, [3, self.last_axis0_input, False]]
                 self.mainQueue.put(msg)
 
-            if self.last_axis1_input > 0.1:
+            if self.last_axis1_input > 0.3:
                 msg = [2, 4, [1, self.last_axis1_input, True]]
                 self.mainQueue.put(msg)
-            elif self.last_axis1_input < -0.1:
+            elif self.last_axis1_input < -0.3:
                 msg = [2, 4, [1, self.last_axis1_input, False]]
                 self.mainQueue.put(msg)
 
-            if self.last_axis3_input > 0.1:
+            if self.last_axis3_input > 0.3:
                 msg = [2, 4, [2, self.last_axis3_input, True]]
                 self.mainQueue.put(msg)
-            elif self.last_axis3_input < -0.1:
+            elif self.last_axis3_input < -0.3:
                 msg = [2, 4, [2, self.last_axis3_input, False]]
                 self.mainQueue.put(msg)
 
