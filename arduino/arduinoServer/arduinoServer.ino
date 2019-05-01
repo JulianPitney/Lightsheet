@@ -29,6 +29,7 @@ uint32_t cmdParserTimeout = 10000;
 const int LED = 13;
 // Laser Enable
 const int LASER_ENABLE = 3;
+const int SOLENOID_ENABLE = 14;
 
 bool STEPPERS_ON = false;
 
@@ -72,7 +73,9 @@ void setup() {
   Serial.write("ARDUINO READY\n");
   pinMode(LED, OUTPUT);
   pinMode(LASER_ENABLE, OUTPUT);
+  pinMode(SOLENOID_ENABLE, OUTPUT);
   digitalWrite(LASER_ENABLE, LOW);
+  digitalWrite(SOLENOID_ENABLE, LOW);
 
 
   // Setup STEPPER1
@@ -486,4 +489,5 @@ void loop() {
     default:
       break;
   }
+
 }

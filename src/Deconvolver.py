@@ -20,9 +20,11 @@ class Deconvolver(object):
     def __init__(self):
         self.PSFGenConfigPath = "../config/PSFGenerator_psf_config.txt"
         self.FlowdecPSFConfigPath = "../config/Flowdec_psf_config.json"
+        self.JVM_HEAP_MEMORY_MB = 40000
+        self.theoreticalPSFAccuracy = "Good"
 
 
-    def gen_psf_PSFGenerator(self, refractiveIndexImmersion, accuracy, wavelength, numericalAperture, pixelsizeXY, zStep, sizeX, sizeY, sizeZ, scanPath):
+    def gen_psf_PSFGenerator(self, refractiveIndexImmersion, wavelength, numericalAperture, pixelsizeXY, zStep, sizeX, sizeY, sizeZ, outputPath):
 
         configLines = []
 
@@ -45,7 +47,7 @@ class Deconvolver(object):
         configLines.append("psf-Gaussian-defocus=100.0")
         configLines.append("psf-Astigmatism-focus=0.0")
 
-        accuracyLine = "psf-BW-accuracy=" + str(accuracy)
+        accuracyLine = "psf-BW-accuracy=" + str(self.theoreticalPSFAccuracy)
         configLines.append(accuracyLine)
 
         configLines.append("psf-Cardinale-Sine-focus=0.0")
@@ -128,11 +130,11 @@ class Deconvolver(object):
             file.close()
 
         os.system("java -cp ../bin/PSFGenerator.jar PSFGenerator " + self.PSFGenConfigPath)
-        os.rename("../src/PSF BW.tif", scanPath + "PSFGenerator_psf.tif")
+        os.rename("../src/PSF BW.tif", outputPath + "PSFGenerator_psf.tif")
+        return outputPath + "PSFGenerator_psf.tif"
 
 
-
-    def gen_psf_Flowdec(self, numericalAperture, wavelength, size_z, size_x, size_y, scanPath):
+    def gen_psf_Flowdec(self, numericalAperture, wavelength, size_z, size_x, size_y, outputPath):
 
         command = "echo {\"na\": " + str(numericalAperture)
         command +=  ", \"wavelength\": " + str(wavelength)
@@ -143,27 +145,29 @@ class Deconvolver(object):
         os.system(command)
         psf = fd_psf.GibsonLanni.load('../config/' + self.FlowdecPSFConfigPath)
         psfStack = psf.generate()
-        io.imsave(scanPath + "flowdec_psf.tif", psfStack)
+        io.imsave(outputPath + "Flowdec_psf.tif", psfStack)
+        return outputPath + "Flowdec_psf.tif"
 
+    def deconvolve_DeconvLab2(self, imgStackPath, psfStackPath, iterations, outputPath):
 
-    def deconvolve_DeconvLab2(self, imgStackPath, psfStackPath, iterations, scanPath):
-
-        command = "java -Xms40000M -jar ../bin/DeconvolutionLab_2.jar Run "
+        command = "java -Xms" + str(self.JVM_HEAP_MEMORY_MB) + "m -jar ../bin/DeconvolutionLab_2.jar Run "
         command += "-image file " + str(imgStackPath) + " "
         command += "-psf file " + str(psfStackPath) + " "
         command += "-algorithm RL " + str(iterations) + " "
         command += "-out stack noshow " + "DeconvLab2_deconvolved" + " "
-        command += "-path " + str(scanPath)
+        command += "-path " + str(outputPath)
         os.system(command)
+        return outputPath + "DeconvLab2_deconvolved.tif"
 
-    def deconvolve_Flowdec(self, imgStackPath, psfStackPath, iterations, scanPath):
+    def deconvolve_Flowdec(self, imgStackPath, psfStackPath, iterations, outputPath):
 
         imgStack = io.imread(imgStackPath)
         psfStack = io.imread(psfStackPath)
 
         algo = RichardsonLucyDeconvolver(imgStack.ndim).initialize()
         resultStack = algo.run(fd_data.Acquisition(data=imgStack, kernel=psfStack), niter=iterations).data
-        io.imsave(scanPath + "flowdec_deconvoled.tif", resultStack)
+        io.imsave(outputPath + "Flowdec_deconvoled.tif", resultStack)
+        return outputPath + "Flowdec_deconvolved.tif"
 
     def crop_volume(self, img, boundingBox):
 
@@ -173,26 +177,21 @@ class Deconvolver(object):
         return img[slices]
 
 
-    def load_tiff_stack(self, path):
-
-        stack = io.imread(path)
-        return stack
 
 
 
 
 
 
-
-
+"""
 dc = Deconvolver()
 # Gen psf
 dc.gen_psf_PSFGenerator(1.33, "Good", 530, 0.5, 180, 700, 1440, 1080, 110, "../scans/")
 dc.gen_psf_Flowdec(0.5,530,110,1440,1080, "../scans/")
 # deconvolve
 dc.deconvolve_DeconvLab2("../scans/scan1/scan1.tif", "../scans/PSFGenerator_psf.tif", 50, "../scans/")
-dc.deconvolve_Flowdec("../scans/scan1/scan1.tif", "../scans/flowdec_psf.tif", 50, "../scans/")
-
+dc.deconvolve_Flowdec("../scans/scan1/scan1.tif", "../scans/Flowdec_psf.tif", 50, "../scans/")
+"""
 
 
 """
