@@ -24,14 +24,15 @@ class Scanner(object):
 
         # Deconvolution parameters
         self.deconvolver = Deconvolver()
-        self.deconvolveAfterScan = True
+        self.deconvolveAfterScan = False
         self.refractiveIndexImmersion = 1.33
         self.numericalAperture = 0.5
         self.wavelength = 530
         self.nanometersPerPixel = 180
+        self.richardsonLucyIterations = 2
         self.sizeX = 1440
         self.sizeY = 1080
-        self.richardsonLucyIterations = 2
+
 
 
     def set_z_step_size(self, step_size_um):
@@ -83,7 +84,7 @@ class Scanner(object):
         print(self.LOG_PREFIX + "RICHARDSON_LUCY_ITERATIONS=" + str(iterations))
 
     def set_deconvolve_after_scan(self, deconvolveAfterScan):
-        self.deconvolveAfterScan = deconvolveAfterScan
+        self.deconvolveAfterScan = bool(deconvolveAfterScan)
         print(self.LOG_PREFIX + "DECONVOLVE_AFTER_SCAN=" + str(deconvolveAfterScan))
 
 
@@ -111,6 +112,15 @@ class Scanner(object):
             return path
 
 
+        self.refractiveIndexImmersion = 1.33
+        self.numericalAperture = 0.5
+        self.wavelength = 530
+        self.nanometersPerPixel = 180
+        self.richardsonLucyIterations = 2
+        self.sizeX = 1440
+        self.sizeY = 1080
+
+
     def gen_stack_metadata(self):
 
         # Generate stack metadata
@@ -120,6 +130,14 @@ class Scanner(object):
         metadata.append(['stack_size', self.STACK_SIZE])
         metadata.append(['motor_step_speed', self.SCAN_STEP_SPEED])
         metadata.append(['vibration_settle_delay', self.SLEEP_DURATION_AFTER_MOVEMENT_S])
+        metadata.append(['timelapse_interval', self.TIMELAPSE_INTERVAL_S])
+        metadata.append(['refractive_index_immersion', self.refractiveIndexImmersion])
+        metadata.append(['numericalApertureCollection', self.numericalAperture])
+        metadata.append(['wavelengthEmission', self.wavelength])
+        metadata.append(['nanometers_per_pixel', self.nanometersPerPixel])
+        metadata.append(['size_x', self.sizeX])
+        metadata.append(['size_y', self.sizeY])
+        metadata.append(['richardsosLucy_deconvolution_iterations', self.richardsonLucyIterations])
         return metadata
 
 
@@ -146,7 +164,7 @@ class Scanner(object):
             for stackPath in stackPaths:
                 outputPath = os.path.dirname(stackPath) +"\\"
                 deconvolvedStackPaths.append(self.deconvolver.deconvolve_DeconvLab2(stackPath, psfPath, self.richardsonLucyIterations, outputPath))
-
+            print(self.LOG_PREFIX + "Scan deconvolution complete")
 
 
     def scan_stack(self, scanName, timelapseScanName):

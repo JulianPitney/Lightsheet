@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f5686c8e-07ad-49ff-9056-a03209307a70" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/arduino/arduinoServer/arduinoServer.ino" beforeDir="false" afterPath="$PROJECT_DIR$/arduino/arduinoServer/arduinoServer.ino" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/PSFGenerator_psf_config.txt" beforeDir="false" afterPath="$PROJECT_DIR$/config/PSFGenerator_psf_config.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Deconvolver.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Deconvolver.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GUI.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Scanner.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Scanner.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -18,8 +17,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Deconvolver.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="189">
-              <caret line="174" column="35" selection-start-line="174" selection-start-column="35" selection-end-line="174" selection-end-column="35" />
+            <state relative-caret-position="367">
+              <caret line="149" selection-start-line="149" selection-end-line="149" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -30,8 +29,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Scanner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="630">
-              <caret line="150" lean-forward="true" selection-start-line="150" selection-end-line="150" />
+            <state relative-caret-position="756">
+              <caret line="168" lean-forward="true" selection-start-line="168" selection-end-line="168" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -40,10 +39,19 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/GUI.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="381">
+              <caret line="191" column="71" selection-start-line="191" selection-start-column="71" selection-end-line="191" selection-end-column="71" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="462">
-              <caret line="22" selection-start-line="22" selection-end-line="22" />
+            <state relative-caret-position="252">
+              <caret line="12" selection-start-line="12" selection-end-line="12" />
               <folding>
                 <element signature="e#0#30#0" expanded="true" />
               </folding>
@@ -73,6 +81,7 @@
       <find>1.5</find>
       <find>NA</find>
       <find>XY</find>
+      <find>set_deconvolve_after_scan</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -88,22 +97,22 @@
         <option value="$PROJECT_DIR$/src/main.py" />
         <option value="$PROJECT_DIR$/src/tests/test_main.py" />
         <option value="$USER_HOME$/Anaconda3/envs/lightsheet/Lib/site-packages/pygame/__init__.py" />
-        <option value="$PROJECT_DIR$/src/GUI.py" />
         <option value="$PROJECT_DIR$/src/CameraController.py" />
         <option value="$PROJECT_DIR$/scans/FLOWDEC_TESTING/psf.json" />
         <option value="$PROJECT_DIR$/config/psf_config.txt" />
         <option value="$PROJECT_DIR$/src/PS4Controller.py" />
         <option value="$PROJECT_DIR$/src/ArduinoController.py" />
         <option value="$PROJECT_DIR$/src/Deconvolver.py" />
+        <option value="$PROJECT_DIR$/src/GUI.py" />
         <option value="$PROJECT_DIR$/src/Scanner.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="580" />
-    <option name="y" value="-15" />
-    <option name="width" value="1300" />
-    <option name="height" value="969" />
+    <option name="x" value="230" />
+    <option name="y" value="-25" />
+    <option name="width" value="1967" />
+    <option name="height" value="1374" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -191,7 +200,7 @@
     <frame x="-7" y="-7" width="2062" height="1126" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.10853478" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16428219" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -327,13 +336,6 @@
     <entry file="file://$PROJECT_DIR$/scans/FLOWDEC_TESTING/psf.json" />
     <entry file="file://$PROJECT_DIR$/config/psf_config.txt" />
     <entry file="file://$PROJECT_DIR$/config/psf.json" />
-    <entry file="file://$PROJECT_DIR$/src/GUI.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
-          <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/ArduinoController.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2877">
@@ -350,8 +352,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Deconvolver.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
-          <caret line="174" column="35" selection-start-line="174" selection-start-column="35" selection-end-line="174" selection-end-column="35" />
+        <state relative-caret-position="367">
+          <caret line="149" selection-start-line="149" selection-end-line="149" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
@@ -360,18 +362,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="462">
-          <caret line="22" selection-start-line="22" selection-end-line="22" />
+        <state relative-caret-position="252">
+          <caret line="12" selection-start-line="12" selection-end-line="12" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/GUI.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="381">
+          <caret line="191" column="71" selection-start-line="191" selection-start-column="71" selection-end-line="191" selection-end-column="71" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Scanner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="630">
-          <caret line="150" lean-forward="true" selection-start-line="150" selection-end-line="150" />
+        <state relative-caret-position="756">
+          <caret line="168" lean-forward="true" selection-start-line="168" selection-end-line="168" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

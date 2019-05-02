@@ -35,13 +35,16 @@ class GUI(object):
 		gainScale = Scale(scanConfigFrame, variable=gain, orient=HORIZONTAL, showvalue=0, label="Gain", length=200,from_=1,to=40, resolution=1, command=self.update_scale_bar_gain)
 		self.gainLabel = Label(scanConfigFrame, text="23dB")
 		gainScale.set(23)
+
 		exposure = DoubleVar()
 		exposureScale = Scale(scanConfigFrame, variable=exposure, orient=HORIZONTAL, showvalue=0, label="Exposure(ms)", length=200,from_=5,to=100, resolution=5, command=self.update_scale_bar_exposure)
 		self.exposureLabel = Label(scanConfigFrame, text="30ms")
 		exposureScale.set(30)
+
 		scanDepth = IntVar()
 		scanDepthScale = Scale(scanConfigFrame, variable=scanDepth, orient=HORIZONTAL, showvalue=0, label="Slices Per Stack", length=200,from_=10,to=1500, resolution=10, command=self.update_scale_bar_scan_depth)
 		self.scanDepthLabel = Label(scanConfigFrame, text="10 Slices")
+
 		stepSize = IntVar()
 		stepSizeScale = Scale(scanConfigFrame, variable=stepSize, orient=HORIZONTAL, showvalue=0, label="Step Size(um)", length=200,from_=1,to=64, resolution=1, command=self.update_scale_bar_step_size)
 		self.stepSizeLabel = Label(scanConfigFrame, text="0.15625um")
@@ -49,9 +52,40 @@ class GUI(object):
 		timelapseN = IntVar()
 		timelapseNScale = Scale(scanConfigFrame, variable=timelapseN, orient=HORIZONTAL, showvalue=0, label="Timelapse Iterations", length=200,from_=1,to=100, resolution=1, command=self.update_scale_bar_timelapse_n)
 		self.timelapseNLabel = Label(scanConfigFrame, text="1 Iterations")
+
 		timelapseDelayBetweenStacks = IntVar()
 		timelapseDelayBetweenStacksScale = Scale(scanConfigFrame, variable=timelapseDelayBetweenStacks, orient=HORIZONTAL, showvalue=0, label="Timelapse Delay Between Stacks(s)", length=200,from_=10,to=1000, resolution=1, command=self.update_scale_bar_timelapse_delay)
 		self.timelapseDelayBetweenStacksLabel = Label(scanConfigFrame, text="10s")
+
+		deconvolutionState = BooleanVar()
+		deconvolutionButton = Checkbutton(scanConfigFrame, text="Perform Deconvolution After Scan", variable=deconvolutionState, command=lambda: self.button_push_callback(5, 15, [deconvolutionState.get()]))
+
+		refractiveIndexImmersion = DoubleVar()
+		refractiveIndexImmersionScale = Scale(scanConfigFrame, variable=refractiveIndexImmersion, orient=HORIZONTAL, showvalue=0, label="Refractive Index Immersion", length=200,from_=0.1,to=2.0, resolution=0.01, command=self.update_scale_bar_refrarive_index_immersion)
+		self.refractiveIndexImmersionLabel = Label(scanConfigFrame, text="1.33")
+		refractiveIndexImmersionScale.set(1.33)
+
+
+		numericalApertureCollection = DoubleVar()
+		numericalApertureCollectionScale = Scale(scanConfigFrame, variable=numericalApertureCollection, orient=HORIZONTAL, showvalue=0, label="Numerical Aperture Collection", length=200,from_=0.1,to=2.0, resolution=0.05, command=self.update_scale_bar_numerical_aperture_collection)
+		self.numericalApertureCollectionLabel = Label(scanConfigFrame, text="0.5")
+		numericalApertureCollectionScale.set(0.5)
+
+
+		wavelengthEmmision = IntVar()
+		wavelengthEmmisionScale = Scale(scanConfigFrame, variable=wavelengthEmmision, orient=HORIZONTAL, showvalue=0, label="Emission Wavelength(nm)", length=200,from_=200,to=1000, resolution=1, command=self.update_scale_bar_wavelength_emmision)
+		self.wavelengthEmmisionLabel = Label(scanConfigFrame, text="530nm")
+		wavelengthEmmisionScale.set(530)
+
+		nanometersPerPixel = IntVar()
+		nanometersPerPixelScale = Scale(scanConfigFrame, variable=nanometersPerPixel, orient=HORIZONTAL, showvalue=0, label="Nanometers Per Pixel", length=200,from_=10,to=2000, resolution=1, command=self.update_scale_bar_nanometers_per_pixel)
+		self.nanometersPerPixelLabel = Label(scanConfigFrame, text="177")
+		nanometersPerPixelScale.set(177)
+
+		richardsonLucyIterations = IntVar()
+		richardsonLucyIterationsScale = Scale(scanConfigFrame, variable=richardsonLucyIterations, orient=HORIZONTAL, showvalue=0, label="Richardson-Lucy Deconvolution Iterations", length=200,from_=1,to=500, resolution=1, command=self.update_scale_bar_richardson_lucy_iterations)
+		self.richardsonLucyIterationsLabel = Label(scanConfigFrame, text="1")
+		richardsonLucyIterationsScale.set(1)
 
 
 		scanName = StringVar()
@@ -86,14 +120,22 @@ class GUI(object):
 		self.timelapseNLabel.pack()
 		timelapseDelayBetweenStacksScale.pack()
 		self.timelapseDelayBetweenStacksLabel.pack()
-
-
+		refractiveIndexImmersionScale.pack()
+		self.refractiveIndexImmersionLabel.pack()
+		numericalApertureCollectionScale.pack()
+		self.numericalApertureCollectionLabel.pack()
+		wavelengthEmmisionScale.pack()
+		self.wavelengthEmmisionLabel.pack()
+		nanometersPerPixelScale.pack()
+		self.nanometersPerPixelLabel.pack()
+		richardsonLucyIterationsScale.pack()
+		self.richardsonLucyIterationsLabel.pack()
 
 		scanNameEntry.pack(pady=(10,0))
 		setScanName.pack(pady=(0,10))
 		scanButton.pack()
 		scanTimelapseButton.pack()
-
+		deconvolutionButton.pack()
 
 	def button_push_callback(self, processIndex, functionIndex, args):
 
@@ -137,7 +179,30 @@ class GUI(object):
 		self.timelapseDelayBetweenStacksLabel.config(text=timelapseDelay + "s")
 		self.button_push_callback(5, 9, [int(timelapseDelay)])
 
+	def update_scale_bar_refrarive_index_immersion(self, refractiveIndexImmersion):
 
+		self.refractiveIndexImmersionLabel.config(text=str(refractiveIndexImmersion))
+		self.button_push_callback(5, 10, [refractiveIndexImmersion])
+
+	def update_scale_bar_numerical_aperture_collection(self, numericalApertureCollection):
+
+		self.numericalApertureCollectionLabel.config(text=str(numericalApertureCollection))
+		self.button_push_callback(5, 11, [numericalApertureCollection])
+
+	def update_scale_bar_wavelength_emmision(self, wavelengthEmmision):
+
+		self.wavelengthEmmisionLabel.config(text=str(wavelengthEmmision) + "nm")
+		self.button_push_callback(5, 12, [wavelengthEmmision])
+
+	def update_scale_bar_nanometers_per_pixel(self, nanometersPerPixel):
+
+		self.nanometersPerPixelLabel.config(text=str(nanometersPerPixel))
+		self.button_push_callback(5, 13, [nanometersPerPixel])
+
+	def update_scale_bar_richardson_lucy_iterations(self, iterations):
+
+		self.richardsonLucyIterationsLabel.config(text=str(iterations))
+		self.button_push_callback(5, 14, [iterations])
 
 
 def launch_gui(queue, mainQueue):
