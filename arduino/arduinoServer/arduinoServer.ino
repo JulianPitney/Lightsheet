@@ -75,7 +75,7 @@ void setup() {
   pinMode(LASER_ENABLE, OUTPUT);
   pinMode(SOLENOID_ENABLE, OUTPUT);
   digitalWrite(LASER_ENABLE, LOW);
-  digitalWrite(SOLENOID_ENABLE, LOW);
+  digitalWrite(SOLENOID_ENABLE, HIGH);
 
 
   // Setup STEPPER1
