@@ -200,13 +200,13 @@ class Scanner(object):
 
             start = time()
             # Turn laser on
-            self.mainQueue.put([2, 0, []])
+            self.mainQueue.put([2, 7, []])
             # Wait 1 second for laser to power up
             sleep(1)
             # Scan stack
             stackPaths.append(self.scan_stack(self.SCAN_NAME + "_timelapse\\" + self.SCAN_NAME + "_timelapse" + str(i), self.SCAN_NAME + "_timelapse" + str(i)))
             # Turn laser off
-            self.mainQueue.put([2, 0, []])
+            self.mainQueue.put([2, 7, []])
             # Move back to top of stack
             self.mainQueue.put([2, 6, [2, -(self.STACK_SIZE * self.Z_STEP_SIZE_um), True]])
             # Wait for confirmation from arduino that we've returned to top of the stack

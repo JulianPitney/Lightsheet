@@ -83,7 +83,7 @@ class GUI(object):
 		nanometersPerPixelScale.set(177)
 
 		richardsonLucyIterations = IntVar()
-		richardsonLucyIterationsScale = Scale(scanConfigFrame, variable=richardsonLucyIterations, orient=HORIZONTAL, showvalue=0, label="Richardson-Lucy Deconvolution Iterations", length=200,from_=1,to=500, resolution=1, command=self.update_scale_bar_richardson_lucy_iterations)
+		richardsonLucyIterationsScale = Scale(scanConfigFrame, variable=richardsonLucyIterations, orient=HORIZONTAL, showvalue=0, label="Deconvolution Iterations", length=200,from_=1,to=500, resolution=1, command=self.update_scale_bar_richardson_lucy_iterations)
 		self.richardsonLucyIterationsLabel = Label(scanConfigFrame, text="1")
 		richardsonLucyIterationsScale.set(1)
 

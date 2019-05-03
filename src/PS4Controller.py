@@ -121,7 +121,7 @@ class PS4Controller(object):
             self.mainQueue.put([5, 0, []])
         elif event.button == 2:
             # Tell arduinoController to toggle laser
-            self.mainQueue.put([2, 0, []])
+            self.mainQueue.put([2, 7, []])
         elif event.button == 3:
             # Tell cameraController to toggle preview window
             self.mainQueue.put([1, 0, []])

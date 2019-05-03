@@ -94,6 +94,13 @@ class ArduinoController(object):
 		response = self.serialInterface.readline().decode()
 		print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
+	def toggle_solenoid(self):
+
+		command = "TOGGLE_SOLENOID\n"
+		self.serialInterface.write(command.encode('UTF-8'))
+		response = self.serialInterface.readline().decode()
+		print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+
 	def set_motor_speed(self, motorIndex, speed):
 
 		speed = int(speed)
@@ -163,6 +170,8 @@ class ArduinoController(object):
 			self.toggle_coarse_jog()
 		elif funcIndex == 6:
 			self.move_motor_micrometers(msg[2][0], msg[2][1], msg[2][2])
+		elif funcIndex == 7:
+			self.toggle_solenoid()
 
 	def mainloop(self):
 		while True :

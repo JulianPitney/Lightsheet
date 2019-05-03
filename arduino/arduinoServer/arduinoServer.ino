@@ -241,6 +241,19 @@ int runCommand() {
       sendResponse("LASER_SET:" + String(rc));
     }
   }
+  else if(command->cmd == "TOGGLE_SOLENOID")
+  {
+    if(command->argc != 1)
+    {
+      sendResponse("Invalid number of parameters!");
+      rc = -1;
+    }
+    else
+    {
+      rc = toggleSolenoidCommand();
+      sendResponse("SOLENOID_SET:" + String(rc));
+    }
+  }
   else
   {
       sendResponse("Invalid command!");
@@ -347,6 +360,13 @@ int toggleLaserCommand() {
 
   int newState = !digitalRead(LASER_ENABLE);
   digitalWrite(LASER_ENABLE, newState);
+  return newState;
+}
+
+int toggleSolenoidCommand() {
+
+  int newState = !digitalRead(SOLENOID_ENABLE);
+  digitalWrite(SOLENOID_ENABLE, newState);
   return newState;
 }
 
