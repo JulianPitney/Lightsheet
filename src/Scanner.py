@@ -2,6 +2,9 @@ from time import *
 from Deconvolver import *
 import os
 import os.path
+import cv2
+from skimage import io
+
 
 class Scanner(object):
 
@@ -21,6 +24,13 @@ class Scanner(object):
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.5
         self.TIMELAPSE_N = 1
         self.TIMELAPSE_INTERVAL_S = 10
+
+        self.imagingObjectiveMagnification = 20
+        self.umPerPixel_5x = 0.666
+        self.umPerPixel_10x = 0.357
+        self.umPerPixel_20x = 0.175
+        self.umPerPixel_40x = 0.089
+        self.umPerPixel_63x = 0.057
 
         # Deconvolution parameters
         self.deconvolver = Deconvolver()
@@ -140,6 +150,36 @@ class Scanner(object):
         metadata.append(['richardsosLucy_deconvolution_iterations', self.richardsonLucyIterations])
         return metadata
 
+    def paint_scalebar(self, frame):
+
+        umPixelsRatio = 10
+
+        if (self.imagingObjectiveMagnification == 5):
+            umPixelsRatio = self.umPerPixel_5x
+        elif (self.imagingObjectiveMagnification == 10):
+            umPixelsRatio = self.umPerPixel_10x
+        elif (self.imagingObjectiveMagnification == 20):
+            umPixelsRatio = self.umPerPixel_20x
+        elif (self.imagingObjectiveMagnification == 40):
+            umPixelsRatio = self.umPerPixel_40x
+        elif (self.imagingObjectiveMagnification == 63):
+            umPixelsRatio = self.umPerPixel_63x
+
+        height, width = frame.shape[:2]
+        # Figure out how many pixels represent 10um
+        lineLengthPixels = int(10 / umPixelsRatio)
+        p1 = (50, height - 50)
+        p2 = (50 + lineLengthPixels, height - 50)
+        cv2.line(frame, p1, p2, (255, 255, 255), 2)
+
+        cp1 = ((50 + int(lineLengthPixels / 2)), (height - 40))
+        cp2 = ((50 + int(lineLengthPixels / 2)), (height - 60))
+        cv2.line(frame, cp1, cp2, (255, 255, 255), 2)
+
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(frame, '10um', ((int(lineLengthPixels / 2)), (height - 80)), font, 1, (255, 255, 255), 2,
+                    cv2.LINE_AA)
+
 
     def scan(self, scanType):
 
@@ -164,6 +204,7 @@ class Scanner(object):
             for stackPath in stackPaths:
                 outputPath = os.path.dirname(stackPath) +"\\"
                 deconvolvedStackPaths.append(self.deconvolver.deconvolve_DeconvLab2(stackPath, psfPath, self.richardsonLucyIterations, outputPath))
+
             print(self.LOG_PREFIX + "Scan deconvolution complete")
 
 
