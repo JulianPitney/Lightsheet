@@ -26,6 +26,13 @@ class CameraController(object):
 		self.displayPreview = False
 		self.previewProcQueue = Queue()
 		self.previewProc = None
+		self.imagingObjectiveMagnification = 20
+		self.umPerPixel_5x = 0.666
+		self.umPerPixel_10x = 0.357
+		self.umPerPixel_20x = 0.175
+		self.umPerPixel_40x = 0.089
+		self.umPerPixel_63x = 0.057
+
 
 		# Acquisition config
 		self.EXPOSURE = 30000
@@ -365,6 +372,10 @@ class CameraController(object):
 						self.GAIN = min(camera.Gain.GetMax(), self.GAIN)
 						camera.Gain.SetValue(self.GAIN)
 
+				elif msg[2][0] == "MAGNIFICATION":
+					self.imagingObjectiveMagnification = int(msg[2][1])
+
+
 			image_result = camera.GetNextImage()
 			if image_result.IsIncomplete():
 				print(self.LOG_PREFIX + "Camera image incomplete with image status=%d" % image_result.GetImageStatus())
@@ -375,6 +386,7 @@ class CameraController(object):
 				#TODO: Replace the rectanlge bounds with Rayleigh bounding box once we have that info
 				cv2.rectangle(cvMatPaintedFrame,(520,340),(920,740),150,3)
 				cv2.addWeighted(cvMatPaintedFrame, 0.1, cvMatOriginalFrame, 1, 0, cvMatOriginalFrame)
+				cvMatOriginalFrame = self.paint_scalebar(cvMatOriginalFrame)
 				cv2.imshow('image', cvMatOriginalFrame)
 				cv2.waitKey(1)
 				image_result.Release()
@@ -404,6 +416,42 @@ class CameraController(object):
 		self.previewProcQueue.put([-1, -1, ["GAIN",self.GAIN]])
 		print(self.LOG_PREFIX + "GAIN=" + str(self.GAIN) + "dB")
 
+	def set_scalebar_size(self, imagingObjectiveMagnification):
+		self.imagingObjectiveMagnification = imagingObjectiveMagnification
+		self.previewProcQueue.put([-1, -1, ["MAGNIFICATION", self.imagingObjectiveMagnification]])
+		print(self.LOG_PREFIX + "MAGNIFICATION=" + str(self.imagingObjectiveMagnification) + "x")
+
+	def paint_scalebar(self, frame):
+
+		umPixelsRatio = 10
+
+		if(self.imagingObjectiveMagnification == 5):
+			umPixelsRatio = self.umPerPixel_5x
+		elif(self.imagingObjectiveMagnification == 10):
+			umPixelsRatio = self.umPerPixel_10x
+		elif(self.imagingObjectiveMagnification == 20):
+			umPixelsRatio = self.umPerPixel_20x
+		elif(self.imagingObjectiveMagnification == 40):
+			umPixelsRatio = self.umPerPixel_40x
+		elif(self.imagingObjectiveMagnification == 63):
+			umPixelsRatio = self.umPerPixel_63x
+
+
+		height, width = frame.shape[:2]
+		# Figure out how many pixels represent 10um
+		lineLengthPixels = int(10 / umPixelsRatio)
+		p1 = (50, height - 50)
+		p2 = (50 + lineLengthPixels, height - 50)
+		cv2.line(frame, p1, p2, (255,255,255), 2)
+
+		cp1 = ((50 + int(lineLengthPixels / 2)), (height - 40))
+		cp2 = ((50 + int(lineLengthPixels / 2)), (height - 60))
+		cv2.line(frame, cp1, cp2, (255,255,255), 2)
+
+		font = cv2.FONT_HERSHEY_SIMPLEX
+		cv2.putText(frame, '10um', ((int(lineLengthPixels / 2)), (height - 80)), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
+		return frame
 
 	def set_camera_gain(self, camera):
 
@@ -550,7 +598,8 @@ class CameraController(object):
 			self.set_gain(msg[2][0])
 		elif functionIndex == 3:
 			self.scan(msg[2][0], msg[2][1], msg[2][2])
-
+		elif functionIndex == 4:
+			self.set_scalebar_size(msg[2][0])
 
 	def mainloop(self):
 		while True:

@@ -88,6 +88,12 @@ class GUI(object):
 		richardsonLucyIterationsScale.set(1)
 
 
+		self.magnification = IntVar()
+		self.magnification.set(20)  # set the default option
+		magnifications = {5, 10, 20, 40, 63}
+		magnificationLabel = Label(scanConfigFrame, text="Imaging Objective Magnification",)
+		magnificationDropdown = OptionMenu(scanConfigFrame, self.magnification, *magnifications)
+
 		scanName = StringVar()
 		scanName.set("default")
 		scanNameEntry = Entry(scanConfigFrame, textvariable=scanName, bd=5)
@@ -130,6 +136,9 @@ class GUI(object):
 		self.nanometersPerPixelLabel.pack()
 		richardsonLucyIterationsScale.pack()
 		self.richardsonLucyIterationsLabel.pack()
+		magnificationLabel.pack()
+		magnificationDropdown.pack()
+		self.magnification.trace('w', self.update_magnification_dropdown)
 
 		scanNameEntry.pack(pady=(10,0))
 		setScanName.pack(pady=(0,10))
@@ -204,6 +213,8 @@ class GUI(object):
 		self.richardsonLucyIterationsLabel.config(text=str(iterations))
 		self.button_push_callback(5, 14, [iterations])
 
+	def update_magnification_dropdown(self, *args):
+		self.button_push_callback(1, 4, [int(self.magnification.get())])
 
 def launch_gui(queue, mainQueue):
 
