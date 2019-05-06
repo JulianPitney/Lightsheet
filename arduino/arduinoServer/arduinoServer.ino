@@ -30,6 +30,7 @@ const int LED = 13;
 // Laser Enable
 const int LASER_ENABLE = 3;
 const int SOLENOID_ENABLE = 14;
+const int IMAGING_LED_PIN = 42; 
 
 bool STEPPERS_ON = false;
 
@@ -74,8 +75,10 @@ void setup() {
   pinMode(LED, OUTPUT);
   pinMode(LASER_ENABLE, OUTPUT);
   pinMode(SOLENOID_ENABLE, OUTPUT);
+  pinMode(IMAGING_LED_PIN, OUTPUT);
   digitalWrite(LASER_ENABLE, LOW);
   digitalWrite(SOLENOID_ENABLE, HIGH);
+  digitalWrite(IMAGING_LED_PIN, LOW);
 
 
   // Setup STEPPER1
@@ -254,6 +257,19 @@ int runCommand() {
       sendResponse("SOLENOID_SET:" + String(rc));
     }
   }
+  else if(command->cmd == "TOGGLE_LED")
+  {
+    if(command->argc != 1)
+    {
+      sendResponse("Invalid number of parameters!");
+      rc = -1;
+    }
+    else
+    {
+      rc = toggleLEDCommand();
+      sendResponse("LED_SET:" + String(rc));
+    }
+  }
   else
   {
       sendResponse("Invalid command!");
@@ -370,6 +386,12 @@ int toggleSolenoidCommand() {
   return newState;
 }
 
+int toggleLEDCommand() {
+
+  int newState = !digitalRead(IMAGING_LED_PIN);
+  digitalWrite(IMAGING_LED_PIN, newState);
+  return newState;
+}
 
 /*
    Helper function for selecting the stepper motor requested by
@@ -509,5 +531,4 @@ void loop() {
     default:
       break;
   }
-
 }
