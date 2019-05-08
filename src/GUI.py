@@ -215,6 +215,7 @@ class GUI(object):
 
 	def update_magnification_dropdown(self, *args):
 		self.button_push_callback(1, 4, [int(self.magnification.get())])
+		self.button_push_callback(5, 16, [int(self.magnification.get())])
 
 def launch_gui(queue, mainQueue):
 

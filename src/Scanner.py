@@ -3,8 +3,8 @@ from Deconvolver import *
 import os
 import os.path
 import cv2
+import numpy as np
 from skimage import io
-
 
 class Scanner(object):
 
@@ -97,6 +97,9 @@ class Scanner(object):
         self.deconvolveAfterScan = bool(deconvolveAfterScan)
         print(self.LOG_PREFIX + "DECONVOLVE_AFTER_SCAN=" + str(deconvolveAfterScan))
 
+    def set_imaging_objective_magnification(self, magnification):
+        self.imagingObjectiveMagnification = int(magnification)
+        print(self.LOG_PREFIX + "IMAGING_OBJECTIVE_MAGNIFICATION=" + str(magnification))
 
 
     def wait_for_confirmation(self, procIndex):
@@ -154,16 +157,17 @@ class Scanner(object):
 
         umPixelsRatio = 10
 
-        if (self.imagingObjectiveMagnification == 5):
+        if self.imagingObjectiveMagnification == 5:
             umPixelsRatio = self.umPerPixel_5x
-        elif (self.imagingObjectiveMagnification == 10):
+        elif self.imagingObjectiveMagnification == 10:
             umPixelsRatio = self.umPerPixel_10x
-        elif (self.imagingObjectiveMagnification == 20):
+        elif self.imagingObjectiveMagnification == 20:
             umPixelsRatio = self.umPerPixel_20x
-        elif (self.imagingObjectiveMagnification == 40):
+        elif self.imagingObjectiveMagnification == 40:
             umPixelsRatio = self.umPerPixel_40x
-        elif (self.imagingObjectiveMagnification == 63):
+        elif self.imagingObjectiveMagnification == 63:
             umPixelsRatio = self.umPerPixel_63x
+
 
         height, width = frame.shape[:2]
         # Figure out how many pixels represent 10um
@@ -179,6 +183,8 @@ class Scanner(object):
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame, '10um', ((int(lineLengthPixels / 2)), (height - 80)), font, 1, (255, 255, 255), 2,
                     cv2.LINE_AA)
+
+        return frame
 
 
     def scan(self, scanType):
@@ -200,10 +206,14 @@ class Scanner(object):
             path = os.path.dirname(path) + "\\"
 
             psfPath = self.deconvolver.gen_psf_PSFGenerator(self.refractiveIndexImmersion, self.wavelength, self.numericalAperture, self.nanometersPerPixel, self.Z_STEP_SIZE_um, self.sizeX, self.sizeY, self.STACK_SIZE, path)
-            deconvolvedStackPaths = []
             for stackPath in stackPaths:
                 outputPath = os.path.dirname(stackPath) +"\\"
-                deconvolvedStackPaths.append(self.deconvolver.deconvolve_DeconvLab2(stackPath, psfPath, self.richardsonLucyIterations, outputPath))
+                deconvolvedStackPath = self.deconvolver.deconvolve_DeconvLab2(stackPath, psfPath, self.richardsonLucyIterations, outputPath)
+                deconvolvedStack = io.imread(deconvolvedStackPath)
+                deconvolvedStackMaxProj = np.max(deconvolvedStack, axis=0)
+                deconvolvedStackMaxProj = self.paint_scalebar(deconvolvedStackMaxProj)
+                io.imsave(outputPath + "maxProj.tif",deconvolvedStackMaxProj)
+
 
             print(self.LOG_PREFIX + "Scan deconvolution complete")
 
@@ -316,7 +326,8 @@ class Scanner(object):
             self.set_richardson_lucy_iterations(msg[2][0])
         elif funcIndex == 15:
             self.set_deconvolve_after_scan(msg[2][0])
-
+        elif funcIndex == 16:
+            self.set_imaging_objective_magnification(msg[2][0])
 
 def launch_scanner(queue, mainQueue):
 
