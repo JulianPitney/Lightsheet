@@ -1,4 +1,5 @@
 #include <AccelStepper.h>
+#include <Servo.h>
 #include <CmdParser.hpp>
 #include <Encoder.h>
 
@@ -29,7 +30,7 @@ uint32_t cmdParserTimeout = 10000;
 const int LED = 13;
 // Laser Enable
 const int LASER_ENABLE = 3;
-const int SOLENOID_ENABLE = 14;
+const int LASER_SHUTTER_SERVO_PIN = 13;
 const int IMAGING_LED_PIN = 42; 
 
 bool STEPPERS_ON = false;
@@ -62,7 +63,11 @@ AccelStepper STEPPER3(AccelStepper::DRIVER, DRIVER3_PUL, DRIVER3_DIR);
 Encoder STEPPER1_ENCODER(2,3);
 //Encoder STEPPER2_ENCODER(??,??);
 //Encoder STEPPER3_ENCODER(??,??);
-
+// Servo(s)
+Servo laserShutter;
+const int SHUTTER_ON_POS = 90;
+const int SHUTTER_OFF_POS = 130;
+bool SHUTTER_ON;
 
 void setup() {
 
@@ -74,12 +79,12 @@ void setup() {
   Serial.write("ARDUINO READY\n");
   pinMode(LED, OUTPUT);
   pinMode(LASER_ENABLE, OUTPUT);
-  pinMode(SOLENOID_ENABLE, OUTPUT);
   pinMode(IMAGING_LED_PIN, OUTPUT);
   digitalWrite(LASER_ENABLE, LOW);
-  digitalWrite(SOLENOID_ENABLE, HIGH);
   digitalWrite(IMAGING_LED_PIN, LOW);
-
+  laserShutter.attach(LASER_SHUTTER_SERVO_PIN);
+  laserShutter.write(90);
+  SHUTTER_ON = true;
 
   // Setup STEPPER1
   STEPPER1.setMaxSpeed(STEPPER1_MAX_SPEED);
@@ -244,7 +249,7 @@ int runCommand() {
       sendResponse("LASER_SET:" + String(rc));
     }
   }
-  else if(command->cmd == "TOGGLE_SOLENOID")
+  else if(command->cmd == "TOGGLE_SHUTTER")
   {
     if(command->argc != 1)
     {
@@ -253,8 +258,8 @@ int runCommand() {
     }
     else
     {
-      rc = toggleSolenoidCommand();
-      sendResponse("SOLENOID_SET:" + String(rc));
+      rc = toggleShutterCommand();
+      sendResponse("SHUTTER_SET:" + String(rc));
     }
   }
   else if(command->cmd == "TOGGLE_LED")
@@ -379,11 +384,20 @@ int toggleLaserCommand() {
   return newState;
 }
 
-int toggleSolenoidCommand() {
+int toggleShutterCommand() {
 
-  int newState = !digitalRead(SOLENOID_ENABLE);
-  digitalWrite(SOLENOID_ENABLE, newState);
-  return newState;
+  if(SHUTTER_ON)
+  {
+    laserShutter.write(SHUTTER_OFF_POS);
+    SHUTTER_ON = false;
+  }
+  else
+  {
+    laserShutter.write(SHUTTER_ON_POS);
+    SHUTTER_ON = true;
+  }
+
+  return SHUTTER_ON;
 }
 
 int toggleLEDCommand() {
@@ -503,7 +517,7 @@ void sendResponse(String response) {
 
 
 void loop() {
-
+  
   // New command received (0), Parse error (-1), Listening timed out (1)
   int rc = listenForCommandWithTimeout();
 
@@ -531,4 +545,5 @@ void loop() {
     default:
       break;
   }
+  
 }

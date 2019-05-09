@@ -96,7 +96,7 @@ class ArduinoController(object):
 
 	def toggle_solenoid(self):
 
-		command = "TOGGLE_SOLENOID\n"
+		command = "TOGGLE_SHUTTER\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
 		print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
