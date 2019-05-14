@@ -5,6 +5,7 @@ import os.path
 import cv2
 import numpy as np
 from skimage import io
+import random
 
 class Scanner(object):
 
@@ -38,7 +39,6 @@ class Scanner(object):
         self.refractiveIndexImmersion = 1.33
         self.numericalAperture = 0.5
         self.wavelength = 530
-        self.nanometersPerPixel = 180
         self.richardsonLucyIterations = 2
         self.sizeX = 1440
         self.sizeY = 1080
@@ -79,7 +79,7 @@ class Scanner(object):
 
     def set_numerical_aperture(self, numericalAperture):
         self.numericalAperture = numericalAperture
-        print(self.LOG_PREFIX + "NUMERICAL_APERTURE=" + str(numericalAperture))
+        print(self.LOG_PREFIX + "NUMERICAL_APERTURE_IMAGING=" + str(numericalAperture))
 
     def set_wavelength(self, wavelength):
         self.wavelength = wavelength
@@ -119,19 +119,12 @@ class Scanner(object):
         try:
             os.mkdir(path)
         except OSError:
-            print(self.LOG_PREFIX + "Creation of the directory %s failed" % path)
+            print(self.LOG_PREFIX + "Creation of the directory %s failed. Aborting scan." % path)
+            return -1
         else:
             print(self.LOG_PREFIX + "Successfully created the directory %s " % path)
             return path
 
-
-        self.refractiveIndexImmersion = 1.33
-        self.numericalAperture = 0.5
-        self.wavelength = 530
-        self.nanometersPerPixel = 180
-        self.richardsonLucyIterations = 2
-        self.sizeX = 1440
-        self.sizeY = 1080
 
 
     def gen_stack_metadata(self):
@@ -147,10 +140,9 @@ class Scanner(object):
         metadata.append(['refractive_index_immersion', self.refractiveIndexImmersion])
         metadata.append(['numericalApertureCollection', self.numericalAperture])
         metadata.append(['wavelengthEmission', self.wavelength])
-        metadata.append(['nanometers_per_pixel', self.nanometersPerPixel])
         metadata.append(['size_x', self.sizeX])
         metadata.append(['size_y', self.sizeY])
-        metadata.append(['richardsosLucy_deconvolution_iterations', self.richardsonLucyIterations])
+        metadata.append(['richardsonLucy_deconvolution_iterations', self.richardsonLucyIterations])
         return metadata
 
     def paint_scalebar(self, frame):
@@ -192,10 +184,16 @@ class Scanner(object):
         stackPaths = []
 
         if scanType == "stack":
-            stackPaths.append(self.scan_stack(self.SCAN_NAME, self.SCAN_NAME))
+            stackPath = self.scan_stack(self.SCAN_NAME, self.SCAN_NAME)
+            if stackPath == -1:
+                return -1
+            else:
+                stackPaths.append(stackPath)
 
         elif scanType == "timelapse":
             stackPaths = self.scan_timelapse()
+            if stackPaths == -1:
+                return -1
 
         # deconvolve scan if selected
         if self.deconvolveAfterScan:
@@ -212,7 +210,17 @@ class Scanner(object):
                 deconvolvedStack = io.imread(deconvolvedStackPath)
                 deconvolvedStackMaxProj = np.max(deconvolvedStack, axis=0)
                 deconvolvedStackMaxProj = self.paint_scalebar(deconvolvedStackMaxProj)
-                io.imsave(outputPath + "maxProj.tif",deconvolvedStackMaxProj)
+                filename = outputPath + "maxProj.tif"
+
+                # Make sure we don't overwrite anything
+                while os.path.exists(filename):
+                    print(self.LOG_PREFIX + "An attempt was made to overwrite an existing file. This attempt has been blocked.")
+                    print(self.LOG_PREFIX + "The current scan has had a random number appended to the filename.")
+                    randomSuffix = str(random.randint(100000, 900000))
+                    filename = os.path.splitext()[0]
+                    filename += randomSuffix + ".tif"
+
+                io.imsave(filename,deconvolvedStackMaxProj)
 
 
             print(self.LOG_PREFIX + "Scan deconvolution complete")
@@ -222,6 +230,11 @@ class Scanner(object):
 
         metadata = self.gen_stack_metadata()
         path = self.gen_scan_directory(scanName)
+        # Directory creation failed
+        if path == -1:
+            return -1
+
+
         # Put camera in scan mode
         self.mainQueue.put([1, 3, [timelapseScanName, metadata, path]])
         self.wait_for_confirmation(1)
@@ -244,19 +257,30 @@ class Scanner(object):
 
     def scan_timelapse(self):
 
-        self.gen_scan_directory(self.SCAN_NAME + "_timelapse")
+        timelapsePath = self.gen_scan_directory(self.SCAN_NAME + "_timelapse")
+        if timelapsePath == -1:
+            return -1
+
         stackPaths = []
 
         for i in range(0,self.TIMELAPSE_N):
 
             start = time()
-            # Turn laser on
+            # Open shutter
             self.mainQueue.put([2, 7, []])
             # Wait 1 second for laser to power up
             sleep(1)
             # Scan stack
-            stackPaths.append(self.scan_stack(self.SCAN_NAME + "_timelapse\\" + self.SCAN_NAME + "_timelapse" + str(i), self.SCAN_NAME + "_timelapse" + str(i)))
-            # Turn laser off
+            stackPath = self.scan_stack(self.SCAN_NAME + "_timelapse\\" + self.SCAN_NAME + "_timelapse" + str(i), self.SCAN_NAME + "_timelapse" + str(i))
+            if stackPath == -1:
+                # Close shutter
+                self.mainQueue.put([2, 7, []])
+                return -1
+            else:
+                stackPaths.append(stackPath)
+
+
+            # Close shutter
             self.mainQueue.put([2, 7, []])
             # Move back to top of stack
             self.mainQueue.put([2, 6, [2, -(self.STACK_SIZE * self.Z_STEP_SIZE_um), True]])

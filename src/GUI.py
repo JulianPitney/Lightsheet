@@ -11,6 +11,7 @@ class GUI(object):
 
 		# GUI Init
 		self.master = Tk()
+		self.master.geometry("598x1080+1442+0")  # Width x Height
 		self.gen_widgets()
 		self.stepsPerPush = 10
 
@@ -67,7 +68,7 @@ class GUI(object):
 
 
 		numericalApertureCollection = DoubleVar()
-		numericalApertureCollectionScale = Scale(scanConfigFrame, variable=numericalApertureCollection, orient=HORIZONTAL, showvalue=0, label="Numerical Aperture Collection", length=200,from_=0.1,to=2.0, resolution=0.05, command=self.update_scale_bar_numerical_aperture_collection)
+		numericalApertureCollectionScale = Scale(scanConfigFrame, variable=numericalApertureCollection, orient=HORIZONTAL, showvalue=0, label="Numerical Aperture Imaging", length=200,from_=0.1,to=2.0, resolution=0.01, command=self.update_scale_bar_numerical_aperture_collection)
 		self.numericalApertureCollectionLabel = Label(scanConfigFrame, text="0.5")
 		numericalApertureCollectionScale.set(0.5)
 
@@ -77,10 +78,6 @@ class GUI(object):
 		self.wavelengthEmmisionLabel = Label(scanConfigFrame, text="530nm")
 		wavelengthEmmisionScale.set(530)
 
-		nanometersPerPixel = IntVar()
-		nanometersPerPixelScale = Scale(scanConfigFrame, variable=nanometersPerPixel, orient=HORIZONTAL, showvalue=0, label="Nanometers Per Pixel", length=200,from_=10,to=2000, resolution=1, command=self.update_scale_bar_nanometers_per_pixel)
-		self.nanometersPerPixelLabel = Label(scanConfigFrame, text="177")
-		nanometersPerPixelScale.set(177)
 
 		richardsonLucyIterations = IntVar()
 		richardsonLucyIterationsScale = Scale(scanConfigFrame, variable=richardsonLucyIterations, orient=HORIZONTAL, showvalue=0, label="Deconvolution Iterations", length=200,from_=1,to=500, resolution=1, command=self.update_scale_bar_richardson_lucy_iterations)
@@ -132,8 +129,6 @@ class GUI(object):
 		self.numericalApertureCollectionLabel.pack()
 		wavelengthEmmisionScale.pack()
 		self.wavelengthEmmisionLabel.pack()
-		nanometersPerPixelScale.pack()
-		self.nanometersPerPixelLabel.pack()
 		richardsonLucyIterationsScale.pack()
 		self.richardsonLucyIterationsLabel.pack()
 		magnificationLabel.pack()

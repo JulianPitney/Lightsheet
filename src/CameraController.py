@@ -4,7 +4,8 @@ from multiprocessing import Process, Queue
 import tifffile as tif
 import numpy as np
 import time
-
+import os
+import random
 
 class TriggerType:
 	SOFTWARE = 1
@@ -42,7 +43,7 @@ class CameraController(object):
 		self.HEIGHT = 1080
 
 		self.test_camera_initialization()
-
+		self.toggle_preview()
 
 	def test_camera_initialization(self):
 
@@ -286,8 +287,10 @@ class CameraController(object):
 			frameRateNode.SetValue(self.FPS)
 
 
-		cv2.namedWindow('image',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('image',640,480)
+		cv2.namedWindow('Lightsheet Live Feed',cv2.WINDOW_NORMAL)
+		cv2.moveWindow('Lightsheet Live Feed', 0, 0)
+		cv2.resizeWindow('Lightsheet Live Feed',1440,1080)
+
 
 
 		# set exposure
@@ -387,7 +390,7 @@ class CameraController(object):
 				cv2.rectangle(cvMatPaintedFrame,(520,340),(920,740),150,3)
 				cv2.addWeighted(cvMatPaintedFrame, 0.1, cvMatOriginalFrame, 1, 0, cvMatOriginalFrame)
 				cvMatOriginalFrame = self.paint_scalebar(cvMatOriginalFrame)
-				cv2.imshow('image', cvMatOriginalFrame)
+				cv2.imshow('Lightsheet Live Feed', cvMatOriginalFrame)
 				cv2.waitKey(1)
 				image_result.Release()
 				fpsCounter += 1
@@ -515,6 +518,10 @@ class CameraController(object):
 		if(self.displayPreview):
 			self.toggle_preview()
 
+		cv2.namedWindow('Lightsheet Live Feed',cv2.WINDOW_NORMAL)
+		cv2.moveWindow('Lightsheet Live Feed', 0, 0)
+		cv2.resizeWindow('Lightsheet Live Feed',1440,1080)
+
 
 		camList, system = self.init_spinnaker()
 		camera = camList.GetByIndex(0)
@@ -540,6 +547,8 @@ class CameraController(object):
 
 				self.grab_next_image_by_trigger(nodemap, camera)
 				image_result = camera.GetNextImage()
+				image_converted = image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
+				cv2.imshow('Lightsheet Live Feed', image_converted)
 
 				if image_result.IsIncomplete():
 					print(self.LOG_PREFIX + "Image incomplete with image status=%d" % image_result.GetImageStatus())
@@ -564,6 +573,15 @@ class CameraController(object):
 		metadata_dict = {}
 		for item in metadata:
 			metadata_dict.update({item[0] : item[1]})
+
+		# Make sure we don't overwrite anything
+		while os.path.exists(filename):
+			print(self.LOG_PREFIX + "An attempt was made to overwrite an existing file. This attempt has been blocked.")
+			print(self.LOG_PREFIX + "The current scan has had a random number appended to the filename.")
+			randomSuffix = str(random.randint(100000, 900000))
+			filename = os.path.splitext(filename)[0]
+			filename += randomSuffix + ".tif"
+
 		tif.imwrite(filename, imageStack, imagej=True, metadata = metadata_dict)
 
 		"""
