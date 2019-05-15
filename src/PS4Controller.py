@@ -14,7 +14,7 @@
 
 import pygame
 from time import sleep
-
+import time
 
 
 class PS4Controller(object):
@@ -23,6 +23,7 @@ class PS4Controller(object):
     axis_data = None
     button_data = None
     hat_data = None
+    LAST_JOYSTICK_POSITION_UPDATE_TIME = time.time()
 
 
     def __init__(self, queue, mainQueue):
@@ -70,8 +71,8 @@ class PS4Controller(object):
                 elif event.type == pygame.JOYHATMOTION:
                     self.process_hat_motion_event(event)
 
-
-            self.send_joystick_position_update()
+            if(time.time() - self.LAST_JOYSTICK_POSITION_UPDATE_TIME < 30):
+                self.send_joystick_position_update()
 
 
 			# Delay this process to control the number of messages being sent by the PS4 controller.
@@ -92,12 +93,20 @@ class PS4Controller(object):
 
         if event.axis == 0:
             self.last_axis0_input = event.value
+            if event.value < -0.3 or event.value > 0.3:
+                self.LAST_JOYSTICK_POSITION_UPDATE_TIME = time.time()
         elif event.axis == 1:
             self.last_axis1_input = event.value
+            if event.value < -0.3 or event.value > 0.3:
+                self.LAST_JOYSTICK_POSITION_UPDATE_TIME = time.time()
         elif event.axis == 2:
             self.last_axis2_input = event.value
+            if event.value < -0.3 or event.value > 0.3:
+                self.LAST_JOYSTICK_POSITION_UPDATE_TIME = time.time()
         elif event.axis == 3:
             self.last_axis3_input = event.value
+            if event.value < -0.3 or event.value > 0.3:
+                self.LAST_JOYSTICK_POSITION_UPDATE_TIME = time.time()
 
 
     def process_button_down_event(self, event):
