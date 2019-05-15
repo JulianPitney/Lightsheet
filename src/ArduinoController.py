@@ -17,16 +17,14 @@ class ArduinoController(object):
 
 
 		# Motor configuration
-		self.COARSE_JOG = False
 		self.SEEK_SPEED = 1600
-		self.JOG_INCREMENT = 5
 		self.JOG_MIN_SPEED = 800
-		self.JOG_MAX_SPEED = 1600
+		self.JOG_MAX_SPEED = 2000
 		self.MICROMETERS_PER_STEP = 0.15625
 
 		# Hardware interface
 		SERIAL_PORT_PATH = "COM4"
-		BAUDRATE = 57600
+		BAUDRATE = 115200
 		self.serialInterface = self.open_serial_interface(SERIAL_PORT_PATH, BAUDRATE)
 		self.wait_for_arduino_confirmation()
 
@@ -80,12 +78,10 @@ class ArduinoController(object):
 
 	def toggle_coarse_jog(self):
 
-		if(self.JOG_INCREMENT == 5):
-			self.JOG_INCREMENT = 30
-			print(self.LOG_PREFIX + "COARSE_JOG=ON")
-		else:
-			self.JOG_INCREMENT = 5
-			print(self.LOG_PREFIX + "COARSE_JOG=OFF")
+		command = "TOGGLE_COARSE_JOG\n"
+		self.serialInterface.write(command.encode('UTF-8'))
+		response = self.serialInterface.readline().decode()
+		print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 	def toggle_laser(self):
 
@@ -145,18 +141,24 @@ class ArduinoController(object):
 			self.mainQueue.put([5, -1, [2]])
 
 
-	def jog_motor(self, motorIndex, speed, dir):
+	def jog_motor(self, motorInputs):
 
-		steps = self.JOG_INCREMENT
-		if(dir):
-			speed = self.map_analog_to_discrete_range(speed, 0.3, 1, self.JOG_MIN_SPEED, self.JOG_MAX_SPEED)
-			steps *= -1
-		else:
-			speed = self.map_analog_to_discrete_range(speed, -0.3, -1, self.JOG_MIN_SPEED, self.JOG_MAX_SPEED)
+		speeds = []
 
-		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(speed) + "\n"
+		for motorInput in motorInputs:
+
+			if motorInput > 0.3:
+				speed = self.map_analog_to_discrete_range(motorInput, 0.3, 1, self.JOG_MIN_SPEED, self.JOG_MAX_SPEED)
+			elif motorInput < -0.3:
+				speed = self.map_analog_to_discrete_range(motorInput, -0.3, -1, -self.JOG_MIN_SPEED, -self.JOG_MAX_SPEED)
+			else:
+				speed = 0
+
+			speeds.append(speed)
+
+		command = "JOG " + str(speeds[0]) + " " + str(speeds[1]) + " " + str(speeds[2]) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
-		response = self.serialInterface.readline().decode()
+		#response = self.serialInterface.readline().decode()
 		#print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 
@@ -173,7 +175,7 @@ class ArduinoController(object):
 		elif funcIndex == 3:
 			self.move_motor_steps(msg[2][0], msg[2][1], msg[2][2])
 		elif funcIndex == 4:
-			self.jog_motor(msg[2][0], msg[2][1], msg[2][2])
+			self.jog_motor(msg[2])
 		elif funcIndex == 5:
 			self.toggle_coarse_jog()
 		elif funcIndex == 6:

@@ -16,6 +16,7 @@ import pygame
 from time import sleep
 
 
+
 class PS4Controller(object):
 
     controller = None
@@ -70,32 +71,20 @@ class PS4Controller(object):
                     self.process_hat_motion_event(event)
 
 
-            if(self.last_axis0_input > 0.3):
-                msg = [2, 4, [3, self.last_axis0_input, True]]
-                self.mainQueue.put(msg)
-            elif(self.last_axis0_input < -0.3):
-                msg = [2, 4, [3, self.last_axis0_input, False]]
-                self.mainQueue.put(msg)
-
-            if self.last_axis1_input > 0.3:
-                msg = [2, 4, [1, self.last_axis1_input, True]]
-                self.mainQueue.put(msg)
-            elif self.last_axis1_input < -0.3:
-                msg = [2, 4, [1, self.last_axis1_input, False]]
-                self.mainQueue.put(msg)
-
-            if self.last_axis3_input > 0.3:
-                msg = [2, 4, [2, self.last_axis3_input, True]]
-                self.mainQueue.put(msg)
-            elif self.last_axis3_input < -0.3:
-                msg = [2, 4, [2, self.last_axis3_input, False]]
-                self.mainQueue.put(msg)
+            self.send_joystick_position_update()
 
 
 			# Delay this process to control the number of messages being sent by the PS4 controller.
             # (The controller can spit out messages much faster than the arduino/motors can process/execute those
             # messages).
             sleep(0.03)
+
+
+    def send_joystick_position_update(self):
+
+        msg = [2, 4, [self.last_axis0_input, -self.last_axis1_input, self.last_axis3_input]]
+        self.mainQueue.put(msg)
+
 
 
 

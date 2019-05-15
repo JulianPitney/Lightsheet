@@ -56,6 +56,8 @@ const int DRIVER3_PUL = 7;
 const int STEPPER3_MAX_SPEED = 4000.0;
 const int STEPPER3_SPEED = 20.0;
 const int STEPPER3_ACCELERATION = 400.0;
+int STEPPER_JOG_INCREMENT = 10;
+
 // Steppers
 AccelStepper STEPPER1(AccelStepper::DRIVER, DRIVER1_PUL, DRIVER1_DIR);
 AccelStepper STEPPER2(AccelStepper::DRIVER, DRIVER2_PUL, DRIVER2_DIR);
@@ -72,7 +74,7 @@ bool SHUTTER_ON;
 void setup() {
 
   // Block until serial connection established
-  Serial.begin(57600);
+  Serial.begin(115200);
   while(!Serial) {
     delay(100);
   }
@@ -109,9 +111,6 @@ void setup() {
 
 
 /*
-    This function enables the outputs of <stepper> and moves
-    it for <steps>. It then disables the outputs again.
-
     Note: The sign of <steps> determines the direction of rotation.
     Note: This function blocks until the movement is completed.
  */
@@ -275,6 +274,31 @@ int runCommand() {
       sendResponse("LED_SET:" + String(rc));
     }
   }
+  else if(command->cmd == "JOG")
+  {
+    if(command->argc != 4)
+    {
+      sendResponse("Invalid number of parameters!");
+      rc = -1;
+    }
+    else
+    {
+      rc = jogCommand();
+    }
+  }
+  else if(command->cmd == "TOGGLE_COARSE_JOG")
+  {
+    if(command->argc != 1)
+    {
+      sendResponse("Invalid number of parameters!");
+      rc = -1;
+    }
+    else
+    {
+      rc = toggleCoarseJogCommand();
+      sendResponse("COARSE_JOG_SET:" + String(rc));
+    }
+  }
   else
   {
       sendResponse("Invalid command!");
@@ -321,6 +345,73 @@ int moveCommand() {
 
   return rc;
 }
+
+int calcStepsFromSpeed(int speed) {
+
+  int steps = STEPPER_JOG_INCREMENT;
+
+  if(speed > 0)
+  {
+    steps = steps;
+  }
+  else if(speed < 0)
+  {
+    steps = steps * -1;
+  }
+  else
+  {
+    steps = 0;
+  }
+
+  return steps;
+}
+
+int jogCommand() {
+
+  int speed3 = command->params[1].toInt();
+  int speed1 = command->params[2].toInt();
+  int speed2 = command->params[3].toInt();
+
+  int speeds[] = {speed3, speed1, speed2};
+  int steps[] = {0,0,0};
+
+  for(int i = 0; i < 3; i++)
+  {
+    steps[i] = calcStepsFromSpeed(speeds[i]);
+  }
+
+  STEPPER1.move(steps[1]);
+  STEPPER1.setSpeed(speeds[1]);
+  STEPPER2.move(steps[2]);
+  STEPPER2.setSpeed(speeds[2]);
+  STEPPER3.move(steps[0]);
+  STEPPER3.setSpeed(speeds[0]);   
+
+  while(STEPPER1.targetPosition() != STEPPER1.currentPosition() || STEPPER2.targetPosition() != STEPPER2.currentPosition() || STEPPER3.targetPosition() != STEPPER3.currentPosition())
+  {
+    STEPPER1.runSpeedToPosition();
+    STEPPER2.runSpeedToPosition();
+    STEPPER3.runSpeedToPosition();
+  }
+
+ return 0;
+}
+
+int toggleCoarseJogCommand() {
+
+
+  if(STEPPER_JOG_INCREMENT == 10)
+  {
+    STEPPER_JOG_INCREMENT = 40;
+  }
+  else if(STEPPER_JOG_INCREMENT == 40)
+  {
+    STEPPER_JOG_INCREMENT = 10;
+  }
+
+  return STEPPER_JOG_INCREMENT;
+}
+  
 
 
 /*
