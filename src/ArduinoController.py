@@ -132,6 +132,7 @@ class ArduinoController(object):
 
 	def move_motor_steps(self, motorIndex, steps, scanMode):
 
+		steps = int(steps)
 		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(self.SEEK_SPEED) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()

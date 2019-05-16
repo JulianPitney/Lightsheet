@@ -238,6 +238,10 @@ class Scanner(object):
         # Put camera in scan mode
         self.mainQueue.put([1, 3, [timelapseScanName, metadata, path]])
         self.wait_for_confirmation(1)
+        # Open shutter
+        self.mainQueue.put([2, 7, []])
+        # Wait 1 second for shutter to open
+        sleep(1)
 
         for i in range(0, self.STACK_SIZE):
 
@@ -250,6 +254,12 @@ class Scanner(object):
             # Wait for motor vibration to settle
             sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
 
+        # Move back to top of stack
+        self.mainQueue.put([2, 6, [2, -(self.STACK_SIZE * self.Z_STEP_SIZE_um), True]])
+        # Close shutter
+        self.mainQueue.put([2, 7, []])
+        # Wait for confirmation from arduino that we've returned to top of the stack
+        self.wait_for_confirmation(2)
         # Take camera out of scan mode
         self.mainQueue.put([1, 4, ["STOP"]])
         print(self.LOG_PREFIX + "Stack Scan Complete!")
@@ -266,10 +276,6 @@ class Scanner(object):
         for i in range(0,self.TIMELAPSE_N):
 
             start = time()
-            # Open shutter
-            self.mainQueue.put([2, 7, []])
-            # Wait 1 second for laser to power up
-            sleep(1)
             # Scan stack
             stackPath = self.scan_stack(self.SCAN_NAME + "_timelapse\\" + self.SCAN_NAME + "_timelapse" + str(i), self.SCAN_NAME + "_timelapse" + str(i))
             if stackPath == -1:
@@ -279,15 +285,7 @@ class Scanner(object):
             else:
                 stackPaths.append(stackPath)
 
-
-            # Close shutter
-            self.mainQueue.put([2, 7, []])
-            # Move back to top of stack
-            self.mainQueue.put([2, 6, [2, -(self.STACK_SIZE * self.Z_STEP_SIZE_um), True]])
-            # Wait for confirmation from arduino that we've returned to top of the stack
-            self.wait_for_confirmation(2)
             end = time()
-
             # How long til' next stack?
             timeUntilNextStackDue = self.TIMELAPSE_INTERVAL_S - (end - start)
 

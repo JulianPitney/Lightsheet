@@ -1,4 +1,7 @@
 from tkinter import *
+import tkinter.scrolledtext as tkst
+from PIL import ImageTk, Image
+
 
 class GUI(object):
 
@@ -9,27 +12,71 @@ class GUI(object):
 		self.mainQueue = mainQueue
 		self.LOG_PREFIX = "GUI: "
 
+
 		# GUI Init
 		self.master = Tk()
-		self.master.geometry("598x1080+1442+0")  # Width x Height
+		self.master.geometry("2560x1440")
 		self.gen_widgets()
-		self.stepsPerPush = 10
+		self.micrometersPerStep = 0.15625
+		self.micrometersPerPush = 10
 
 	def gen_widgets(self):
 
 
-		stageAdjustFrame = Frame(self.master)
-		y_inc = Button(stageAdjustFrame, text="y+", command=lambda: self.button_push_callback(2, 3, [1,self.stepsPerPush, False]))
-		y_dec = Button(stageAdjustFrame, text="y-", command=lambda: self.button_push_callback(2, 3, [1,-self.stepsPerPush, False]))
-		x_inc = Button(stageAdjustFrame, text="x+", command=lambda: self.button_push_callback(2, 3, [3,self.stepsPerPush, False]))
-		x_dec = Button(stageAdjustFrame, text="x-", command=lambda: self.button_push_callback(2, 3, [3,-self.stepsPerPush, False]))
-		z_inc = Button(stageAdjustFrame, text="z+", command=lambda: self.button_push_callback(2, 3, [2,self.stepsPerPush, False]))
-		z_dec = Button(stageAdjustFrame, text="z-", command=lambda: self.button_push_callback(2, 3, [2,-self.stepsPerPush, False]))
+		logFrame = Frame(self.master)
+		logBox = tkst.ScrolledText(master=logFrame, wrap=WORD, height=16, bg="black", fg="RoyalBlue1")
+		logFrame.pack(side=BOTTOM, fill="both", expand="yes", padx=5, pady=5)
+		logBox.pack(fill="both", expand="yes", padx=5, pady=5)
+		logBox.insert(INSERT,"THIS BOX WILL CONTAIN LOG INFORMATION AND STATUS UPDATES\n")
+		logBox.insert(INSERT,"CameraProcess: INFO= TEST LOG MESSAGE!\n")
+		logBox.insert(INSERT,"ArduinoProcess: INFO= TEST LOG MESSAGE!\n")
+		logBox.insert(INSERT,"PS4Process: INFO= TEST LOG MESSAGE!\n")
+		logBox.insert(INSERT,"ScannerProcess: INFO= TEST LOG MESSAGE!\n")
+
+		hardwareControlFrame = Frame(self.master)
+		movementButtonsFrame = Frame(hardwareControlFrame)
+		controllerPictureFrame = Frame(hardwareControlFrame)
+		self.controllerImg = ImageTk.PhotoImage(Image.open("C:/Users/Lightsheet/Desktop/ps4Controller.png"))
+		imgPanel = Label(controllerPictureFrame, image=self.controllerImg)
+		y_inc = Button(movementButtonsFrame, text="y+", font=20, width=4, height=2, bg="slate gray", activebackground="dark slate gray", bd=2, relief=GROOVE, command=lambda: self.button_push_callback(2, 3, [1, self.micrometersPerPush/self.micrometersPerStep, False]))
+		y_dec = Button(movementButtonsFrame, text="y-", font=20, width=4, height=2, bg="slate gray", activebackground="dark slate gray", bd=2, relief=GROOVE, command=lambda: self.button_push_callback(2, 3, [1, -self.micrometersPerPush/self.micrometersPerStep, False]))
+		x_inc = Button(movementButtonsFrame, text="x+", font=20, width=4, height=2, bg="slate gray", activebackground="dark slate gray", bd=2, relief=GROOVE, command=lambda: self.button_push_callback(2, 3, [3, self.micrometersPerPush/self.micrometersPerStep, False]))
+		x_dec = Button(movementButtonsFrame, text="x-", font=20, width=4, height=2, bg="slate gray", activebackground="dark slate gray", bd=2, relief=GROOVE, command=lambda: self.button_push_callback(2, 3, [3, -self.micrometersPerPush/self.micrometersPerStep, False]))
+		z_inc = Button(movementButtonsFrame, text="z+", font=20, width=4, height=2, bg="slate gray", activebackground="dark slate gray", bd=2, relief=GROOVE, command=lambda: self.button_push_callback(2, 3, [2, self.micrometersPerPush/self.micrometersPerStep, False]))
+		z_dec = Button(movementButtonsFrame, text="z-", font=20, width=4, height=2, bg="slate gray", activebackground="dark slate gray", bd=2, relief=GROOVE, command=lambda: self.button_push_callback(2, 3, [2, -self.micrometersPerPush/self.micrometersPerStep, False]))
 		stepsPerButtonPush = StringVar()
 		stepsPerButtonPush.set("10")
-		SPPEntry = Entry(stageAdjustFrame, textvariable=stepsPerButtonPush, bd=5)
-		setSPP = Button(stageAdjustFrame, text="Set SPP", command=lambda: self.update_steps_per_push(SPPEntry.get()))
-		togglePreview = Button(stageAdjustFrame, text="Toggle Live Preview", command=lambda: self.button_push_callback(1, 0, []))
+		stepsPerButtonPushLabel = Label(movementButtonsFrame, text="Use these buttons to make the stage perform\n precise movements. The number in the box specifies \nhow many micrometers the stage will move per button push.", justify=CENTER)
+		SPPEntry = Entry(movementButtonsFrame, textvariable=stepsPerButtonPush, bd=5)
+		setSPP = Button(movementButtonsFrame, text="Set μm Per Push", command=lambda: self.update_steps_per_push(SPPEntry.get()))
+		togglePreview = Button(hardwareControlFrame, text="Toggle Live Preview", command=lambda: self.button_push_callback(1, 0, []))
+		hardwareControlFrame.pack(side=LEFT, fill="both", expand="yes")
+		movementButtonsFrame.pack(side=BOTTOM, fill="both",pady=100, padx=50)
+		controllerPictureFrame.pack(side=TOP, fill="both", expand="yes")
+
+
+		imgPanel.pack(side=LEFT, padx=(100,0))
+		y_inc.grid(row=1,column=3, padx=4, pady=4)
+		y_dec.grid(row=3,column=3, padx=4, pady=4)
+		x_inc.grid(row=2,column=4, padx=4, pady=4)
+		x_dec.grid(row=2,column=2, padx=4, pady=4)
+		z_inc.grid(row=1,column=5, padx=4, pady=4)
+		z_dec.grid(row=3,column=5, padx=4, pady=4)
+		stepsPerButtonPushLabel.grid(row=1, column=0, padx=(0,30), stick=S)
+		SPPEntry.grid(row=2, column=0, padx=(0, 30))
+		setSPP.grid(row=3, column=0, padx=(0, 30), stick=N)
+
+
+
+
+		cameraFeedFrame = Frame(self.master)
+		cameraFeedFrame.pack(side=LEFT, fill="both", expand="yes")
+		self.tempImg = ImageTk.PhotoImage(Image.open("C:/Users/Lightsheet/Desktop/inprogress.png"))
+		imgPanel = Label(cameraFeedFrame, image=self.tempImg)
+		explanationLabel = Label(cameraFeedFrame, text="Camera feed will go here, embedded in GUI window", font=16)
+		explanationLabel.pack(pady=(300, 0))
+		imgPanel.pack()
+
 
 		scanConfigFrame = Frame(self.master)
 		gain = IntVar()
@@ -47,8 +94,8 @@ class GUI(object):
 		self.scanDepthLabel = Label(scanConfigFrame, text="10 Slices")
 
 		stepSize = IntVar()
-		stepSizeScale = Scale(scanConfigFrame, variable=stepSize, orient=HORIZONTAL, showvalue=0, label="Step Size(um)", length=200,from_=1,to=64, resolution=1, command=self.update_scale_bar_step_size)
-		self.stepSizeLabel = Label(scanConfigFrame, text="0.15625um")
+		stepSizeScale = Scale(scanConfigFrame, variable=stepSize, orient=HORIZONTAL, showvalue=0, label="Step Size(μm)", length=200,from_=1,to=64, resolution=1, command=self.update_scale_bar_step_size)
+		self.stepSizeLabel = Label(scanConfigFrame, text="0.15625μm")
 
 		timelapseN = IntVar()
 		timelapseNScale = Scale(scanConfigFrame, variable=timelapseN, orient=HORIZONTAL, showvalue=0, label="Timelapse Iterations", length=200,from_=1,to=100, resolution=1, command=self.update_scale_bar_timelapse_n)
@@ -99,18 +146,10 @@ class GUI(object):
 		scanTimelapseButton = Button(scanConfigFrame, text="Scan Timelapse", command=lambda: self.button_push_callback(5, 7, []))
 
 
-		stageAdjustFrame.pack(side=LEFT)
-		y_inc.pack(fill=X, padx=30)
-		y_dec.pack(fill=X, padx=30)
-		x_inc.pack(fill=X, padx=30)
-		x_dec.pack(fill=X, padx=30)
-		z_inc.pack(fill=X, padx=30)
-		z_dec.pack(fill=X, padx=30)
-		SPPEntry.pack(fill=X, padx=30)
-		setSPP.pack(padx=30)
-		togglePreview.pack(fill=X, padx=30)
 
-		scanConfigFrame.pack(side=RIGHT,padx=50)
+
+
+		scanConfigFrame.pack(side=RIGHT, fill="both", expand="yes")
 		gainScale.pack()
 		self.gainLabel.pack()
 		exposureScale.pack()
@@ -134,12 +173,14 @@ class GUI(object):
 		magnificationLabel.pack()
 		magnificationDropdown.pack()
 		self.magnification.trace('w', self.update_magnification_dropdown)
-
-		scanNameEntry.pack(pady=(10,0))
-		setScanName.pack(pady=(0,10))
+		scanNameEntry.pack(pady=(10, 0))
+		setScanName.pack(pady=(0, 10))
 		scanButton.pack()
 		scanTimelapseButton.pack()
 		deconvolutionButton.pack()
+
+
+
 
 	def button_push_callback(self, processIndex, functionIndex, args):
 
@@ -148,7 +189,7 @@ class GUI(object):
 
 	def update_steps_per_push(self, steps):
 
-		self.stepsPerPush = int(steps)
+		self.micrometersPerPush = int(steps)
 
 	def update_scale_bar_gain(self, gain):
 
@@ -211,6 +252,8 @@ class GUI(object):
 	def update_magnification_dropdown(self, *args):
 		self.button_push_callback(1, 4, [int(self.magnification.get())])
 		self.button_push_callback(5, 16, [int(self.magnification.get())])
+
+
 
 def launch_gui(queue, mainQueue):
 
