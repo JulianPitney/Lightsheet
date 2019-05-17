@@ -236,7 +236,7 @@ class Scanner(object):
 
 
         # Put camera in scan mode
-        self.mainQueue.put([1, 3, [timelapseScanName, metadata, path]])
+        self.mainQueue.put([1, 3, [timelapseScanName, metadata, path, 0]])
         self.wait_for_confirmation(1)
         # Open shutter
         self.mainQueue.put([2, 7, []])
