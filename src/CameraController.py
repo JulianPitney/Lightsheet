@@ -3,7 +3,7 @@ import cv2
 from multiprocessing import Process, Queue
 import tifffile as tif
 import numpy as np
-import time
+from time import sleep
 import os
 import random
 
@@ -18,11 +18,13 @@ CHOSEN_TRIGGER = TriggerType.SOFTWARE
 
 class CameraController(object):
 
-    def __init__(self, queue, mainQueue):
+    def __init__(self, queue, mainQueue, guiVideoQueue, guiLogQueue):
 
         # Process objects
         self.queue = queue
         self.mainQueue = mainQueue
+        self.guiVideoQueue = guiVideoQueue
+        self.guiLogQueue = guiLogQueue
         self.LOG_PREFIX = "CameraController: "
 
         # Image Parameters
@@ -49,6 +51,8 @@ class CameraController(object):
             self.nodemaps.append(nodemap)
 
 
+        self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
+
 #--------------------------------------------------------------------------------------------#
 #                               SPINNAKER CONFIG START                                       #
 #--------------------------------------------------------------------------------------------#
@@ -60,10 +64,10 @@ class CameraController(object):
         if camList.GetSize() == 0:
             camList.Clear()
             system.ReleaseInstance()
-            print(self.LOG_PREFIX + "No cameras were found")
+            self.guiLogQueue.put(self.LOG_PREFIX + "No cameras were found")
             return None, None
         else:
-            print(self.LOG_PREFIX + str(camList.GetSize()) + " cameras detected")
+            self.guiLogQueue.put(self.LOG_PREFIX + str(camList.GetSize()) + " cameras detected")
             return camList, system
 #--------------------------------------------------------------------------------------------#
 #                               SPINNAKER CONFIG END                                         #
@@ -100,12 +104,12 @@ class CameraController(object):
         # In order to access the node entries, they have to be casted to a pointer type (CEnumerationPtr here)
         node_acquisition_mode = PySpin.CEnumerationPtr(nodemap.GetNode('AcquisitionMode'))
         if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(node_acquisition_mode):
-            print(self.LOG_PREFIX + "Unable to access acquisition mode of camera")
+            self.guiLogQueue.put(self.LOG_PREFIX + "Unable to access acquisition mode of camera")
 
         node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName(acquisitionMode)
         if not PySpin.IsAvailable(node_acquisition_mode_continuous) or not PySpin.IsReadable(
                 node_acquisition_mode_continuous):
-            print(self.LOG_PREFIX + "Unable to set acquisition mode of camera")
+            self.guiLogQueue.put(self.LOG_PREFIX + "Unable to set acquisition mode of camera")
 
         acquisition_mode_continuous = node_acquisition_mode_continuous.GetValue()
         node_acquisition_mode.SetIntValue(acquisition_mode_continuous)
@@ -128,13 +132,13 @@ class CameraController(object):
 
         enableAcquisitionFrameRateNode = PySpin.CBooleanPtr(nodemap.GetNode("AcquisitionFrameRateEnable"))
         if enableAcquisitionFrameRateNode.GetAccessMode() != PySpin.RW:
-            print(self.LOG_PREFIX + "Unable to enable camera acquistion frame rate control")
+            self.guiLogQueue.put(self.LOG_PREFIX + "Unable to enable camera acquistion frame rate control")
         else:
             enableAcquisitionFrameRateNode.SetValue(True)
 
         frameRateNode = PySpin.CFloatPtr(nodemap.GetNode("AcquisitionFrameRate"))
         if frameRateNode.GetAccessMode() != PySpin.RW:
-            print(self.LOG_PREFIX + "Unable to set camera acquisition frame rate")
+            self.guiLogQueue.put(self.LOG_PREFIX + "Unable to set camera acquisition frame rate")
         else:
             frameRateNode.SetValue(self.FPS)
 
@@ -143,13 +147,13 @@ class CameraController(object):
     def set_camera_gain(self, camera, gain):
 
         if camera.GainAuto.GetAccessMode() != PySpin.RW:
-            print(self.LOG_PREFIX + "Unable to disable camera automatic gain")
+            self.guiLogQueue.put(self.LOG_PREFIX + "Unable to disable camera automatic gain")
             return False
         else:
             camera.GainAuto.SetValue(PySpin.GainAuto_Off)
 
         if camera.Gain.GetAccessMode() != PySpin.RW:
-            print(self.LOG_PREFIX + "Unable to set camera gain")
+            self.guiLogQueue.put(self.LOG_PREFIX + "Unable to set camera gain")
             return False
         else:
             gain = min(camera.Gain.GetMax(), gain)
@@ -160,13 +164,13 @@ class CameraController(object):
 
 
         if camera.ExposureAuto.GetAccessMode() != PySpin.RW:
-            print(self.LOG_PREFIX + 'Unable to disable camera automatic exposure')
+            self.guiLogQueue.put(self.LOG_PREFIX + 'Unable to disable camera automatic exposure')
             return False
         else:
             camera.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
 
         if camera.ExposureTime.GetAccessMode() != PySpin.RW:
-            print(self.LOG_PREFIX + 'Unable to set camera exposure')
+            self.guiLogQueue.put(self.LOG_PREFIX + 'Unable to set camera exposure')
             return False
         else:
             # Ensure desired exposure time does not exceed the maximum
@@ -186,11 +190,11 @@ class CameraController(object):
                 pixel_format_mono16 = node_pixel_format_mono16.GetValue()
                 # Set integer as new value for enumeration node
                 node_pixel_format.SetIntValue(pixel_format_mono16)
-                print(self.LOG_PREFIX + "PIXEL_FORMAT=%s" % node_pixel_format.GetCurrentEntry().GetSymbolic())
+                self.guiLogQueue.put(self.LOG_PREFIX + "PIXEL_FORMAT=%s" % node_pixel_format.GetCurrentEntry().GetSymbolic())
             else:
-                print(self.LOG_PREFIX + "Camera pixel format mono 16 not available")
+                self.guiLogQueue.put(self.LOG_PREFIX + "Camera pixel format mono 16 not available")
         else:
-            print(self.LOG_PREFIX + "Camera pixel format not available")
+            self.guiLogQueue.put(self.LOG_PREFIX + "Camera pixel format not available")
 
 
 
@@ -210,12 +214,12 @@ class CameraController(object):
             nodemap = camera.GetNodeMap()
             node_trigger_mode = PySpin.CEnumerationPtr(nodemap.GetNode('TriggerMode'))
             if not PySpin.IsAvailable(node_trigger_mode) or not PySpin.IsReadable(node_trigger_mode):
-                print(self.LOG_PREFIX + 'Unable to access camera trigger mode')
+                self.guiLogQueue.put(self.LOG_PREFIX + 'Unable to access camera trigger mode')
                 return False
 
             node_trigger_mode_off = node_trigger_mode.GetEntryByName('Off')
             if not PySpin.IsAvailable(node_trigger_mode_off) or not PySpin.IsReadable(node_trigger_mode_off):
-                print(self.LOG_PREFIX + 'Unable to disable camera trigger mode')
+                self.guiLogQueue.put(self.LOG_PREFIX + 'Unable to disable camera trigger mode')
             # return False
 
             node_trigger_mode.SetIntValue(node_trigger_mode_off.GetValue())
@@ -225,14 +229,14 @@ class CameraController(object):
             # mode is off.
             node_trigger_source = PySpin.CEnumerationPtr(nodemap.GetNode('TriggerSource'))
             if not PySpin.IsAvailable(node_trigger_source) or not PySpin.IsWritable(node_trigger_source):
-                print(self.LOG_PREFIX + 'Unable to access camera trigger source')
+                self.guiLogQueue.put(self.LOG_PREFIX + 'Unable to access camera trigger source')
                 return False
 
             if CHOSEN_TRIGGER == TriggerType.SOFTWARE:
                 node_trigger_source_software = node_trigger_source.GetEntryByName('Software')
                 if not PySpin.IsAvailable(node_trigger_source_software) or not PySpin.IsReadable(
                         node_trigger_source_software):
-                    print(self.LOG_PREFIX + 'Unable to set camera trigger source')
+                    self.guiLogQueue.put(self.LOG_PREFIX + 'Unable to set camera trigger source')
                     return False
                 node_trigger_source.SetIntValue(node_trigger_source_software.GetValue())
 
@@ -240,7 +244,7 @@ class CameraController(object):
                 node_trigger_source_hardware = node_trigger_source.GetEntryByName('Line0')
                 if not PySpin.IsAvailable(node_trigger_source_hardware) or not PySpin.IsReadable(
                         node_trigger_source_hardware):
-                    print(self.LOG_PREFIX + 'Unable to set camera trigger source')
+                    self.guiLogQueue.put(self.LOG_PREFIX + 'Unable to set camera trigger source')
                     return False
                 node_trigger_source.SetIntValue(node_trigger_source_hardware.GetValue())
 
@@ -249,13 +253,13 @@ class CameraController(object):
             # on in order to retrieve images using the trigger.
             node_trigger_mode_on = node_trigger_mode.GetEntryByName('On')
             if not PySpin.IsAvailable(node_trigger_mode_on) or not PySpin.IsReadable(node_trigger_mode_on):
-                print(self.LOG_PREFIX + 'Unable to enable camera trigger mode')
+                self.guiLogQueue.put(self.LOG_PREFIX + 'Unable to enable camera trigger mode')
                 return False
 
             node_trigger_mode.SetIntValue(node_trigger_mode_on.GetValue())
 
         except PySpin.SpinnakerException as ex:
-            print(self.LOG_PREFIX + 'Error=%s' % ex)
+            self.guiLogQueue.put(self.LOG_PREFIX + 'Error=%s' % ex)
             return False
 
         return result
@@ -268,18 +272,18 @@ class CameraController(object):
             result = True
             node_trigger_mode = PySpin.CEnumerationPtr(nodemap.GetNode('TriggerMode'))
             if not PySpin.IsAvailable(node_trigger_mode) or not PySpin.IsReadable(node_trigger_mode):
-                print(self.LOG_PREFIX + 'Unable to disable camera trigger mode')
+                self.guiLogQueue.put(self.LOG_PREFIX + 'Unable to disable camera trigger mode')
                 return False
 
             node_trigger_mode_off = node_trigger_mode.GetEntryByName('Off')
             if not PySpin.IsAvailable(node_trigger_mode_off) or not PySpin.IsReadable(node_trigger_mode_off):
-                print(self.LOG_PREFIX + 'Unable to disable camera trigger mode')
+                self.guiLogQueue.put(self.LOG_PREFIX + 'Unable to disable camera trigger mode')
                 return False
 
             node_trigger_mode.SetIntValue(node_trigger_mode_off.GetValue())
 
         except PySpin.SpinnakerException as ex:
-            print(self.LOG_PREFIX + 'Error=%s' % ex)
+            self.guiLogQueue.put(self.LOG_PREFIX + 'Error=%s' % ex)
             result = False
 
         return result
@@ -308,17 +312,17 @@ class CameraController(object):
                 # Execute software trigger
                 node_softwaretrigger_cmd = PySpin.CCommandPtr(nodemap.GetNode('TriggerSoftware'))
                 if not PySpin.IsAvailable(node_softwaretrigger_cmd) or not PySpin.IsWritable(node_softwaretrigger_cmd):
-                    print(self.LOG_PREFIX + 'Unable to execute camera trigger')
+                    self.guiLogQueue.put(self.LOG_PREFIX + 'Unable to execute camera trigger')
                     return False
 
                 node_softwaretrigger_cmd.Execute()
 
 
             elif CHOSEN_TRIGGER == TriggerType.HARDWARE:
-                print(self.LOG_PREFIX + 'Camera hardware trigger selected')
+                self.guiLogQueue.put(self.LOG_PREFIX + 'Camera hardware trigger selected')
 
         except PySpin.SpinnakerException as ex:
-            print(self.LOG_PREFIX + 'Error=%s' % ex)
+            self.guiLogQueue.put(self.LOG_PREFIX + 'Error=%s' % ex)
             return False
 
         return result
@@ -329,7 +333,7 @@ class CameraController(object):
         self.grab_next_image_by_trigger(self.nodemaps[cameraIndex])
         image_result = self.cameras[cameraIndex].GetNextImage()
         if image_result.IsIncomplete():
-            print(self.LOG_PREFIX + "Image incomplete with image status=%d" % image_result.GetImageStatus())
+            self.guiLogQueue.put(self.LOG_PREFIX + "Image incomplete with image status=%d" % image_result.GetImageStatus())
             self.lastFrame = []
         else:
             image_converted = image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
@@ -340,9 +344,9 @@ class CameraController(object):
     def retrieve_next_image_IPC(self, cameraIndex, destinationProcessIndex, destinationFunctionIndex):
 
         if len(self.lastFrame) != 0:
-            self.mainQueue.put([destinationProcessIndex, destinationFunctionIndex, [self.lastFrame, True]])
+            self.guiVideoQueue.put([destinationProcessIndex, destinationFunctionIndex, [self.lastFrame, True]])
         else:
-            self.mainQueue.put([destinationProcessIndex, destinationFunctionIndex, [self.lastFrame, False]])
+            self.guiVideoQueue.put([destinationProcessIndex, destinationFunctionIndex, [self.lastFrame, False]])
 
 #--------------------------------------------------------------------------------------------#
 #                               CAMERA CONTROL END                                           #
@@ -424,7 +428,7 @@ class CameraController(object):
                 cv2.waitKey(1)
 
                 if image_result.IsIncomplete():
-                    print(self.LOG_PREFIX + "Image incomplete with image status=%d" % image_result.GetImageStatus())
+                    self.guiLogQueue.put(self.LOG_PREFIX + "Image incomplete with image status=%d" % image_result.GetImageStatus())
                 else:
                     frames.append(image_result)
                     # Send confirmation of capture to scanner
@@ -448,8 +452,8 @@ class CameraController(object):
 
         # Make sure we don't overwrite anything
         while os.path.exists(filename):
-            print(self.LOG_PREFIX + "An attempt was made to overwrite an existing file. This attempt has been blocked.")
-            print(self.LOG_PREFIX + "The current scan has had a random number appended to the filename.")
+            self.guiLogQueue.put(self.LOG_PREFIX + "An attempt was made to overwrite an existing file. This attempt has been blocked.")
+            self.guiLogQueue.put(self.LOG_PREFIX + "The current scan has had a random number appended to the filename.")
             randomSuffix = str(random.randint(100000, 900000))
             filename = os.path.splitext(filename)[0]
             filename += randomSuffix + ".tif"
@@ -486,7 +490,6 @@ class CameraController(object):
 
             self.retrieve_next_image(0)
 
-def launch_camera(queue, mainQueue):
-    cc = CameraController(queue, mainQueue)
-    print("Camera Process: Initialization complete")
+def launch_camera(queue, mainQueue, guiVideoQueue, guiLogQueue):
+    cc = CameraController(queue, mainQueue, guiVideoQueue, guiLogQueue)
     cc.mainloop()

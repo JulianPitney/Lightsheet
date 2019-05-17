@@ -6,12 +6,13 @@ import serial
 class ArduinoController(object):
 
 
-	def __init__(self, queue, mainQueue):
+	def __init__(self, queue, mainQueue, guiLogQueue):
 
 
 		# Process objects
 		self.queue = queue
 		self.mainQueue = mainQueue
+		self.guiLogQueue = guiLogQueue
 		self.LOG_PREFIX = "ArduinoController: "
 
 
@@ -28,6 +29,7 @@ class ArduinoController(object):
 		self.serialInterface = self.open_serial_interface(SERIAL_PORT_PATH, BAUDRATE)
 		self.wait_for_arduino_confirmation()
 
+		self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
 
 
 	def __del__(self):
@@ -41,10 +43,10 @@ class ArduinoController(object):
 		while(1):
 			serialInterface = serial.Serial(SERIAL_PORT_PATH, BAUDRATE, timeout=3)
 			if serialInterface.is_open:
-				print(self.LOG_PREFIX + "Serial connection successfully established (" + SERIAL_PORT_PATH + "," + str(BAUDRATE) + ")")
+				self.guiLogQueue.put(self.LOG_PREFIX + "Serial connection successfully established (" + SERIAL_PORT_PATH + "," + str(BAUDRATE) + ")")
 				return serialInterface
 			else:
-				print(self.LOG_PREFIX + "Failed to open serial connection (" + SERIAL_PORT_PATH + "," + str(BAUDRATE) + ")")
+				self.guiLogQueue.put(self.LOG_PREFIX + "Failed to open serial connection (" + SERIAL_PORT_PATH + "," + str(BAUDRATE) + ")")
 
 
 	def wait_for_arduino_confirmation(self):
@@ -53,17 +55,17 @@ class ArduinoController(object):
 		while(1):
 			confirmation = self.serialInterface.readline().decode()
 			if confirmation == "ARDUINO READY\n":
-				print(self.LOG_PREFIX + "Arduino ready!")
+				self.guiLogQueue.put(self.LOG_PREFIX + "Arduino ready!")
 				return 0
 			else:
-				print(self.LOG_PREFIX + "Arduino failed to respond!")
+				self.guiLogQueue.put(self.LOG_PREFIX + "Arduino failed to respond!")
 
 
 	def convert_um_to_steps(self, um):
 
 		# ensure request is a whole number multiple of <MICROMETERS_PER_STEP>
 		if um % self.MICROMETERS_PER_STEP != 0:
-			print(self.LOG_PREFIX + " ERROR=Motor can only provide movement in whole number multiples of <MICROMETERS_PER_STEP>!")
+			self.guiLogQueue.put(self.LOG_PREFIX + " ERROR=Motor can only provide movement in whole number multiples of <MICROMETERS_PER_STEP>!")
 			return 0
 		else:
 			steps = um / self.MICROMETERS_PER_STEP
@@ -81,28 +83,28 @@ class ArduinoController(object):
 		command = "TOGGLE_COARSE_JOG\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 	def toggle_laser(self):
 
 		command = "TOGGLE_LASER\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 	def toggle_solenoid(self):
 
 		command = "TOGGLE_SHUTTER\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 	def toggle_led(self):
 
 		command ="TOGGLE_LED\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 
 	def set_motor_speed(self, motorIndex, speed):
@@ -111,7 +113,7 @@ class ArduinoController(object):
 		command = "SET S" + str(motorIndex) + " " + "SPEED" + " " + str(speed) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 	def set_motor_acceleration(self, motorIndex, acceleration):
 
@@ -119,7 +121,7 @@ class ArduinoController(object):
 		command = "SET S" + str(motorIndex) + " " + "ACCELERATION" + " " + str(acceleration) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 
 	def move_motor_micrometers(self, motorIndex, um, scanMode):
@@ -136,7 +138,7 @@ class ArduinoController(object):
 		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(self.SEEK_SPEED) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		#print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 		if scanMode:
 			self.mainQueue.put([5, -1, [2]])
@@ -160,7 +162,7 @@ class ArduinoController(object):
 		command = "JOG " + str(speeds[0]) + " " + str(speeds[1]) + " " + str(speeds[2]) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		#response = self.serialInterface.readline().decode()
-		#print(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 
 	def process_msg(self, msg):
@@ -192,8 +194,7 @@ class ArduinoController(object):
 				self.process_msg(self.queue.get())
 
 
-def launch_arduino_controller(queue, mainQueue):
+def launch_arduino_controller(queue, mainQueue, guiLogQueue):
 
-	ac = ArduinoController(queue, mainQueue)
-	print("Arduino Process: Initialization complete")
+	ac = ArduinoController(queue, mainQueue, guiLogQueue)
 	ac.mainloop()

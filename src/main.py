@@ -9,13 +9,15 @@ from multiprocessing import Process, Queue
 def launch_system_processes():
 
 	queues = [Queue(0), Queue(0), Queue(0), Queue(0), Queue(0), Queue(0)]
+	guiVideoQueue = Queue(0)
+	guiLogQueue = Queue(0)
 	processes = []
 
-	processes.append(Process(target=launch_arduino_controller, args=(queues[2], queues[0],)))
-	processes.append(Process(target=launch_camera, args=(queues[1], queues[0],)))
-	processes.append(Process(target=launch_gui, args=(queues[4], queues[0],)))
-	processes.append(Process(target=launch_ps4_controller, args=(queues[3], queues[0],)))
-	processes.append(Process(target=launch_scanner, args=(queues[5], queues[0],)))
+	processes.append(Process(target=launch_arduino_controller, args=(queues[2], queues[0], guiLogQueue,)))
+	processes.append(Process(target=launch_camera, args=(queues[1], queues[0], guiVideoQueue, guiLogQueue,)))
+	processes.append(Process(target=launch_gui, args=(queues[4], queues[0], guiVideoQueue, guiLogQueue,)))
+	processes.append(Process(target=launch_ps4_controller, args=(queues[3], queues[0], guiLogQueue,)))
+	processes.append(Process(target=launch_scanner, args=(queues[5], queues[0], guiLogQueue,)))
 
 	for process in processes:
 		process.start()

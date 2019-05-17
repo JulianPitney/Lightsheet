@@ -26,11 +26,12 @@ class PS4Controller(object):
     LAST_JOYSTICK_POSITION_UPDATE_TIME = time.time()
 
 
-    def __init__(self, queue, mainQueue):
+    def __init__(self, queue, mainQueue, guiLogQueue):
 
         # Process objects
         self.queue = queue
         self.mainQueue = mainQueue
+        self.guiLogQueue = guiLogQueue
         self.LOG_PREFIX = "PS4Controller: "
 
         # Controller init
@@ -42,6 +43,8 @@ class PS4Controller(object):
         self.last_axis1_input = 0
         self.last_axis2_input = 0
         self.last_axis3_input = 0
+
+        self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
 
     def listen(self):
 
@@ -136,8 +139,7 @@ class PS4Controller(object):
 
 
 
-def launch_ps4_controller(queue, mainQueue):
+def launch_ps4_controller(queue, mainQueue, guiLogQueue):
 
-    ps4 = PS4Controller(queue, mainQueue)
-    print("PS4 Process: Initialization complete")
+    ps4 = PS4Controller(queue, mainQueue, guiLogQueue)
     ps4.listen()
