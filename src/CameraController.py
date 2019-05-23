@@ -84,11 +84,7 @@ class CameraController(object):
     def init_video_stream(self, cameraIndex):
 
         camera = self.camList.GetByIndex(cameraIndex)
-        self.initialize_camera(camera, True, 'Continuous')
-        nodemap = camera.GetNodeMap()
-        self.set_camera_pixel_format(nodemap)
-        self.set_camera_exposure(camera, 30000)
-        self.set_camera_gain(camera, 24)
+        nodemap = self.initialize_camera(camera, True, 'Continuous')
         camera.BeginAcquisition()
         return camera, nodemap
 
@@ -98,6 +94,10 @@ class CameraController(object):
 
         camera.Init()
         nodemap = camera.GetNodeMap()
+
+        self.set_camera_pixel_format(nodemap)
+        self.set_camera_exposure(camera, 30000)
+        self.set_camera_gain(camera, 24)
 
         # In order to access the node entries, they have to be casted to a pointer type (CEnumerationPtr here)
         node_acquisition_mode = PySpin.CEnumerationPtr(nodemap.GetNode('AcquisitionMode'))
@@ -115,7 +115,7 @@ class CameraController(object):
         if configureTrigger:
             self.configure_trigger(camera)
 
-
+        return nodemap
 
     def deinitialize_camera(self, camera, nodemap):
 
