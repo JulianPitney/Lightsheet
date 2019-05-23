@@ -43,6 +43,7 @@ class Scanner(object):
         self.richardsonLucyIterations = 2
         self.sizeX = 1440
         self.sizeY = 1080
+        self.nanometersPerPixel = 175
 
         self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
 
@@ -99,7 +100,22 @@ class Scanner(object):
         self.guiLogQueue.put(self.LOG_PREFIX + "DECONVOLVE_AFTER_SCAN=" + str(deconvolveAfterScan))
 
     def set_imaging_objective_magnification(self, magnification):
-        self.imagingObjectiveMagnification = int(magnification)
+
+        magnification = int(magnification)
+        self.imagingObjectiveMagnification = magnification
+
+        if magnification == 5:
+            self.nanometersPerPixel = 666
+        elif magnification == 10:
+            self.nanometersPerPixel == 357
+        elif magnification == 20:
+            self.nanometersPerPixel = 175
+        elif magnification == 40:
+            self.nanometersPerPixel = 89
+        elif magnification == 63:
+            self.nanometersPerPixel = 57
+
+
         self.guiLogQueue.put(self.LOG_PREFIX + "IMAGING_OBJECTIVE_MAGNIFICATION=" + str(magnification))
 
 
@@ -202,12 +218,12 @@ class Scanner(object):
             self.guiLogQueue.put(self.LOG_PREFIX + "Scan deconvolution starting...")
             # generate psf for this scan
             path = stackPaths[0]
-            path = os.path.dirname(path)
             path = os.path.dirname(path) + "\\"
+
 
             psfPath = self.deconvolver.gen_psf_PSFGenerator(self.refractiveIndexImmersion, self.wavelength, self.numericalAperture, self.nanometersPerPixel, self.Z_STEP_SIZE_um, self.sizeX, self.sizeY, self.STACK_SIZE, path)
             for stackPath in stackPaths:
-                outputPath = os.path.dirname(stackPath) +"\\"
+                outputPath = os.path.dirname(stackPath) + "\\"
                 deconvolvedStackPath = self.deconvolver.deconvolve_DeconvLab2(stackPath, psfPath, self.richardsonLucyIterations, outputPath)
                 deconvolvedStack = io.imread(deconvolvedStackPath)
                 deconvolvedStackMaxProj = np.max(deconvolvedStack, axis=0)
@@ -226,6 +242,7 @@ class Scanner(object):
 
 
             self.guiLogQueue.put(self.LOG_PREFIX + "Scan deconvolution complete")
+
 
 
     def scan_stack(self, scanName, timelapseScanName):
@@ -299,7 +316,6 @@ class Scanner(object):
             elif i == self.TIMELAPSE_N - 1:
                 self.guiLogQueue.put(self.LOG_PREFIX + "Timelapse Scan Complete!")
                 return stackPaths
-                break
 
             # Otherwise, sleep til' next stack is due.
             else:

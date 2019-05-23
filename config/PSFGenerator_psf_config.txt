@@ -3,7 +3,7 @@
 psf-Circular-Pupil-defocus=100.0
 psf-Oriented-Gaussian-axial=Linear
 psf-RW-NI=1.5
-ResLateral=177
+ResLateral=175
 psf-Defocus-DBot=30.0
 psf-Oriented-Gaussian-focus=0.0
 psf-Astigmatism-axial=Linear

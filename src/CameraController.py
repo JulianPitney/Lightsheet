@@ -1,9 +1,7 @@
 import PySpin
 import cv2
-from multiprocessing import Process, Queue
 import tifffile as tif
 import numpy as np
-from time import sleep
 import os
 import random
 
@@ -161,8 +159,6 @@ class CameraController(object):
 
     def set_camera_exposure(self, camera, exposure):
 
-
-
         if camera.ExposureAuto.GetAccessMode() != PySpin.RW:
             self.guiLogQueue.put(self.LOG_PREFIX + 'Unable to disable camera automatic exposure')
             return False
@@ -176,6 +172,7 @@ class CameraController(object):
             # Ensure desired exposure time does not exceed the maximum
             exposure = min(camera.ExposureTime.GetMax(), exposure)
             camera.ExposureTime.SetValue(exposure)
+
 
     def set_camera_pixel_format(self, nodemap):
 
@@ -335,10 +332,12 @@ class CameraController(object):
         if image_result.IsIncomplete():
             self.guiLogQueue.put(self.LOG_PREFIX + "Image incomplete with image status=%d" % image_result.GetImageStatus())
             self.lastFrame = []
+            return False
         else:
             image_converted = image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
             image_converted = image_converted.GetNDArray()
             self.lastFrame = image_converted
+            return True
 
 
     def retrieve_next_image_IPC(self, cameraIndex, destinationProcessIndex, destinationFunctionIndex):
@@ -360,6 +359,11 @@ class CameraController(object):
 #--------------------------------------------------------------------------------------------#
 #                               OpenCV UTILITY                                               #
 #--------------------------------------------------------------------------------------------#
+
+    def set_scalebar_size(self, imagingObjectiveMagnification):
+        self.imagingObjectiveMagnification = imagingObjectiveMagnification
+        self.guiLogQueue.put(self.LOG_PREFIX + "MAGNIFICATION=" + str(self.imagingObjectiveMagnification) + "x")
+
     def paint_scalebar(self, frame):
 
         umPixelsRatio = 10
@@ -405,12 +409,11 @@ class CameraController(object):
 
 
 
-
     def scan(self, SCAN_NAME, metadata, path, cameraIndex):
 
 
         keepAlive = True
-        frames = []
+        imageStack = []
         # Tell the scanner the camera is ready to go
         self.mainQueue.put([5, -1, [1]])
 
@@ -420,28 +423,18 @@ class CameraController(object):
 
             if msg[2][0] == "CAPTURE":
 
-                self.grab_next_image_by_trigger(self.nodemaps[cameraIndex])
-                image_result = self.cameras[cameraIndex].GetNextImage()
-                image_converted = image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
-                image_converted = image_converted.GetNDArray()
-                cv2.imshow('Lightsheet Live Feed', image_converted)
-                cv2.waitKey(1)
-
-                if image_result.IsIncomplete():
-                    self.guiLogQueue.put(self.LOG_PREFIX + "Image incomplete with image status=%d" % image_result.GetImageStatus())
-                else:
-                    frames.append(image_result)
+                if self.retrieve_next_image(0):
+                    image_result = self.lastFrame
+                    imageStack.append(image_result)
                     # Send confirmation of capture to scanner
                     self.mainQueue.put([5, -1, [1]])
+                else:
+                    self.guiLogQueue.put(self.LOG_PREFIX + "Scanner was unable to retrieve frame from camera")
 
             elif msg[2][0] == "STOP":
                 keepAlive = False
 
-        imageStack = []
-        for i in range(0, len(frames)):
-            imageConverted = frames[i].Convert(PySpin.PixelFormat_Mono16, PySpin.HQ_LINEAR)
-            imageStack.append(imageConverted.GetNDArray())
-            frames[i].Release()
+
 
         filename = path + "\\" + SCAN_NAME + ".tif"
         imageStack = np.asarray(imageStack)
@@ -459,11 +452,6 @@ class CameraController(object):
             filename += randomSuffix + ".tif"
 
         tif.imwrite(filename, imageStack, imagej=True, metadata=metadata_dict)
-        cv2.destroyAllWindows()
-
-
-
-
 
 
     def process_msg(self, msg):
@@ -471,11 +459,11 @@ class CameraController(object):
         functionIndex = msg[1]
 
         if functionIndex == 0:
-            print("TOGGLING PREVIEW")
+            pass
         elif functionIndex == 1:
-            print("SETTING EXPOSURE")
+            self.set_camera_exposure(self.cameras[0], msg[2][0])
         elif functionIndex == 2:
-            print("SETTING GAIN")
+            self.set_camera_gain(self.cameras[0], msg[2][0])
         elif functionIndex == 3:
             self.scan(msg[2][0], msg[2][1], msg[2][2], msg[2][3])
         elif functionIndex == 4:

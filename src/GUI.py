@@ -3,9 +3,9 @@ import tkinter.scrolledtext as tkst
 from PIL import ImageTk, Image
 import cv2
 import threading
-
-
+import time
 from time import sleep
+
 
 class GUI(object):
 
@@ -49,20 +49,25 @@ class GUI(object):
 
             # Send request to camera process for latest frame
             self.mainQueue.put([1, 5, [0, 4, 0]])
-            # Wait for response from camera
-            while self.videoQueue.empty():
-                sleep(0.005)
+            # If frame doesn't arrive within 0.1s, retry.
+            msgReceived = False
+            start = time.time()
+            while (time.time() - start) < 0.05:
+                if not self.videoQueue.empty():
+                    msg = self.videoQueue.get()
+                    msgReceived = True
 
-            msg = self.videoQueue.get()
-            frameAvailable = msg[2][1]
+            if msgReceived:
+                frameAvailable = msg[2][1]
 
-            if frameAvailable:
-                frame = msg[2][0]
-                image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                image = Image.fromarray(image)
-                image = ImageTk.PhotoImage(image)
-                self.videoWindow.configure(image=image)
-                self.videoWindow.image = image
+                if frameAvailable:
+                    frame = msg[2][0]
+                    image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    image = Image.fromarray(image)
+                    image = ImageTk.PhotoImage(image)
+                    self.videoWindow.configure(image=image)
+                    self.videoWindow.image = image
+
 
 
 
