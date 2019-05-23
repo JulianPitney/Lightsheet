@@ -86,7 +86,7 @@ class PS4Controller(object):
 
     def send_joystick_position_update(self):
 
-        msg = [2, 4, [self.last_axis0_input, -self.last_axis1_input, self.last_axis3_input]]
+        msg = [2, 4, [self.last_axis0_input, -self.last_axis1_input, -self.last_axis3_input]]
         self.mainQueue.put(msg)
 
 
