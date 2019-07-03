@@ -5,6 +5,7 @@ import os.path
 import cv2
 import numpy as np
 from skimage import io
+import tifffile as tif
 import random
 
 class Scanner(object):
@@ -240,8 +241,22 @@ class Scanner(object):
 
                 io.imsave(filename,deconvolvedStackMaxProj)
 
-
             self.guiLogQueue.put(self.LOG_PREFIX + "Scan deconvolution complete")
+
+
+        else:
+            path = stackPaths[0]
+            path = os.path.dirname(path)
+            path = os.path.dirname(path) + "\\"
+            maxProjections = []
+
+            for stackPath in stackPaths:
+                stack = io.imread(stackPath)
+                maxProj = np.max(stack, axis=0)
+                maxProjections.append(maxProj)
+
+            maxProjStack = np.asarray(maxProjections)
+            tif.imwrite(path + "timelapse_max_proj.tif", maxProjStack, imagej=True)
 
 
 

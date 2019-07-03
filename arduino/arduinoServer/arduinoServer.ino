@@ -31,7 +31,7 @@ const int LED = 13;
 // Laser Enable
 const int LASER_ENABLE = 3;
 const int LASER_SHUTTER_SERVO_PIN = 13;
-const int IMAGING_LED_PIN = 42; 
+const int IMAGING_LED_PIN = 42;
 
 bool STEPPERS_ON = false;
 
@@ -385,7 +385,7 @@ int jogCommand() {
   STEPPER2.move(steps[2]);
   STEPPER2.setSpeed(speeds[2]);
   STEPPER3.move(steps[0]);
-  STEPPER3.setSpeed(speeds[0]);   
+  STEPPER3.setSpeed(speeds[0]);
 
   while(STEPPER1.targetPosition() != STEPPER1.currentPosition() || STEPPER2.targetPosition() != STEPPER2.currentPosition() || STEPPER3.targetPosition() != STEPPER3.currentPosition())
   {
@@ -411,7 +411,7 @@ int toggleCoarseJogCommand() {
 
   return STEPPER_JOG_INCREMENT;
 }
-  
+
 
 
 /*
@@ -608,7 +608,7 @@ void sendResponse(String response) {
 
 
 void loop() {
-  
+
   // New command received (0), Parse error (-1), Listening timed out (1)
   int rc = listenForCommandWithTimeout();
 
@@ -636,5 +636,5 @@ void loop() {
     default:
       break;
   }
-  
+
 }

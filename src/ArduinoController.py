@@ -18,7 +18,7 @@ class ArduinoController(object):
 
 
 		# Motor configuration
-		self.SEEK_SPEED = 1600
+		self.SEEK_SPEED = 2000
 		self.JOG_MIN_SPEED = 800
 		self.JOG_MAX_SPEED = 2000
 		self.MICROMETERS_PER_STEP = 0.15625

@@ -2,7 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f5686c8e-07ad-49ff-9056-a03209307a70" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../processABF/processABF.py" beforeDir="false" afterPath="$PROJECT_DIR$/../processABF/processABF.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../3D-Kinematics/.idea/3D-Kinematics.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../3D-Kinematics/.idea/3D-Kinematics.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../3D-Kinematics/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../3D-Kinematics/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../3D-Kinematics/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../3D-Kinematics/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../3D-Kinematics/src/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/../3D-Kinematics/src/camera.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../3D-Kinematics/src/camtrig/camtrig.ino" beforeDir="false" afterPath="$PROJECT_DIR$/../3D-Kinematics/src/camtrig/camtrig.ino" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Lightsheet.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Lightsheet.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arduino/arduinoServer/arduinoServer.ino" beforeDir="false" afterPath="$PROJECT_DIR$/arduino/arduinoServer/arduinoServer.ino" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/PSFGenerator_psf_config.txt" beforeDir="false" afterPath="$PROJECT_DIR$/config/PSFGenerator_psf_config.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ArduinoController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ArduinoController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scanner.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Scanner.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -11,15 +24,36 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../processABF/processABF.py">
+    <leaf>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="787">
-              <caret line="133" column="30" lean-forward="true" selection-start-line="133" selection-start-column="30" selection-end-line="133" selection-end-column="30" />
+            <state relative-caret-position="504">
+              <caret line="24" selection-start-line="24" selection-end-line="24" />
               <folding>
-                <element signature="e#0#31#0" expanded="true" />
+                <element signature="e#0#30#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Scanner.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="273">
+              <caret line="208" column="17" lean-forward="true" selection-start-line="208" selection-start-column="17" selection-end-line="208" selection-end-column="17" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/CameraController.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="42">
+              <caret line="2" column="12" selection-start-line="2" selection-end-line="3" />
             </state>
           </provider>
         </entry>
@@ -50,7 +84,7 @@
     </findStrings>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../processABF" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -71,15 +105,17 @@
         <option value="$PROJECT_DIR$/src/numpy_test.py" />
         <option value="$USER_HOME$/Desktop/ABF_to_svg_v2.py" />
         <option value="$PROJECT_DIR$/src/GUI.py" />
-        <option value="$PROJECT_DIR$/src/Scanner.py" />
         <option value="$PROJECT_DIR$/../processABF/processABF.py" />
+        <option value="$PROJECT_DIR$/../3D-Kinematics/src/camera.py" />
+        <option value="$PROJECT_DIR$/src/Scanner.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1271" />
-    <option name="width" value="1298" />
-    <option name="height" value="1399" />
+    <option name="x" value="570" />
+    <option name="y" value="-29" />
+    <option name="width" value="1300" />
+    <option name="height" value="1410" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -88,27 +124,13 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="Lightsheet" type="b2602c69:ProjectViewProjectNode" />
-              <item name="processABF" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Lightsheet" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
+      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../processABF" />
-    <property name="settings.editor.selected.configurable" value="configurable.group.project" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -149,6 +171,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="processABF" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="numpy_test" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Lightsheet" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -168,6 +211,50 @@
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
       <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="Tox" factoryName="Tox">
+      <module name="processABF" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Doctests">
+      <module name="processABF" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="py.test">
+      <module name="processABF" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method v="2" />
     </configuration>
     <recent_temporary>
@@ -192,6 +279,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="2062" height="1126" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25111002" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -319,16 +407,6 @@
     <entry file="file://$PROJECT_DIR$/scans/FLOWDEC_TESTING/psf.json" />
     <entry file="file://$PROJECT_DIR$/config/psf_config.txt" />
     <entry file="file://$PROJECT_DIR$/config/psf.json" />
-    <entry file="file://$PROJECT_DIR$/src/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
-          <caret line="14" column="81" selection-start-line="14" selection-start-column="81" selection-end-line="14" selection-end-column="81" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/PS4Controller.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2205">
@@ -350,32 +428,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Downloads/ABF_to_svg_v2 (1).py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-378" />
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/Downloads/ABF_to_svg_v2 (1).py" />
     <entry file="file://$USER_HOME$/Desktop/ABF_to_svg_v2.py" />
-    <entry file="file://$PROJECT_DIR$/src/numpy_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
-          <caret line="11" selection-start-line="11" selection-end-line="11" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Scanner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4032">
-          <caret line="192" lean-forward="true" selection-start-line="192" selection-end-line="192" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/numpy_test.py" />
     <entry file="file://$PROJECT_DIR$/src/GUI.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="738">
@@ -383,22 +438,49 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/CameraController.py">
+    <entry file="file://$PROJECT_DIR$/../processABF/processABF.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="591">
-          <caret line="387" column="101" selection-start-line="384" selection-start-column="16" selection-end-line="387" selection-end-column="101" />
+        <state relative-caret-position="787">
+          <caret line="133" column="28" selection-start-line="133" selection-start-column="28" selection-end-line="133" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../3D-Kinematics/src/camera.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="8" selection-start-line="8" selection-end-line="8" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../processABF/processABF.py">
+    <entry file="file://$PROJECT_DIR$/src/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="787">
-          <caret line="133" column="30" lean-forward="true" selection-start-line="133" selection-start-column="30" selection-end-line="133" selection-end-column="30" />
+        <state relative-caret-position="504">
+          <caret line="24" selection-start-line="24" selection-end-line="24" />
           <folding>
-            <element signature="e#0#31#0" expanded="true" />
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/CameraController.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="42">
+          <caret line="2" column="12" selection-start-line="2" selection-end-line="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Scanner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="273">
+          <caret line="208" column="17" lean-forward="true" selection-start-line="208" selection-start-column="17" selection-end-line="208" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
