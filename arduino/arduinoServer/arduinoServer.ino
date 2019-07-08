@@ -68,7 +68,7 @@ Encoder STEPPER1_ENCODER(2,3);
 // Servo(s)
 Servo laserShutter;
 const int SHUTTER_ON_POS = 90;
-const int SHUTTER_OFF_POS = 130;
+const int SHUTTER_OFF_POS = 120;
 bool SHUTTER_ON;
 
 void setup() {
@@ -85,7 +85,7 @@ void setup() {
   digitalWrite(LASER_ENABLE, LOW);
   digitalWrite(IMAGING_LED_PIN, LOW);
   laserShutter.attach(LASER_SHUTTER_SERVO_PIN);
-  laserShutter.write(90);
+  laserShutter.write(SHUTTER_ON_POS);
   SHUTTER_ON = true;
 
   // Setup STEPPER1
