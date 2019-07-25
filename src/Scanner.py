@@ -27,6 +27,7 @@ class Scanner(object):
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.5
         self.TIMELAPSE_N = 1
         self.TIMELAPSE_INTERVAL_S = 10
+        self.TILE_SCAN_TRANSLATIONS = [[],[]]
 
         self.imagingObjectiveMagnification = 20
         self.umPerPixel_5x = 0.666
@@ -214,6 +215,15 @@ class Scanner(object):
             if stackPaths == -1:
                 return -1
 
+        elif scanType == "tiled":
+            stackPaths = self.scan_tiles()
+            if stackPaths == -1:
+                return -1
+
+        # Sleep to make sure CameraController process has time to save stacks to disk before we try to read them
+        # Note: SHOULD wait for confirmation from camera process before continuing....maybe I'll get to it one day
+        sleep(4)
+
         # deconvolve scan if selected
         if self.deconvolveAfterScan:
             self.guiLogQueue.put(self.LOG_PREFIX + "Scan deconvolution starting...")
@@ -245,9 +255,7 @@ class Scanner(object):
 
 
         else:
-            path = stackPaths[0]
-            path = os.path.dirname(path)
-            path = os.path.dirname(path) + "\\"
+
             maxProjections = []
 
             for stackPath in stackPaths:
@@ -256,7 +264,21 @@ class Scanner(object):
                 maxProjections.append(maxProj)
 
             maxProjStack = np.asarray(maxProjections)
-            tif.imwrite(path + "timelapse_max_proj.tif", maxProjStack, imagej=True)
+            path = stackPaths[0]
+
+            if scanType == "timelapse":
+                path = os.path.dirname(path)
+                path = os.path.dirname(path) + "\\"
+                tif.imwrite(path + "timelapse_max_proj.tif", maxProjStack, imagej=True)
+
+            elif scanType == "stack":
+                print("attempting to run stack")
+                print("path=" + path)
+                path = os.path.dirname(path) + "\\"
+                tif.imwrite(path + "max_proj.tif", maxProjStack, imagej=True)
+
+
+
 
 
 
@@ -338,6 +360,35 @@ class Scanner(object):
                 sleep(timeUntilNextStackDue - 1)
 
 
+    def scan_tiles(self):
+
+        tiledScanPath = self.gen_scan_directory(self.SCAN_NAME + "_tiled")
+        if tiledScanPath == -1:
+            return -1
+
+        stackPaths = []
+
+        for i in range(0, len(self.TILE_SCAN_TRANSLATIONS[0]) + 2):
+
+            stackPath = self.scan_stack(self.SCAN_NAME + "_tiled\\" + self.SCAN_NAME + "_tiled" + str(i), self.SCAN_NAME + "_tiled" + str(i))
+
+            if stackPath == -1:
+                # Close shutter
+                self.mainQueue.put([2, 7, []])
+                return -1
+            else:
+                stackPaths.append(stackPath)
+
+
+            # perform stage translations here
+            self.TILE_SCAN_TRANSLATIONS = []
+
+
+        self.guiLogQueue.put(self.LOG_PREFIX + "Tiled Scan Complete!")
+        return stackPaths
+
+
+
 
     def mainloop(self):
         while True:
@@ -383,6 +434,8 @@ class Scanner(object):
             self.set_deconvolve_after_scan(msg[2][0])
         elif funcIndex == 16:
             self.set_imaging_objective_magnification(msg[2][0])
+        elif funcIndex == 17:
+            self.scan("tiled", msg[2][0])
 
 def launch_scanner(queue, mainQueue, guiLogQueue):
 

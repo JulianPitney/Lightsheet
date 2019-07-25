@@ -222,7 +222,7 @@ class GUI(object):
         scanButton = Button(scanConfigFrame, text="Scan Stack", fg=self.text_colour, height=3, font=16, command=lambda: self.button_push_callback(5, 0, [self.scanNameEntry.get()]), bg=self.light_color, highlightbackground=self.scale_border_color,)
         scanTimelapseButton = Button(scanConfigFrame, fg=self.text_colour, height=3, font=16, text="Scan Timelapse",
                                      command=lambda: self.button_push_callback(5, 7, [self.scanNameEntry.get()]), bg=self.light_color, highlightbackground=self.scale_border_color,)
-
+        scanTiledButton = Button(scanConfigFrame, text="Scan Tiles", fg=self.text_colour, height=3, font=16, command=lambda: self.button_push_callback(5, 17, [self.scanNameEntry.get()]), bg=self.light_color, highlightbackground=self.scale_border_color,)
         scanConfigFrame.pack(side=RIGHT, fill="both", expand="yes")
         scanConfigFrameLabel.pack(side=TOP, pady=(0,20))
         scanDepthScale.pack()
@@ -247,6 +247,7 @@ class GUI(object):
         richardsonLucyIterationsScale.pack()
         self.richardsonLucyIterationsLabel.pack(pady=(0, 20))
 
+        scanTiledButton.pack(side=BOTTOM, fill=X, padx=10, pady=5)
         scanTimelapseButton.pack(side=BOTTOM, fill=X, padx=10, pady=5)
         scanButton.pack(side=BOTTOM, fill=X, padx=10, pady=5)
         self.scanNameEntry.pack(side=BOTTOM, fill=X, padx=10, pady=2)

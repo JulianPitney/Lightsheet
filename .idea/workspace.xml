@@ -2,19 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f5686c8e-07ad-49ff-9056-a03209307a70" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../3D-Kinematics/.idea/3D-Kinematics.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../3D-Kinematics/.idea/3D-Kinematics.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../3D-Kinematics/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../3D-Kinematics/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../3D-Kinematics/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../3D-Kinematics/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../3D-Kinematics/src/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/../3D-Kinematics/src/camera.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../3D-Kinematics/src/camtrig/camtrig.ino" beforeDir="false" afterPath="$PROJECT_DIR$/../3D-Kinematics/src/camtrig/camtrig.ino" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../3D-Kinematics/src/FlirController.py" beforeDir="false" afterPath="$PROJECT_DIR$/../3D-Kinematics/src/FlirController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../3D-Kinematics/src/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/../3D-Kinematics/src/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/Lightsheet.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Lightsheet.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arduino/arduinoServer/arduinoServer.ino" beforeDir="false" afterPath="$PROJECT_DIR$/arduino/arduinoServer/arduinoServer.ino" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/PSFGenerator_psf_config.txt" beforeDir="false" afterPath="$PROJECT_DIR$/config/PSFGenerator_psf_config.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ArduinoController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ArduinoController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/GUI.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Scanner.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Scanner.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -24,11 +18,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="504">
+            <state relative-caret-position="399">
               <caret line="24" selection-start-line="24" selection-end-line="24" />
               <folding>
                 <element signature="e#0#30#0" expanded="true" />
@@ -40,8 +34,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Scanner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="273">
-              <caret line="208" column="17" lean-forward="true" selection-start-line="208" selection-start-column="17" selection-end-line="208" selection-end-column="17" />
+            <state relative-caret-position="738">
+              <caret line="279" lean-forward="true" selection-start-line="279" selection-end-line="279" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -52,8 +46,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/CameraController.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="42">
-              <caret line="2" column="12" selection-start-line="2" selection-end-line="3" />
+            <state relative-caret-position="528">
+              <caret line="440" lean-forward="true" selection-start-line="440" selection-end-line="440" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/GUI.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="474">
+              <caret line="229" column="28" selection-start-line="229" selection-start-column="28" selection-end-line="229" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -74,13 +80,15 @@
       <find>Number</find>
       <find>set_camera_exposure</find>
       <find>deinit_spinnaker</find>
-      <find>scan</find>
       <find>Good</find>
       <find>wavelength</find>
       <find>1.5</find>
       <find>NA</find>
       <find>XY</find>
       <find>set_deconvolve_after_scan</find>
+      <find>set_camera_pixel_format</find>
+      <find>scan</find>
+      <find>scanButton</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -104,16 +112,16 @@
         <option value="$PROJECT_DIR$/src/CameraController.py" />
         <option value="$PROJECT_DIR$/src/numpy_test.py" />
         <option value="$USER_HOME$/Desktop/ABF_to_svg_v2.py" />
-        <option value="$PROJECT_DIR$/src/GUI.py" />
         <option value="$PROJECT_DIR$/../processABF/processABF.py" />
         <option value="$PROJECT_DIR$/../3D-Kinematics/src/camera.py" />
+        <option value="$PROJECT_DIR$/src/GUI.py" />
         <option value="$PROJECT_DIR$/src/Scanner.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="570" />
-    <option name="y" value="-29" />
+    <option name="y" value="-30" />
     <option name="width" value="1300" />
     <option name="height" value="1410" />
   </component>
@@ -124,7 +132,22 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="ProjectPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="Lightsheet" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Lightsheet" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Lightsheet" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Lightsheet" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -431,13 +454,6 @@
     <entry file="file://$USER_HOME$/Downloads/ABF_to_svg_v2 (1).py" />
     <entry file="file://$USER_HOME$/Desktop/ABF_to_svg_v2.py" />
     <entry file="file://$PROJECT_DIR$/src/numpy_test.py" />
-    <entry file="file://$PROJECT_DIR$/src/GUI.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="738">
-          <caret line="217" column="72" selection-start-line="217" selection-start-column="72" selection-end-line="217" selection-end-column="72" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../processABF/processABF.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="787">
@@ -448,19 +464,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../3D-Kinematics/src/camera.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="8" selection-start-line="8" selection-end-line="8" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../3D-Kinematics/src/camera.py" />
     <entry file="file://$PROJECT_DIR$/src/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
+        <state relative-caret-position="399">
           <caret line="24" selection-start-line="24" selection-end-line="24" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
@@ -468,17 +475,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/GUI.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="474">
+          <caret line="229" column="28" selection-start-line="229" selection-start-column="28" selection-end-line="229" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/CameraController.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="42">
-          <caret line="2" column="12" selection-start-line="2" selection-end-line="3" />
+        <state relative-caret-position="528">
+          <caret line="440" lean-forward="true" selection-start-line="440" selection-end-line="440" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Scanner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="208" column="17" lean-forward="true" selection-start-line="208" selection-start-column="17" selection-end-line="208" selection-end-column="17" />
+        <state relative-caret-position="738">
+          <caret line="279" lean-forward="true" selection-start-line="279" selection-end-line="279" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
