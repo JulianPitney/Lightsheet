@@ -8,6 +8,8 @@ from skimage import io
 import tifffile as tif
 import random
 
+
+
 class Scanner(object):
 
 
@@ -21,13 +23,18 @@ class Scanner(object):
 
 
         self.Z_STEP_SIZE_um = 0.15625
+        # We should be getting this from the arduino controller but for now it's hard coded here
+        self.MICROMETERS_PER_STEP = 0.15625
         self.STACK_SIZE = 10
         self.SCAN_STEP_SPEED = 50
         self.SCAN_NAME = "default"
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.5
         self.TIMELAPSE_N = 1
         self.TIMELAPSE_INTERVAL_S = 10
-        self.TILE_SCAN_TRANSLATIONS = [[],[]]
+        self.TILE_SCAN_DIMENSIONS = (2, 2)
+        self.TILE_uM_OVERLAP_X = 2
+        self.TILE_uM_OVERLAP_Y = 2
+
 
         self.imagingObjectiveMagnification = 20
         self.umPerPixel_5x = 0.666
@@ -35,6 +42,7 @@ class Scanner(object):
         self.umPerPixel_20x = 0.175
         self.umPerPixel_40x = 0.089
         self.umPerPixel_63x = 0.057
+
 
         # Deconvolution parameters
         self.deconvolver = Deconvolver()
@@ -47,6 +55,7 @@ class Scanner(object):
         self.sizeY = 1080
         self.nanometersPerPixel = 175
 
+        self.set_imaging_objective_magnification(5)
         self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
 
     def set_z_step_size(self, step_size_um):
@@ -362,27 +371,58 @@ class Scanner(object):
 
     def scan_tiles(self):
 
+        stackPaths = []
         tiledScanPath = self.gen_scan_directory(self.SCAN_NAME + "_tiled")
         if tiledScanPath == -1:
             return -1
 
-        stackPaths = []
+        # calculate X and Y stage translations
+        tileWidth_uM = int((self.sizeX * self.nanometersPerPixel) / 1000)
+        tileHeight_uM = int((self.sizeY * self.nanometersPerPixel) / 1000)
 
-        for i in range(0, len(self.TILE_SCAN_TRANSLATIONS[0]) + 2):
+        # Subract overlap from translations
+        tileTranslationX_uM = tileWidth_uM - self.TILE_uM_OVERLAP_X
+        tileTranslationY_uM = tileHeight_uM - self.TILE_uM_OVERLAP_Y
 
-            stackPath = self.scan_stack(self.SCAN_NAME + "_tiled\\" + self.SCAN_NAME + "_tiled" + str(i), self.SCAN_NAME + "_tiled" + str(i))
-
-            if stackPath == -1:
-                # Close shutter
-                self.mainQueue.put([2, 7, []])
-                return -1
-            else:
-                stackPaths.append(stackPath)
+        # Round down to a whole number multiple of <MICROMETERS_PER_STEP>
+        tileTranslationX_uM = int(tileTranslationX_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
+        tileTranslationY_uM = int(tileTranslationY_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
+        revertTranslationX_uM = int((tileTranslationX_uM * (self.TILE_SCAN_DIMENSIONS[0] - 1)) / (self.MICROMETERS_PER_STEP)) * self.MICROMETERS_PER_STEP
+        revertTranslationY_uM = int((tileTranslationY_uM * (self.TILE_SCAN_DIMENSIONS[1] - 1)) / (self.MICROMETERS_PER_STEP)) * self.MICROMETERS_PER_STEP
 
 
-            # perform stage translations here
-            self.TILE_SCAN_TRANSLATIONS = []
 
+        for y in range(0, self.TILE_SCAN_DIMENSIONS[1]):
+
+            print(str(y))
+            for x in range(0, self.TILE_SCAN_DIMENSIONS[0]):
+
+                print(str(x))
+                stackPath = self.scan_stack(self.SCAN_NAME + "_tiled\\" + self.SCAN_NAME + "_tiled_X" + str(x) + "_Y=" + str(y), self.SCAN_NAME + "_tiled_X=" + str(x) + "_Y=" + str(y))
+                sleep(0.5)
+                if stackPath == -1:
+                    # Close shutter
+                    self.mainQueue.put([2, 7, []])
+                    return -1
+                else:
+                    stackPaths.append(stackPath)
+
+                if x < self.TILE_SCAN_DIMENSIONS[0] - 1:
+                    # Perform X translation
+                    self.mainQueue.put([2, 6, [3, -tileTranslationX_uM, True]])
+                    sleep(5)
+
+            # If we just scanned the last X of the row, move back to X=0
+            self.mainQueue.put([2, 6, [3, revertTranslationX_uM, True]])
+            sleep(5)
+
+            if y < self.TILE_SCAN_DIMENSIONS[1] - 1:
+                self.mainQueue.put([2, 6, [1, -tileTranslationY_uM, True]])
+                sleep(0.5)
+
+        # If we just scanned the last Y of the column, move back to Y=0
+        self.mainQueue.put([2, 6, [1, revertTranslationY_uM, True]])
+        sleep(0.5)
 
         self.guiLogQueue.put(self.LOG_PREFIX + "Tiled Scan Complete!")
         return stackPaths

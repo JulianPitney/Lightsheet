@@ -137,7 +137,7 @@ class ArduinoController(object):
 		steps = int(steps)
 		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(self.SEEK_SPEED) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
-		response = self.serialInterface.readline().decode()
+		#response = self.serialInterface.readline().decode()
 		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 		if scanMode:
