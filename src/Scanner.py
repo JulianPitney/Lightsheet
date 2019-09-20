@@ -36,12 +36,12 @@ class Scanner(object):
         self.TILE_uM_OVERLAP_Y = 2
 
 
-        self.imagingObjectiveMagnification = 20
-        self.umPerPixel_5x = 0.666
-        self.umPerPixel_10x = 0.357
-        self.umPerPixel_20x = 0.175
-        self.umPerPixel_40x = 0.089
-        self.umPerPixel_63x = 0.057
+        self.imagingObjectiveMagnification = 5
+        self.umPerPixel_5x = 0.714
+        self.umPerPixel_10x = 0.345
+        self.umPerPixel_20x = 0.181
+        self.umPerPixel_40x = 0.090
+        self.umPerPixel_63x = 0.059
 
 
         # Deconvolution parameters
@@ -51,9 +51,9 @@ class Scanner(object):
         self.numericalAperture = 0.5
         self.wavelength = 530
         self.richardsonLucyIterations = 2
-        self.sizeX = 1440
-        self.sizeY = 1080
-        self.nanometersPerPixel = 175
+        self.sizeX = 2448
+        self.sizeY = 2048
+        self.nanometersPerPixel = 714
 
         self.set_imaging_objective_magnification(5)
         self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
@@ -116,15 +116,15 @@ class Scanner(object):
         self.imagingObjectiveMagnification = magnification
 
         if magnification == 5:
-            self.nanometersPerPixel = 666
+            self.nanometersPerPixel = 714
         elif magnification == 10:
-            self.nanometersPerPixel == 357
+            self.nanometersPerPixel == 345
         elif magnification == 20:
-            self.nanometersPerPixel = 175
+            self.nanometersPerPixel = 181
         elif magnification == 40:
-            self.nanometersPerPixel = 89
+            self.nanometersPerPixel = 90
         elif magnification == 63:
-            self.nanometersPerPixel = 57
+            self.nanometersPerPixel = 59
 
 
         self.guiLogQueue.put(self.LOG_PREFIX + "IMAGING_OBJECTIVE_MAGNIFICATION=" + str(magnification))

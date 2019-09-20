@@ -1,16 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from flowdec.nb import utils as nbutils
-from flowdec import data as fd_data
 from scipy import ndimage
 import dask
 import dask.array as da
-import tensorflow as tf
-from flowdec.restoration import RichardsonLucyDeconvolver
 from skimage import io
 import operator
 import os
-from flowdec import psf as fd_psf
+
 
 
 
@@ -134,19 +130,6 @@ class Deconvolver(object):
         return outputPath + "PSFGenerator_psf.tif"
 
 
-    def gen_psf_Flowdec(self, numericalAperture, wavelength, size_z, size_x, size_y, outputPath):
-
-        command = "echo {\"na\": " + str(numericalAperture)
-        command +=  ", \"wavelength\": " + str(wavelength)
-        command += ", \"size_z\": " + str(size_z)
-        command += ", \"size_x\": " + str(size_x)
-        command += ", \"size_y\": " + str(size_y)
-        command += "} > ../config/" + self.FlowdecPSFConfigPath
-        os.system(command)
-        psf = fd_psf.GibsonLanni.load('../config/' + self.FlowdecPSFConfigPath)
-        psfStack = psf.generate()
-        io.imsave(outputPath + "Flowdec_psf.tif", psfStack)
-        return outputPath + "Flowdec_psf.tif"
 
     def deconvolve_DeconvLab2(self, imgStackPath, psfStackPath, iterations, outputPath):
 
@@ -159,15 +142,6 @@ class Deconvolver(object):
         os.system(command)
         return outputPath + "DeconvLab2_deconvolved.tif"
 
-    def deconvolve_Flowdec(self, imgStackPath, psfStackPath, iterations, outputPath):
-
-        imgStack = io.imread(imgStackPath)
-        psfStack = io.imread(psfStackPath)
-
-        algo = RichardsonLucyDeconvolver(imgStack.ndim).initialize()
-        resultStack = algo.run(fd_data.Acquisition(data=imgStack, kernel=psfStack), niter=iterations).data
-        io.imsave(outputPath + "Flowdec_deconvoled.tif", resultStack)
-        return outputPath + "Flowdec_deconvolved.tif"
 
     def crop_volume(self, img, boundingBox):
 

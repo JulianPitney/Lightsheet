@@ -36,8 +36,8 @@ class CameraController(object):
         self.EXPOSURE = 30000
         self.GAIN = 23
         self.FPS = 60.00
-        self.WIDTH = 1440
-        self.HEIGHT = 1080
+        self.WIDTH = 2448
+        self.HEIGHT = 2048
         # Spinnaker Initialization
         self.camList, self.system = self.init_spinnaker()
         self.cameras = []

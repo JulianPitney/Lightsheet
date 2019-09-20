@@ -94,7 +94,7 @@ class GUI(object):
         hardwareControlFrame = Frame(self.master, borderwidth=2, relief=RIDGE, bg=self.dark_color, highlightbackground=self.frame_border_color, highlightcolor=self.frame_border_color)
         movementButtonsFrame = Frame(hardwareControlFrame, bg=self.dark_color)
         controllerPictureFrame = Frame(hardwareControlFrame, bg=self.dark_color)
-        self.controllerImg = ImageTk.PhotoImage(Image.open("C:/Users/Lightsheet/Desktop/ps4Controller.png"))
+        self.controllerImg = ImageTk.PhotoImage(Image.open("C:\\Projects\\Lightsheet\\resources\\ps4controller.png"))
         imgPanel = Label(controllerPictureFrame, image=self.controllerImg, bg=self.dark_color)
         y_inc = Button(movementButtonsFrame, text="y+", font=20, width=4, height=2, fg=self.text_colour, bg=self.light_color,
                        activebackground=self.button_focus_color,
@@ -208,7 +208,7 @@ class GUI(object):
         self.richardsonLucyIterationsLabel = Label(scanConfigFrame, text="1", fg=self.text_colour, bg=self.dark_color)
         richardsonLucyIterationsScale.set(1)
         self.magnification = IntVar()
-        self.magnification.set(20)  # set the default option
+        self.magnification.set(5)  # set the default option
         magnifications = {5, 10, 20, 40, 63}
         magnificationLabel = Label(scanConfigFrame, text="Imaging Objective Magnification", fg=self.text_colour, bg=self.dark_color)
         magnificationDropdown = OptionMenu(scanConfigFrame, self.magnification, *magnifications)
@@ -257,7 +257,7 @@ class GUI(object):
 
         cameraFeedFrame = Frame(self.master, borderwidth=2, relief=RIDGE, bg=self.dark_color, highlightbackground=self.frame_border_color, highlightcolor=self.frame_border_color)
         cameraFeedFrame.pack(side=LEFT, fill="both",  expand="yes")
-        self.videoFeedFrame = ImageTk.PhotoImage(Image.open("C:/Users/Lightsheet/Desktop/inprogress.png"))
+        self.videoFeedFrame = ImageTk.PhotoImage(Image.open("C:\\Projects\\Lightsheet\\resources\\inprogress.png"))
         self.videoWindow = Label(cameraFeedFrame, image=self.videoFeedFrame, width=1024, height=700, bg=self.dark_color)
         explanationLabel = Label(cameraFeedFrame, text="Camera Live Feed", font=16, fg=self.text_colour, bg=self.dark_color)
         gain = IntVar()
