@@ -209,6 +209,7 @@ int runCommand() {
       else
       {
         rc = moveCommand();
+        sendResponse("MOVE COMPLETED");
       }
   }
   else if(command->cmd == "SET")

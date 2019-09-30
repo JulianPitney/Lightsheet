@@ -28,12 +28,11 @@ class Scanner(object):
         self.STACK_SIZE = 10
         self.SCAN_STEP_SPEED = 50
         self.SCAN_NAME = "default"
-        self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.5
+        self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0
         self.TIMELAPSE_N = 1
         self.TIMELAPSE_INTERVAL_S = 10
         self.TILE_SCAN_DIMENSIONS = (2, 2)
-        self.TILE_uM_OVERLAP_X = 2
-        self.TILE_uM_OVERLAP_Y = 2
+
 
 
         self.imagingObjectiveMagnification = 5
@@ -54,6 +53,10 @@ class Scanner(object):
         self.sizeX = 2448
         self.sizeY = 2048
         self.nanometersPerPixel = 714
+        self.TILE_uM_OVERLAP_X = ((self.sizeX * self.nanometersPerPixel) * 0.1) / 1000
+        self.TILE_uM_OVERLAP_Y = ((self.sizeY * self.nanometersPerPixel) * 0.1) / 1000
+
+
 
         self.set_imaging_objective_magnification(5)
         self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
@@ -126,8 +129,12 @@ class Scanner(object):
         elif magnification == 63:
             self.nanometersPerPixel = 59
 
-
         self.guiLogQueue.put(self.LOG_PREFIX + "IMAGING_OBJECTIVE_MAGNIFICATION=" + str(magnification))
+
+    def update_tiled_scan_overlap(self):
+
+        self.TILE_uM_OVERLAP_X = (self.sizeX * self.nanometersPerPixel) * 0.1
+        self.TILE_uM_OVERLAP_Y = (self.sizeY * self.nanometersPerPixel) * 0.1
 
 
     def wait_for_confirmation(self, procIndex):
@@ -391,15 +398,15 @@ class Scanner(object):
         revertTranslationY_uM = int((tileTranslationY_uM * (self.TILE_SCAN_DIMENSIONS[1] - 1)) / (self.MICROMETERS_PER_STEP)) * self.MICROMETERS_PER_STEP
 
 
-
         for y in range(0, self.TILE_SCAN_DIMENSIONS[1]):
 
-            print(str(y))
             for x in range(0, self.TILE_SCAN_DIMENSIONS[0]):
 
-                print(str(x))
+
+                sleep(7)
+                print("STACK")
                 stackPath = self.scan_stack(self.SCAN_NAME + "_tiled\\" + self.SCAN_NAME + "_tiled_X" + str(x) + "_Y=" + str(y), self.SCAN_NAME + "_tiled_X=" + str(x) + "_Y=" + str(y))
-                sleep(0.5)
+                sleep(4)
                 if stackPath == -1:
                     # Close shutter
                     self.mainQueue.put([2, 7, []])
@@ -409,21 +416,22 @@ class Scanner(object):
 
                 if x < self.TILE_SCAN_DIMENSIONS[0] - 1:
                     # Perform X translation
+                    print("TRANSLATE")
                     self.mainQueue.put([2, 6, [3, -tileTranslationX_uM, True]])
-                    sleep(5)
-
+                    sleep(2)
             # If we just scanned the last X of the row, move back to X=0
+            print("TRANSLATE")
             self.mainQueue.put([2, 6, [3, revertTranslationX_uM, True]])
-            sleep(5)
+            sleep(2)
 
             if y < self.TILE_SCAN_DIMENSIONS[1] - 1:
+                print("TRANSLATE")
                 self.mainQueue.put([2, 6, [1, -tileTranslationY_uM, True]])
-                sleep(0.5)
-
+                sleep(2)
         # If we just scanned the last Y of the column, move back to Y=0
+        print("TRANSLATE")
         self.mainQueue.put([2, 6, [1, revertTranslationY_uM, True]])
-        sleep(0.5)
-
+        sleep(2)
         self.guiLogQueue.put(self.LOG_PREFIX + "Tiled Scan Complete!")
         return stackPaths
 
@@ -476,6 +484,8 @@ class Scanner(object):
             self.set_imaging_objective_magnification(msg[2][0])
         elif funcIndex == 17:
             self.scan("tiled", msg[2][0])
+        elif funcIndex == 18:
+            self.update_tiled_scan_overlap()
 
 def launch_scanner(queue, mainQueue, guiLogQueue):
 

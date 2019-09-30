@@ -5,6 +5,7 @@ import cv2
 import threading
 import time
 from time import sleep
+import numpy as np
 
 
 class GUI(object):
@@ -63,6 +64,7 @@ class GUI(object):
                 if frameAvailable:
                     frame = msg[2][0]
                     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    image = cv2.resize(image, dsize=(1024, 768), interpolation=cv2.INTER_CUBIC)
                     image = Image.fromarray(image)
                     image = ImageTk.PhotoImage(image)
                     self.videoWindow.configure(image=image)
@@ -258,7 +260,7 @@ class GUI(object):
         cameraFeedFrame = Frame(self.master, borderwidth=2, relief=RIDGE, bg=self.dark_color, highlightbackground=self.frame_border_color, highlightcolor=self.frame_border_color)
         cameraFeedFrame.pack(side=LEFT, fill="both",  expand="yes")
         self.videoFeedFrame = ImageTk.PhotoImage(Image.open("C:\\Projects\\Lightsheet\\resources\\inprogress.png"))
-        self.videoWindow = Label(cameraFeedFrame, image=self.videoFeedFrame, width=1024, height=700, bg=self.dark_color)
+        self.videoWindow = Label(cameraFeedFrame, image=self.videoFeedFrame, width=1024, height=768, bg=self.dark_color)
         explanationLabel = Label(cameraFeedFrame, text="Camera Live Feed", font=16, fg=self.text_colour, bg=self.dark_color)
         gain = IntVar()
         gainScale = Scale(cameraFeedFrame, fg=self.text_colour, variable=gain, orient=HORIZONTAL, showvalue=0, label="Gain", length=200,
@@ -339,7 +341,7 @@ class GUI(object):
     def update_magnification_dropdown(self, *args):
         self.button_push_callback(1, 4, [int(self.magnification.get())])
         self.button_push_callback(5, 16, [int(self.magnification.get())])
-
+        self.button_push_callback(5, 18, [])
 
 
 def launch_gui(queue, mainQueue, videoQueue, logQueue):
