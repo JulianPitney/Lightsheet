@@ -28,7 +28,7 @@ class Scanner(object):
         self.STACK_SIZE = 10
         self.SCAN_STEP_SPEED = 50
         self.SCAN_NAME = "default"
-        self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0
+        self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.2
         self.TIMELAPSE_N = 1
         self.TIMELAPSE_INTERVAL_S = 10
         self.TILE_SCAN_DIMENSIONS = (2, 2)
@@ -56,9 +56,6 @@ class Scanner(object):
         self.TILE_uM_OVERLAP_X = ((self.sizeX * self.nanometersPerPixel) * 0.1) / 1000
         self.TILE_uM_OVERLAP_Y = ((self.sizeY * self.nanometersPerPixel) * 0.1) / 1000
 
-
-
-        self.set_imaging_objective_magnification(5)
         self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
 
     def set_z_step_size(self, step_size_um):
@@ -121,7 +118,7 @@ class Scanner(object):
         if magnification == 5:
             self.nanometersPerPixel = 714
         elif magnification == 10:
-            self.nanometersPerPixel == 345
+            self.nanometersPerPixel = 345
         elif magnification == 20:
             self.nanometersPerPixel = 181
         elif magnification == 40:
@@ -129,12 +126,13 @@ class Scanner(object):
         elif magnification == 63:
             self.nanometersPerPixel = 59
 
-        self.guiLogQueue.put(self.LOG_PREFIX + "IMAGING_OBJECTIVE_MAGNIFICATION=" + str(magnification))
+        self.update_tiled_scan_overlap()
+
 
     def update_tiled_scan_overlap(self):
 
-        self.TILE_uM_OVERLAP_X = (self.sizeX * self.nanometersPerPixel) * 0.1
-        self.TILE_uM_OVERLAP_Y = (self.sizeY * self.nanometersPerPixel) * 0.1
+        self.TILE_uM_OVERLAP_X = ((self.sizeX * self.nanometersPerPixel) * 0.1) / 1000
+        self.TILE_uM_OVERLAP_Y = ((self.sizeY * self.nanometersPerPixel) * 0.1) / 1000
 
 
     def wait_for_confirmation(self, procIndex):
@@ -182,7 +180,7 @@ class Scanner(object):
 
     def paint_scalebar(self, frame):
 
-        umPixelsRatio = 10
+        umPixelsRatio = self.umPerPixel_5x
 
         if self.imagingObjectiveMagnification == 5:
             umPixelsRatio = self.umPerPixel_5x
@@ -236,6 +234,7 @@ class Scanner(object):
             if stackPaths == -1:
                 return -1
 
+        # TODO: FIX THIS!
         # Sleep to make sure CameraController process has time to save stacks to disk before we try to read them
         # Note: SHOULD wait for confirmation from camera process before continuing....maybe I'll get to it one day
         sleep(4)
@@ -323,7 +322,11 @@ class Scanner(object):
             # Move motor down z
             self.mainQueue.put([2, 6, [2, self.Z_STEP_SIZE_um, True]])
             self.wait_for_confirmation(2)
-            # Wait for motor vibration to settle
+
+            # TODO: We don't care about vibration settle delay for low magnification
+            # TODO: But at high mag the vibration causes bad smearing during exposure.
+            # TODO: For high mag turn this back on and set it appropriately
+            # TODO: Wait for motor vibration to settle
             sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
 
         # Move back to top of stack
@@ -402,11 +405,14 @@ class Scanner(object):
 
             for x in range(0, self.TILE_SCAN_DIMENSIONS[0]):
 
-
                 sleep(7)
-                print("STACK")
                 stackPath = self.scan_stack(self.SCAN_NAME + "_tiled\\" + self.SCAN_NAME + "_tiled_X" + str(x) + "_Y=" + str(y), self.SCAN_NAME + "_tiled_X=" + str(x) + "_Y=" + str(y))
                 sleep(4)
+
+                # TODO make arduino reset more robust
+                self.mainQueue.put([2, 9, []])
+                self.wait_for_confirmation(2)
+
                 if stackPath == -1:
                     # Close shutter
                     self.mainQueue.put([2, 7, []])
@@ -416,20 +422,16 @@ class Scanner(object):
 
                 if x < self.TILE_SCAN_DIMENSIONS[0] - 1:
                     # Perform X translation
-                    print("TRANSLATE")
                     self.mainQueue.put([2, 6, [3, -tileTranslationX_uM, True]])
                     sleep(2)
             # If we just scanned the last X of the row, move back to X=0
-            print("TRANSLATE")
             self.mainQueue.put([2, 6, [3, revertTranslationX_uM, True]])
             sleep(2)
 
             if y < self.TILE_SCAN_DIMENSIONS[1] - 1:
-                print("TRANSLATE")
                 self.mainQueue.put([2, 6, [1, -tileTranslationY_uM, True]])
                 sleep(2)
         # If we just scanned the last Y of the column, move back to Y=0
-        print("TRANSLATE")
         self.mainQueue.put([2, 6, [1, revertTranslationY_uM, True]])
         sleep(2)
         self.guiLogQueue.put(self.LOG_PREFIX + "Tiled Scan Complete!")
@@ -484,8 +486,6 @@ class Scanner(object):
             self.set_imaging_objective_magnification(msg[2][0])
         elif funcIndex == 17:
             self.scan("tiled", msg[2][0])
-        elif funcIndex == 18:
-            self.update_tiled_scan_overlap()
 
 def launch_scanner(queue, mainQueue, guiLogQueue):
 

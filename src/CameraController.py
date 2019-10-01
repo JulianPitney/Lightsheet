@@ -26,16 +26,16 @@ class CameraController(object):
         self.LOG_PREFIX = "CameraController: "
 
         # Image Parameters
-        self.imagingObjectiveMagnification = 20
-        self.umPerPixel_5x = 0.666
-        self.umPerPixel_10x = 0.357
-        self.umPerPixel_20x = 0.175
-        self.umPerPixel_40x = 0.089
-        self.umPerPixel_63x = 0.057
+        self.imagingObjectiveMagnification = 5
+        self.umPerPixel_5x = 0.714
+        self.umPerPixel_10x = 0.345
+        self.umPerPixel_20x = 0.181
+        self.umPerPixel_40x = 0.090
+        self.umPerPixel_63x = 0.059
         # Acquisition config
         self.EXPOSURE = 30000
         self.GAIN = 23
-        self.FPS = 60.00
+        self.FPS = 20.00
         self.WIDTH = 2448
         self.HEIGHT = 2048
         # Spinnaker Initialization
@@ -156,6 +156,7 @@ class CameraController(object):
         else:
             gain = min(camera.Gain.GetMax(), gain)
             camera.Gain.SetValue(gain)
+            self.guiLogQueue.put(self.LOG_PREFIX + "GAIN=" + str(gain))
 
     def set_camera_exposure(self, camera, exposure):
 
@@ -172,7 +173,7 @@ class CameraController(object):
             # Ensure desired exposure time does not exceed the maximum
             exposure = min(camera.ExposureTime.GetMax(), exposure)
             camera.ExposureTime.SetValue(exposure)
-
+            self.guiLogQueue.put(self.LOG_PREFIX + "EXPOSURE=" + str(exposure))
 
     def set_camera_pixel_format(self, nodemap):
 
@@ -337,15 +338,13 @@ class CameraController(object):
             image_converted = image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
             image_converted = image_converted.GetNDArray()
             self.lastFrame = image_converted
+            self.guiVideoQueue.put([4, -1, [self.lastFrame]])
             return True
 
 
-    def retrieve_next_image_IPC(self, cameraIndex, destinationProcessIndex, destinationFunctionIndex):
 
-        if len(self.lastFrame) != 0:
-            self.guiVideoQueue.put([destinationProcessIndex, destinationFunctionIndex, [self.lastFrame, True]])
-        else:
-            self.guiVideoQueue.put([destinationProcessIndex, destinationFunctionIndex, [self.lastFrame, False]])
+
+
 
 #--------------------------------------------------------------------------------------------#
 #                               CAMERA CONTROL END                                           #
@@ -366,7 +365,7 @@ class CameraController(object):
 
     def paint_scalebar(self, frame):
 
-        umPixelsRatio = 10
+        umPixelsRatio = self.umPerPixel_5x
 
         if self.imagingObjectiveMagnification == 5:
             umPixelsRatio = self.umPerPixel_5x
@@ -468,8 +467,6 @@ class CameraController(object):
             self.scan(msg[2][0], msg[2][1], msg[2][2], msg[2][3])
         elif functionIndex == 4:
             self.set_scalebar_size(msg[2][0])
-        elif functionIndex == 5:
-            self.retrieve_next_image_IPC(msg[2][0], msg[2][1], msg[2][2])
 
     def mainloop(self):
         while True:

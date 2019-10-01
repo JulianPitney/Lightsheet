@@ -24,9 +24,9 @@ class ArduinoController(object):
 		self.MICROMETERS_PER_STEP = 0.15625
 
 		# Hardware interface
-		SERIAL_PORT_PATH = "COM14"
-		BAUDRATE = 115200
-		self.serialInterface = self.open_serial_interface(SERIAL_PORT_PATH, BAUDRATE)
+		self.SERIAL_PORT_PATH = "COM4"
+		self.BAUDRATE = 115200
+		self.serialInterface = self.open_serial_interface(self.SERIAL_PORT_PATH, self.BAUDRATE)
 		self.wait_for_arduino_confirmation()
 
 		self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
@@ -59,7 +59,7 @@ class ArduinoController(object):
 				return 0
 			else:
 				self.guiLogQueue.put(self.LOG_PREFIX + "Arduino failed to respond!")
-
+				return -1
 
 	def convert_um_to_steps(self, um):
 
@@ -164,6 +164,19 @@ class ArduinoController(object):
 		#response = self.serialInterface.readline().decode()
 		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
+	def reset_arduino(self):
+
+		self.serialInterface.close()
+		self.serialInterface = self.open_serial_interface(self.SERIAL_PORT_PATH, self.BAUDRATE)
+		result = self.wait_for_arduino_confirmation()
+
+		# Send result of reset to Scanner
+		if result == 0:
+			self.mainQueue.put([5, -1, [2]])
+			self.guiLogQueue.put(self.LOG_PREFIX + "ARDUINO RESET SUCCESSFUL.")
+		else:
+			self.guiLogQueue.put(self.LOG_PREFIX + "ARDUINO RESET FAILED.")
+
 
 	def process_msg(self, msg):
 
@@ -187,7 +200,10 @@ class ArduinoController(object):
 			self.toggle_solenoid()
 		elif funcIndex == 8:
 			self.toggle_led()
-
+		elif funcIndex == 9:
+			self.reset_arduino()
+			# TODO: LED TOGGLE IS TEMP FOR TESTING.
+			self.toggle_led()
 	def mainloop(self):
 		while True :
 			if not self.queue.empty():

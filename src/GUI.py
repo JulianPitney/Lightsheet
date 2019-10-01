@@ -48,27 +48,15 @@ class GUI(object):
 
         while not self.stopEvent.is_set():
 
-            # Send request to camera process for latest frame
-            self.mainQueue.put([1, 5, [0, 4, 0]])
-            # If frame doesn't arrive within 0.1s, retry.
-            msgReceived = False
-            start = time.time()
-            while (time.time() - start) < 0.05:
-                if not self.videoQueue.empty():
-                    msg = self.videoQueue.get()
-                    msgReceived = True
+            if not self.videoQueue.empty():
 
-            if msgReceived:
-                frameAvailable = msg[2][1]
-
-                if frameAvailable:
-                    frame = msg[2][0]
-                    image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    image = cv2.resize(image, dsize=(1024, 768), interpolation=cv2.INTER_CUBIC)
-                    image = Image.fromarray(image)
-                    image = ImageTk.PhotoImage(image)
-                    self.videoWindow.configure(image=image)
-                    self.videoWindow.image = image
+                frame = self.videoQueue.get()[2][0]
+                image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                image = cv2.resize(image, dsize=(1024, 768), interpolation=cv2.INTER_CUBIC)
+                image = Image.fromarray(image)
+                image = ImageTk.PhotoImage(image)
+                self.videoWindow.configure(image=image)
+                self.videoWindow.image = image
 
 
 
@@ -341,7 +329,6 @@ class GUI(object):
     def update_magnification_dropdown(self, *args):
         self.button_push_callback(1, 4, [int(self.magnification.get())])
         self.button_push_callback(5, 16, [int(self.magnification.get())])
-        self.button_push_callback(5, 18, [])
 
 
 def launch_gui(queue, mainQueue, videoQueue, logQueue):

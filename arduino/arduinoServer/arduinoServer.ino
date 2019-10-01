@@ -607,7 +607,6 @@ void sendResponse(String response) {
 
 
 
-
 void loop() {
 
   // New command received (0), Parse error (-1), Listening timed out (1)
