@@ -436,7 +436,7 @@ class CameraController(object):
 
 
         filename = path + "\\" + SCAN_NAME + ".tif"
-        imageStack = np.asarray(imageStack)
+        imageStack = np.asarray(imageStack, dtype=np.uint16)
 
         metadata_dict = {}
         for item in metadata:
@@ -450,7 +450,7 @@ class CameraController(object):
             filename = os.path.splitext(filename)[0]
             filename += randomSuffix + ".tif"
 
-        tif.imwrite(filename, imageStack, imagej=True, metadata=metadata_dict)
+        tif.imwrite(filename, imageStack, imagej=False, metadata=metadata_dict)
 
 
     def process_msg(self, msg):
