@@ -27,6 +27,7 @@ class CameraController(object):
 
         # Image Parameters
         self.imagingObjectiveMagnification = 5
+        self.umPerPixel_2x = 1.430
         self.umPerPixel_5x = 0.714
         self.umPerPixel_10x = 0.345
         self.umPerPixel_20x = 0.181
@@ -377,6 +378,8 @@ class CameraController(object):
             umPixelsRatio = self.umPerPixel_40x
         elif self.imagingObjectiveMagnification == 63:
             umPixelsRatio = self.umPerPixel_63x
+        elif self.imagingObjectiveMagnification == 2:
+            umPixelsRatio = self.umPerPixel_2x
 
         height, width = frame.shape[:2]
         # Figure out how many pixels represent 10um

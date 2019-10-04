@@ -199,7 +199,7 @@ class GUI(object):
         richardsonLucyIterationsScale.set(1)
         self.magnification = IntVar()
         self.magnification.set(5)  # set the default option
-        magnifications = {5, 10, 20, 40, 63}
+        magnifications = {2, 5, 10, 20, 40, 63}
         magnificationLabel = Label(scanConfigFrame, text="Imaging Objective Magnification", fg=self.text_colour, bg=self.dark_color)
         magnificationDropdown = OptionMenu(scanConfigFrame, self.magnification, *magnifications)
         magnificationDropdown.config(bg=self.light_color)

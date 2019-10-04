@@ -36,6 +36,9 @@ class Scanner(object):
 
 
         self.imagingObjectiveMagnification = 5
+        # 2x is actually 2.5x but we've been using integers to represent
+        # magnifications thus far sooooo 2x it is.
+        self.umPerPixel_2x = 1.430
         self.umPerPixel_5x = 0.714
         self.umPerPixel_10x = 0.345
         self.umPerPixel_20x = 0.181
@@ -141,6 +144,8 @@ class Scanner(object):
             self.nanometersPerPixel = 90
         elif magnification == 63:
             self.nanometersPerPixel = 59
+        elif magnification == 2:
+            self.nanometersPerPixel = 1430
 
         self.update_tiled_scan_overlap()
 
@@ -208,7 +213,8 @@ class Scanner(object):
             umPixelsRatio = self.umPerPixel_40x
         elif self.imagingObjectiveMagnification == 63:
             umPixelsRatio = self.umPerPixel_63x
-
+        elif self.imagingObjectiveMagnification == 2:
+            umPixelsRatio = self.umPerPixel_2x
 
         height, width = frame.shape[:2]
         # Figure out how many pixels represent 10um
