@@ -337,6 +337,8 @@ class Scanner(object):
         self.wait_for_confirmation(2)
         # Take camera out of scan mode
         self.mainQueue.put([1, 4, ["STOP"]])
+        # Wait for confirmation that stack has been saved to disk
+        self.wait_for_confirmation(1)
         self.guiLogQueue.put(self.LOG_PREFIX + "Stack Scan Complete!")
         return path + "\\" + timelapseScanName + ".tif"
 
