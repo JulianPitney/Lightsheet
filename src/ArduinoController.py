@@ -83,28 +83,28 @@ class ArduinoController(object):
 		command = "TOGGLE_COARSE_JOG\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 	def toggle_laser(self):
 
 		command = "TOGGLE_LASER\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 	def toggle_solenoid(self):
 
 		command = "TOGGLE_SHUTTER\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 	def toggle_led(self):
 
 		command ="TOGGLE_LED\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 
 	def set_motor_speed(self, motorIndex, speed):
@@ -113,7 +113,7 @@ class ArduinoController(object):
 		command = "SET S" + str(motorIndex) + " " + "SPEED" + " " + str(speed) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 	def set_motor_acceleration(self, motorIndex, acceleration):
 
@@ -121,7 +121,7 @@ class ArduinoController(object):
 		command = "SET S" + str(motorIndex) + " " + "ACCELERATION" + " " + str(acceleration) + "\n"
 		self.serialInterface.write(command.encode('UTF-8'))
 		response = self.serialInterface.readline().decode()
-		self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
+		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
 
 	def move_motor_micrometers(self, motorIndex, um, scanMode):
@@ -202,8 +202,7 @@ class ArduinoController(object):
 			self.toggle_led()
 		elif funcIndex == 9:
 			self.reset_arduino()
-			# TODO: LED TOGGLE IS TEMP FOR TESTING.
-			self.toggle_led()
+
 	def mainloop(self):
 		while True :
 			if not self.queue.empty():

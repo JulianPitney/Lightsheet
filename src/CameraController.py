@@ -65,7 +65,7 @@ class CameraController(object):
             self.guiLogQueue.put(self.LOG_PREFIX + "No cameras were found")
             return None, None
         else:
-            self.guiLogQueue.put(self.LOG_PREFIX + str(camList.GetSize()) + " cameras detected")
+            #self.guiLogQueue.put(self.LOG_PREFIX + str(camList.GetSize()) + " cameras detected")
             return camList, system
 #--------------------------------------------------------------------------------------------#
 #                               SPINNAKER CONFIG END                                         #
@@ -156,7 +156,7 @@ class CameraController(object):
         else:
             gain = min(camera.Gain.GetMax(), gain)
             camera.Gain.SetValue(gain)
-            self.guiLogQueue.put(self.LOG_PREFIX + "GAIN=" + str(gain))
+            #self.guiLogQueue.put(self.LOG_PREFIX + "GAIN=" + str(gain))
 
     def set_camera_exposure(self, camera, exposure):
 
@@ -173,7 +173,7 @@ class CameraController(object):
             # Ensure desired exposure time does not exceed the maximum
             exposure = min(camera.ExposureTime.GetMax(), exposure)
             camera.ExposureTime.SetValue(exposure)
-            self.guiLogQueue.put(self.LOG_PREFIX + "EXPOSURE=" + str(exposure))
+            #self.guiLogQueue.put(self.LOG_PREFIX + "EXPOSURE=" + str(exposure))
 
     def set_camera_pixel_format(self, nodemap):
 
@@ -188,7 +188,7 @@ class CameraController(object):
                 pixel_format_mono16 = node_pixel_format_mono16.GetValue()
                 # Set integer as new value for enumeration node
                 node_pixel_format.SetIntValue(pixel_format_mono16)
-                self.guiLogQueue.put(self.LOG_PREFIX + "PIXEL_FORMAT=%s" % node_pixel_format.GetCurrentEntry().GetSymbolic())
+                #self.guiLogQueue.put(self.LOG_PREFIX + "PIXEL_FORMAT=%s" % node_pixel_format.GetCurrentEntry().GetSymbolic())
             else:
                 self.guiLogQueue.put(self.LOG_PREFIX + "Camera pixel format mono 16 not available")
         else:
@@ -361,7 +361,7 @@ class CameraController(object):
 
     def set_scalebar_size(self, imagingObjectiveMagnification):
         self.imagingObjectiveMagnification = imagingObjectiveMagnification
-        self.guiLogQueue.put(self.LOG_PREFIX + "MAGNIFICATION=" + str(self.imagingObjectiveMagnification) + "x")
+        #self.guiLogQueue.put(self.LOG_PREFIX + "MAGNIFICATION=" + str(self.imagingObjectiveMagnification) + "x")
 
     def paint_scalebar(self, frame):
 

@@ -56,59 +56,75 @@ class Scanner(object):
         self.TILE_uM_OVERLAP_X = ((self.sizeX * self.nanometersPerPixel) * 0.1) / 1000
         self.TILE_uM_OVERLAP_Y = ((self.sizeY * self.nanometersPerPixel) * 0.1) / 1000
 
+
+        # TODO: Horrible Arduino bug hack fix.
+        # This variable keeps track of how many slices we've scanned.
+        # The reason is that commands to the Arduino start being
+        # executed very slowly after ~400 slices have been scanned.
+        # I don't know why that's the case so the hack solution
+        # is to reset to arduino after 400 slices have been scanned.
+        # This seems to work okay and is viable because the arduino has no
+        # state information on it in-between executing commands.
+        # The reset is performed in the scan_stack() function after
+        # it counts 400 slices scanned, at which point this variable
+        # is reset to 0.
+        self.SLICES_SCANNED = 0
+
+
+
         self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
 
     def set_z_step_size(self, step_size_um):
         self.Z_STEP_SIZE_um = float(step_size_um)
-        self.guiLogQueue.put(self.LOG_PREFIX + "Z_STEP_SIZE=" + str(step_size_um))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "Z_STEP_SIZE=" + str(step_size_um))
 
     def set_stack_size(self, stack_size):
         self.STACK_SIZE = int(stack_size)
-        self.guiLogQueue.put(self.LOG_PREFIX + "STACK_SIZE=" + str(stack_size))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "STACK_SIZE=" + str(stack_size))
 
     def set_scan_step_speed(self, step_speed):
         self.SCAN_STEP_SPEED = int(step_speed)
-        self.guiLogQueue.put(self.LOG_PREFIX + "SCAN_STEP_SPEED=" + str(step_speed))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "SCAN_STEP_SPEED=" + str(step_speed))
 
     def set_scan_name(self, scan_name):
         self.SCAN_NAME = str(scan_name)
-        self.guiLogQueue.put(self.LOG_PREFIX + "SCAN_NAME=" + str(scan_name))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "SCAN_NAME=" + str(scan_name))
 
     def set_sleep_duration_after_movement(self, duration_S):
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = int(duration_S)
-        self.guiLogQueue.put(self.LOG_PREFIX + "SLEEP_DURATION_AFTER_MOVEMENT_S=" + str(duration_S))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "SLEEP_DURATION_AFTER_MOVEMENT_S=" + str(duration_S))
 
     def set_timelapse_n(self, timelapseN):
         self.TIMELAPSE_N = int(timelapseN)
-        self.guiLogQueue.put(self.LOG_PREFIX + "TIMELAPSE_N=" + str(timelapseN))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "TIMELAPSE_N=" + str(timelapseN))
 
     def set_timelapse_interval_s(self, timelapseInterval):
         self.TIMELAPSE_INTERVAL_S = int(timelapseInterval)
-        self.guiLogQueue.put(self.LOG_PREFIX + "TIMELAPSE_INTERVAL_S=" + str(timelapseInterval))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "TIMELAPSE_INTERVAL_S=" + str(timelapseInterval))
 
     def set_refractive_index_immersion(self, refractiveIndexImmersion):
         self.refractiveIndexImmersion = refractiveIndexImmersion
-        self.guiLogQueue.put(self.LOG_PREFIX + "REFRACTIVE_INDEX_IMMERSION=" + str(refractiveIndexImmersion))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "REFRACTIVE_INDEX_IMMERSION=" + str(refractiveIndexImmersion))
 
     def set_numerical_aperture(self, numericalAperture):
         self.numericalAperture = numericalAperture
-        self.guiLogQueue.put(self.LOG_PREFIX + "NUMERICAL_APERTURE_IMAGING=" + str(numericalAperture))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "NUMERICAL_APERTURE_IMAGING=" + str(numericalAperture))
 
     def set_wavelength(self, wavelength):
         self.wavelength = wavelength
-        self.guiLogQueue.put(self.LOG_PREFIX + "WAVELENGTH=" + str(wavelength))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "WAVELENGTH=" + str(wavelength))
 
     def set_nanometers_per_pixel(self, nanometersPerPixel):
         self.nanometersPerPixel = nanometersPerPixel
-        self.guiLogQueue.put(self.LOG_PREFIX + "NANOMETERS_PER_PIXEL=" + str(nanometersPerPixel))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "NANOMETERS_PER_PIXEL=" + str(nanometersPerPixel))
 
     def set_richardson_lucy_iterations(self, iterations):
         self.richardsonLucyIterations = iterations
-        self.guiLogQueue.put(self.LOG_PREFIX + "RICHARDSON_LUCY_ITERATIONS=" + str(iterations))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "RICHARDSON_LUCY_ITERATIONS=" + str(iterations))
 
     def set_deconvolve_after_scan(self, deconvolveAfterScan):
         self.deconvolveAfterScan = bool(deconvolveAfterScan)
-        self.guiLogQueue.put(self.LOG_PREFIX + "DECONVOLVE_AFTER_SCAN=" + str(deconvolveAfterScan))
+        #self.guiLogQueue.put(self.LOG_PREFIX + "DECONVOLVE_AFTER_SCAN=" + str(deconvolveAfterScan))
 
     def set_imaging_objective_magnification(self, magnification):
 
@@ -234,10 +250,6 @@ class Scanner(object):
             if stackPaths == -1:
                 return -1
 
-        # TODO: FIX THIS!
-        # Sleep to make sure CameraController process has time to save stacks to disk before we try to read them
-        # Note: SHOULD wait for confirmation from camera process before continuing....maybe I'll get to it one day
-        sleep(4)
 
         # deconvolve scan if selected
         if self.deconvolveAfterScan:
@@ -323,11 +335,39 @@ class Scanner(object):
             self.mainQueue.put([2, 6, [2, self.Z_STEP_SIZE_um, True]])
             self.wait_for_confirmation(2)
 
+            if i % 10 == 0:
+                self.guiLogQueue.put(self.LOG_PREFIX + "SLICE #=" + str(i))
+
+
             # TODO: We don't care about vibration settle delay for low magnification
             # TODO: But at high mag the vibration causes bad smearing during exposure.
             # TODO: For high mag turn this back on and set it appropriately
             # TODO: Wait for motor vibration to settle
             #sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
+
+            # If we detect that we've scanned 400 slices,
+            # reset the scanned slice counter variable
+            # and reset the arduino. This is related
+            # to the lagging arduino bug. For more
+            # details see the declaration of
+            # <self.SLICES_SCANNED> in init().
+
+            self.SLICES_SCANNED += 1
+            if (self.SLICES_SCANNED == 350):
+
+                self.guiLogQueue.put(self.LOG_PREFIX + "Please wait...")
+                # Sleep for 5 seconds since we don't have reliable confirmation
+                # that arduino has finished executing it's commands from this slice.
+                # 5s should always be enough for it to finish.
+                sleep(2)
+                self.SLICES_SCANNED = 0
+                self.mainQueue.put([2, 9, []])
+                self.wait_for_confirmation(2)
+                # Open shutter
+                self.mainQueue.put([2, 7, []])
+                # Wait 1 second for shutter to open
+                sleep(1)
+                self.guiLogQueue.put(self.LOG_PREFIX + "...Resuming scan")
 
         # Move back to top of stack
         self.mainQueue.put([2, 6, [2, -(self.STACK_SIZE * self.Z_STEP_SIZE_um), True]])
@@ -411,9 +451,6 @@ class Scanner(object):
                 stackPath = self.scan_stack(self.SCAN_NAME + "_tiled\\" + self.SCAN_NAME + "_tiled_X" + str(x) + "_Y=" + str(y), self.SCAN_NAME + "_tiled_X=" + str(x) + "_Y=" + str(y))
                 sleep(4)
 
-                # TODO make arduino reset more robust
-                self.mainQueue.put([2, 9, []])
-                self.wait_for_confirmation(2)
 
                 if stackPath == -1:
                     # Close shutter
