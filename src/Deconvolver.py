@@ -16,7 +16,7 @@ class Deconvolver(object):
     def __init__(self):
         self.PSFGenConfigPath = "../config/PSFGenerator_psf_config.txt"
         self.FlowdecPSFConfigPath = "../config/Flowdec_psf_config.json"
-        self.JVM_HEAP_MEMORY_MB = 40000
+        self.JVM_HEAP_MEMORY_MB = 60000
         self.theoreticalPSFAccuracy = "Good"
 
 

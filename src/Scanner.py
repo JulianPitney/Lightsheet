@@ -327,7 +327,7 @@ class Scanner(object):
             # TODO: But at high mag the vibration causes bad smearing during exposure.
             # TODO: For high mag turn this back on and set it appropriately
             # TODO: Wait for motor vibration to settle
-            sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
+            #sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
 
         # Move back to top of stack
         self.mainQueue.put([2, 6, [2, -(self.STACK_SIZE * self.Z_STEP_SIZE_um), True]])
