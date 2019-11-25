@@ -323,7 +323,6 @@ class Scanner(object):
         if path == -1:
             return -1
 
-
         # Put camera in scan mode
         self.mainQueue.put([1, 3, [timelapseScanName, metadata, path, 0]])
         self.wait_for_confirmation(1)
@@ -339,7 +338,6 @@ class Scanner(object):
             self.wait_for_confirmation(1)
             # Move motor down z
             self.mainQueue.put([2, 6, [2, self.Z_STEP_SIZE_um, True]])
-            self.wait_for_confirmation(2)
 
             if i % 10 == 0:
                 self.guiLogQueue.put(self.LOG_PREFIX + "SLICE #=" + str(i))
@@ -351,36 +349,10 @@ class Scanner(object):
             # TODO: Wait for motor vibration to settle
             #sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
 
-            # If we detect that we've scanned 400 slices,
-            # reset the scanned slice counter variable
-            # and reset the arduino. This is related
-            # to the lagging arduino bug. For more
-            # details see the declaration of
-            # <self.SLICES_SCANNED> in init().
-
-            self.SLICES_SCANNED += 1
-            if (self.SLICES_SCANNED == 350):
-
-                self.guiLogQueue.put(self.LOG_PREFIX + "Please wait...")
-                # Sleep for 5 seconds since we don't have reliable confirmation
-                # that arduino has finished executing it's commands from this slice.
-                # 5s should always be enough for it to finish.
-                sleep(2)
-                self.SLICES_SCANNED = 0
-                self.mainQueue.put([2, 9, []])
-                self.wait_for_confirmation(2)
-                # Open shutter
-                self.mainQueue.put([2, 7, []])
-                # Wait 1 second for shutter to open
-                sleep(1)
-                self.guiLogQueue.put(self.LOG_PREFIX + "...Resuming scan")
-
-        # Move back to top of stack
-        self.mainQueue.put([2, 6, [2, -(self.STACK_SIZE * self.Z_STEP_SIZE_um), True]])
         # Close shutter
         self.mainQueue.put([2, 7, []])
-        # Wait for confirmation from arduino that we've returned to top of the stack
-        self.wait_for_confirmation(2)
+        # Move back to top of stack
+        self.mainQueue.put([2, 6, [2, -(self.STACK_SIZE * self.Z_STEP_SIZE_um), True]])
         # Take camera out of scan mode
         self.mainQueue.put([1, 4, ["STOP"]])
         # Wait for confirmation that stack has been saved to disk

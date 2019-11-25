@@ -136,12 +136,13 @@ class ArduinoController(object):
 
 		steps = int(steps)
 		command = "MOVE S" + str(motorIndex) + " " + str(steps) + " " + str(self.SEEK_SPEED) + "\n"
+
+		if self.serialInterface.in_waiting > 10000:
+			self.serialInterface.reset_input_buffer()
 		self.serialInterface.write(command.encode('UTF-8'))
 		#response = self.serialInterface.readline().decode()
 		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
-		if scanMode:
-			self.mainQueue.put([5, -1, [2]])
 
 
 	def jog_motor(self, motorInputs):
