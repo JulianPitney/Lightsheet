@@ -407,11 +407,14 @@ class Scanner(object):
         tileTranslationX_uM = tileWidth_uM - self.TILE_uM_OVERLAP_X
         tileTranslationY_uM = tileHeight_uM - self.TILE_uM_OVERLAP_Y
 
-        # Round down to a whole number multiple of <MICROMETERS_PER_STEP>
-        tileTranslationX_uM = int(tileTranslationX_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
-        tileTranslationY_uM = int(tileTranslationY_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
-        revertTranslationX_uM = int((tileTranslationX_uM * (self.TILE_SCAN_DIMENSIONS[0] - 1)) / (self.MICROMETERS_PER_STEP)) * self.MICROMETERS_PER_STEP
-        revertTranslationY_uM = int((tileTranslationY_uM * (self.TILE_SCAN_DIMENSIONS[1] - 1)) / (self.MICROMETERS_PER_STEP)) * self.MICROMETERS_PER_STEP
+        # Round down to a whole number multiple of <MICROMETERS_PER_STEP>.
+        # We also take the negative of the translation because that's the direction the stage
+        # moves to start based on our scan pattern.
+        tileTranslationX_uM = -int(tileTranslationX_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
+        tileTranslationY_uM = -int(tileTranslationY_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
+
+        displacementFromStartingPositionX = 0
+        displacementFromStartingPositionY = 0
 
 
         for y in range(0, self.TILE_SCAN_DIMENSIONS[1]):
@@ -432,22 +435,27 @@ class Scanner(object):
 
                 if x < self.TILE_SCAN_DIMENSIONS[0] - 1:
                     # Perform X translation
-                    print("X TRANSLATION=" + str(-tileTranslationX_uM))
-                    self.mainQueue.put([2, 6, [3, -tileTranslationX_uM, True]])
+                    self.mainQueue.put([2, 6, [3, tileTranslationX_uM, True]])
+                    displacementFromStartingPositionX += tileTranslationX_uM
                     sleep(20)
-            # If we just scanned the last X of the row, move back to X=0
-            print("X TRANSLATION=" + str(revertTranslationX_uM))
-            self.mainQueue.put([2, 6, [3, revertTranslationX_uM, True]])
-            sleep(20)
+
+            # If we just scanned the last X of the row, reverse the x translation direction
+            tileTranslationX_uM = -tileTranslationX_uM
 
             if y < self.TILE_SCAN_DIMENSIONS[1] - 1:
-                print("Y TRANSLATION=" + str(-tileTranslationY_uM))
-                self.mainQueue.put([2, 6, [1, -tileTranslationY_uM, True]])
+                self.mainQueue.put([2, 6, [1, tileTranslationY_uM, True]])
+                displacementFromStartingPositionY += tileTranslationY_uM
                 sleep(20)
-        # If we just scanned the last Y of the column, move back to Y=0
-        print("Y TRANSLATION=" + str(revertTranslationY_uM))
-        self.mainQueue.put([2, 6, [1, revertTranslationY_uM, True]])
-        sleep(20)
+
+
+        # If we're not at the origin in either x or y, go back to the origin.
+        if displacementFromStartingPositionX != 0:
+            self.mainQueue.put([2, 6, [3, -displacementFromStartingPositionX, True]])
+            sleep(20)
+        if displacementFromStartingPositionY != 0:
+            self.mainQueue.put([2, 6, [1, -displacementFromStartingPositionY, True]])
+            sleep(20)
+
         self.guiLogQueue.put(self.LOG_PREFIX + "Tiled Scan Complete!")
         return stackPaths
 

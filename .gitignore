@@ -1,3 +1,4 @@
 /FLIR/
 /scans/
 *.pyc
+*.tmp
