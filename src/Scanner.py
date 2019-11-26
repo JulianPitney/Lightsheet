@@ -59,22 +59,6 @@ class Scanner(object):
         self.TILE_uM_OVERLAP_X = ((self.sizeX * self.nanometersPerPixel) * 0.1) / 1000
         self.TILE_uM_OVERLAP_Y = ((self.sizeY * self.nanometersPerPixel) * 0.1) / 1000
 
-
-        # TODO: Horrible Arduino bug hack fix.
-        # This variable keeps track of how many slices we've scanned.
-        # The reason is that commands to the Arduino start being
-        # executed very slowly after ~400 slices have been scanned.
-        # I don't know why that's the case so the hack solution
-        # is to reset to arduino after 400 slices have been scanned.
-        # This seems to work okay and is viable because the arduino has no
-        # state information on it in-between executing commands.
-        # The reset is performed in the scan_stack() function after
-        # it counts 400 slices scanned, at which point this variable
-        # is reset to 0.
-        self.SLICES_SCANNED = 0
-
-
-
         self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
 
     def set_z_step_size(self, step_size_um):
@@ -398,7 +382,16 @@ class Scanner(object):
                 self.guiLogQueue.put(self.LOG_PREFIX + "Time Until Next Stack Scan: " + str(timeUntilNextStackDue) + "s")
                 sleep(timeUntilNextStackDue - 1)
 
-
+    # TODO: The bug where the tiled scan would fail (Not perform the correct stage translations) is
+    # TODO: is caused by the client side not waiting for confirmation that the arduino has
+    # TODO: actually finished performing a translation before moving on in the scan process.
+    # TODO: The temporary hack fix is to have the client sleep for 20 seconds after sending
+    # TODO: a translation command, to "ensure" the arduino has completed the command
+    # TODO: before movnig on. A REAL fix would be to implement real confirmation messages
+    # TODO: from the arduino and wait to receive those before moving on. The first hurdle
+    # TODO: in implementing confirmation messages is that the serial interface between client/server
+    # TODO: is not reliable and messages will be lost. This demands some kidn of protocol
+    # TODO: to ensure message integrity and delivery.
     def scan_tiles(self):
 
         stackPaths = []
@@ -439,18 +432,22 @@ class Scanner(object):
 
                 if x < self.TILE_SCAN_DIMENSIONS[0] - 1:
                     # Perform X translation
+                    print("X TRANSLATION=" + str(-tileTranslationX_uM))
                     self.mainQueue.put([2, 6, [3, -tileTranslationX_uM, True]])
-                    sleep(2)
+                    sleep(20)
             # If we just scanned the last X of the row, move back to X=0
+            print("X TRANSLATION=" + str(revertTranslationX_uM))
             self.mainQueue.put([2, 6, [3, revertTranslationX_uM, True]])
-            sleep(2)
+            sleep(20)
 
             if y < self.TILE_SCAN_DIMENSIONS[1] - 1:
+                print("Y TRANSLATION=" + str(-tileTranslationY_uM))
                 self.mainQueue.put([2, 6, [1, -tileTranslationY_uM, True]])
-                sleep(2)
+                sleep(20)
         # If we just scanned the last Y of the column, move back to Y=0
+        print("Y TRANSLATION=" + str(revertTranslationY_uM))
         self.mainQueue.put([2, 6, [1, revertTranslationY_uM, True]])
-        sleep(2)
+        sleep(20)
         self.guiLogQueue.put(self.LOG_PREFIX + "Tiled Scan Complete!")
         return stackPaths
 

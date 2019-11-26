@@ -24,7 +24,7 @@ class ArduinoController(object):
 		self.MICROMETERS_PER_STEP = 0.15625
 
 		# Hardware interface
-		self.SERIAL_PORT_PATH = "COM4"
+		self.SERIAL_PORT_PATH = "COM14"
 		self.BAUDRATE = 115200
 		self.serialInterface = self.open_serial_interface(self.SERIAL_PORT_PATH, self.BAUDRATE)
 		self.wait_for_arduino_confirmation()
