@@ -31,7 +31,7 @@ class Scanner(object):
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.2
         self.TIMELAPSE_N = 1
         self.TIMELAPSE_INTERVAL_S = 10
-        self.TILE_SCAN_DIMENSIONS = (2, 2)
+        self.TILE_SCAN_DIMENSIONS = (3, 3)
 
 
 
@@ -411,7 +411,7 @@ class Scanner(object):
         # We also take the negative of the translation because that's the direction the stage
         # moves to start based on our scan pattern.
         tileTranslationX_uM = -int(tileTranslationX_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
-        tileTranslationY_uM = -int(tileTranslationY_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
+        tileTranslationY_uM = int(tileTranslationY_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
 
         displacementFromStartingPositionX = 0
         displacementFromStartingPositionY = 0
