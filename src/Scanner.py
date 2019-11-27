@@ -321,7 +321,7 @@ class Scanner(object):
             self.mainQueue.put([1, 4, ["CAPTURE"]])
             self.wait_for_confirmation(1)
             # Move motor down z
-            self.mainQueue.put([2, 6, [2, self.Z_STEP_SIZE_um, True]])
+            self.mainQueue.put([2, 10, [self.Z_STEP_SIZE_um]])
 
             if i % 10 == 0:
                 self.guiLogQueue.put(self.LOG_PREFIX + "SLICE #=" + str(i))

@@ -143,6 +143,13 @@ class ArduinoController(object):
 		#response = self.serialInterface.readline().decode()
 		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
+	def move_motor_steps_accel(self, steps):
+
+		steps = int(steps)
+		command = "MOVEACCEL " + str(steps) + "\n"
+		if self.serialInterface.in_waiting > 10000:
+			self.serialInterface.reset_input_buffer()
+		self.serialInterface.write(command.encode('UTF-8'))
 
 
 	def jog_motor(self, motorInputs):
@@ -203,6 +210,8 @@ class ArduinoController(object):
 			self.toggle_led()
 		elif funcIndex == 9:
 			self.reset_arduino()
+		elif funcIndex == 10:
+			self.move_motor_steps_accel(msg[2][0])
 
 	def mainloop(self):
 		while True :
