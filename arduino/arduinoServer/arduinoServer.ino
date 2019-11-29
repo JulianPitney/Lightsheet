@@ -39,23 +39,23 @@ bool STEPPERS_ON = false;
 const int DRIVER1_ENA = 6;
 const int DRIVER1_DIR = 5;
 const int DRIVER1_PUL = 4;
-const int STEPPER1_MAX_SPEED = 4000.0;
-const int STEPPER1_SPEED = 20.0;
-const int STEPPER1_ACCELERATION = 20.0;
+const int STEPPER1_MAX_SPEED = 3000.0;
+const int STEPPER1_SPEED = 30.0;
+const int STEPPER1_ACCELERATION = 450.0;
 // Driver 2 config
 const int DRIVER2_ENA = 12;
 const int DRIVER2_DIR = 11;
 const int DRIVER2_PUL = 10;
-const int STEPPER2_MAX_SPEED = 4000.0;
-const int STEPPER2_SPEED = 20.0;
-const int STEPPER2_ACCELERATION = 20.0;
+const int STEPPER2_MAX_SPEED = 3000.0;
+const int STEPPER2_SPEED = 30.0;
+const int STEPPER2_ACCELERATION = 450.0;
 // Driver 3 config
 const int DRIVER3_ENA = 9;
 const int DRIVER3_DIR = 8;
 const int DRIVER3_PUL = 7;
-const int STEPPER3_MAX_SPEED = 4000.0;
-const int STEPPER3_SPEED = 20.0;
-const int STEPPER3_ACCELERATION = 20.0;
+const int STEPPER3_MAX_SPEED = 3000.0;
+const int STEPPER3_SPEED = 30.0;
+const int STEPPER3_ACCELERATION = 450.0;
 int STEPPER_JOG_INCREMENT = 10;
 
 // Steppers
@@ -126,8 +126,8 @@ void moveStepper(AccelStepper *stepper, int steps, int speed){
 
 void moveStepperWithAccel(int steps) {
 
-    STEPPER2->move(steps);
-    STEPPER2->runToPosition();
+    STEPPER2.move(steps);
+    STEPPER2.runToPosition();
 }
 
 
@@ -226,8 +226,9 @@ int runCommand() {
       }
       else
       {
-        int steps = command->params[2].toInt();
-        rc = moveStepperWithAccel(steps);
+        int steps = command->params[1].toInt();
+        moveStepperWithAccel(steps);
+        sendResponse("0");
       }
   }
   else if(command->cmd == "SET")

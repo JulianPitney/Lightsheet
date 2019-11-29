@@ -143,14 +143,16 @@ class ArduinoController(object):
 		#response = self.serialInterface.readline().decode()
 		#self.guiLogQueue.put(self.LOG_PREFIX + "COMMAND_CONFIRMATION=" + response)
 
-	def move_motor_steps_accel(self, steps):
+	def move_motor_steps_accel(self, um):
 
-		steps = int(steps)
+		steps = self.convert_um_to_steps(int(um))
 		command = "MOVEACCEL " + str(steps) + "\n"
 		if self.serialInterface.in_waiting > 10000:
 			self.serialInterface.reset_input_buffer()
 		self.serialInterface.write(command.encode('UTF-8'))
-
+		response = self.serialInterface.readline().decode()
+		if (int(response) == 0):
+			self.mainQueue.put([5, -1, [2]])
 
 	def jog_motor(self, motorInputs):
 

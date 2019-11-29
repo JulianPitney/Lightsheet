@@ -28,7 +28,7 @@ class Scanner(object):
         self.STACK_SIZE = 10
         self.SCAN_STEP_SPEED = 50
         self.SCAN_NAME = "default"
-        self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.2
+        self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.25
         self.TIMELAPSE_N = 1
         self.TIMELAPSE_INTERVAL_S = 10
         self.TILE_SCAN_DIMENSIONS = (3, 3)
@@ -321,7 +321,7 @@ class Scanner(object):
             self.mainQueue.put([1, 4, ["CAPTURE"]])
             self.wait_for_confirmation(1)
             # Move motor down z
-            self.mainQueue.put([2, 10, [self.Z_STEP_SIZE_um]])
+            self.mainQueue.put([2, 6, [2, self.Z_STEP_SIZE_um, True]])
 
             if i % 10 == 0:
                 self.guiLogQueue.put(self.LOG_PREFIX + "SLICE #=" + str(i))
@@ -331,7 +331,7 @@ class Scanner(object):
             # TODO: But at high mag the vibration causes bad smearing during exposure.
             # TODO: For high mag turn this back on and set it appropriately
             # TODO: Wait for motor vibration to settle
-            #sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
+            sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
 
         # Close shutter
         self.mainQueue.put([2, 7, []])
@@ -345,7 +345,7 @@ class Scanner(object):
         return path + "\\" + timelapseScanName + ".tif"
 
     def scan_timelapse(self):
-
+        print("START=" + str(time()))
         timelapsePath = self.gen_scan_directory(self.SCAN_NAME + "_timelapse")
         if timelapsePath == -1:
             return -1
@@ -375,6 +375,7 @@ class Scanner(object):
             # If we're on our last iteration, no need to sleep, just shutdown now.
             elif i == self.TIMELAPSE_N - 1:
                 self.guiLogQueue.put(self.LOG_PREFIX + "Timelapse Scan Complete!")
+                print("END=" + str(time()))
                 return stackPaths
 
             # Otherwise, sleep til' next stack is due.
