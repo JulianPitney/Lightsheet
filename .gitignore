@@ -2,3 +2,4 @@
 /scans/
 *.pyc
 *.tmp
+.idea

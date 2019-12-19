@@ -383,7 +383,7 @@ class Scanner(object):
                 self.guiLogQueue.put(self.LOG_PREFIX + "Time Until Next Stack Scan: " + str(timeUntilNextStackDue) + "s")
                 sleep(timeUntilNextStackDue - 1)
 
-    # TODO: The bug where the tiled scan would fail (Not perform the correct stage translations) is
+    # TODO: The bug where the tiled scan would fail (Not perform the correct stage translations)
     # TODO: is caused by the client side not waiting for confirmation that the arduino has
     # TODO: actually finished performing a translation before moving on in the scan process.
     # TODO: The temporary hack fix is to have the client sleep for 20 seconds after sending
@@ -391,7 +391,7 @@ class Scanner(object):
     # TODO: before movnig on. A REAL fix would be to implement real confirmation messages
     # TODO: from the arduino and wait to receive those before moving on. The first hurdle
     # TODO: in implementing confirmation messages is that the serial interface between client/server
-    # TODO: is not reliable and messages will be lost. This demands some kidn of protocol
+    # TODO: is not reliable and messages will be lost. This demands some kind of protocol
     # TODO: to ensure message integrity and delivery.
     def scan_tiles(self):
 
@@ -422,8 +422,13 @@ class Scanner(object):
 
             for x in range(0, self.TILE_SCAN_DIMENSIONS[0]):
 
+                tileIndex_x = x
+                if y % 2 == 1:
+                    tileIndex_x = self.TILE_SCAN_DIMENSIONS[0] - x
+
+
                 sleep(7)
-                stackPath = self.scan_stack(self.SCAN_NAME + "_tiled\\" + self.SCAN_NAME + "_tiled_X" + str(x) + "_Y=" + str(y), self.SCAN_NAME + "_tiled_X=" + str(x) + "_Y=" + str(y))
+                stackPath = self.scan_stack(self.SCAN_NAME + "_tiled\\" + self.SCAN_NAME + "_tiled_X" + str(tileIndex_x) + "_Y=" + str(y), self.SCAN_NAME + "_tiled_X=" + str(tileIndex_x) + "_Y=" + str(y))
                 sleep(4)
 
 
