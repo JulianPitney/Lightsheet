@@ -397,12 +397,35 @@ class Scanner(object):
 
         stackPaths = []
         tiledScanPath = self.gen_scan_directory(self.SCAN_NAME + "_tiled")
+        xDirs = []
+        yDirs = []
+
         if tiledScanPath == -1:
             return -1
 
         # calculate X and Y stage translations
         tileWidth_uM = int((self.sizeX * self.nanometersPerPixel) / 1000)
         tileHeight_uM = int((self.sizeY * self.nanometersPerPixel) / 1000)
+
+        # Generate the directory structure that TeraStitcher requires.
+        for x in range(0, self.TILE_SCAN_DIMENSIONS[0]):
+
+            xCoord = int(x * tileWidth_uM * 10)
+            xDir = self.gen_scan_directory(self.SCAN_NAME + "_tiled\\" + "{:06d}".format(xCoord))
+            xDirs.append(xDir)
+
+            for y in range(0, self.TILE_SCAN_DIMENSIONS[1]):
+
+                yCoord = int(y * tileHeight_uM * 10)
+                yDir = self.gen_scan_directory(self.SCAN_NAME + "_tiled\\" + "{:06d".format(xCoord) + "\\" + "{:06d".format(xCoord) + "_" + "{:06d".format(yCoord))
+                yDirs.append(yDir)
+
+
+        print(xDirs)
+        print(yDirs)
+
+
+
 
         # Subract overlap from translations
         tileTranslationX_uM = tileWidth_uM - self.TILE_uM_OVERLAP_X
