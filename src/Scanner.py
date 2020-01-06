@@ -407,26 +407,6 @@ class Scanner(object):
         tileWidth_uM = int((self.sizeX * self.nanometersPerPixel) / 1000)
         tileHeight_uM = int((self.sizeY * self.nanometersPerPixel) / 1000)
 
-        # Generate the directory structure that TeraStitcher requires.
-        for x in range(0, self.TILE_SCAN_DIMENSIONS[0]):
-
-            xCoord = int(x * tileWidth_uM * 10)
-            xDir = self.gen_scan_directory(self.SCAN_NAME + "_tiled\\" + "{:06d}".format(xCoord))
-            xDirs.append(xDir)
-
-            for y in range(0, self.TILE_SCAN_DIMENSIONS[1]):
-
-                yCoord = int(y * tileHeight_uM * 10)
-                yDir = self.gen_scan_directory(self.SCAN_NAME + "_tiled\\" + "{:06d".format(xCoord) + "\\" + "{:06d".format(xCoord) + "_" + "{:06d".format(yCoord))
-                yDirs.append(yDir)
-
-
-        print(xDirs)
-        print(yDirs)
-
-
-
-
         # Subract overlap from translations
         tileTranslationX_uM = tileWidth_uM - self.TILE_uM_OVERLAP_X
         tileTranslationY_uM = tileHeight_uM - self.TILE_uM_OVERLAP_Y
@@ -436,6 +416,24 @@ class Scanner(object):
         # moves to start based on our scan pattern.
         tileTranslationX_uM = -int(tileTranslationX_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
         tileTranslationY_uM = int(tileTranslationY_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
+
+        # Generate the directory structure that TeraStitcher requires.
+        for x in range(0, self.TILE_SCAN_DIMENSIONS[0]):
+
+            xCoord = int(x * tileTranslationX_uM * 10)
+            xDir = self.gen_scan_directory(self.SCAN_NAME + "_tiled\\" + "{:06d}".format(xCoord))
+            xDirs.append(xDir)
+
+            for y in range(0, self.TILE_SCAN_DIMENSIONS[1]):
+
+                yCoord = int(y * tileTranslationY_uM * 10)
+                yDir = self.gen_scan_directory(self.SCAN_NAME + "_tiled\\" + "{:06d".format(xCoord) + "\\" + "{:06d".format(xCoord) + "_" + "{:06d".format(yCoord))
+                yDirs.append(yDir)
+
+
+        print(xDirs)
+        print(yDirs)
+
 
         displacementFromStartingPositionX = 0
         displacementFromStartingPositionY = 0
