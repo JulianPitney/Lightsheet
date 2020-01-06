@@ -31,7 +31,7 @@ class Scanner(object):
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.25
         self.TIMELAPSE_N = 1
         self.TIMELAPSE_INTERVAL_S = 10
-        self.TILE_SCAN_DIMENSIONS = (3, 3)
+        self.TILE_SCAN_DIMENSIONS = (3, 4)
 
 
 
@@ -397,8 +397,6 @@ class Scanner(object):
 
         stackPaths = []
         tiledScanPath = self.gen_scan_directory(self.SCAN_NAME + "_tiled")
-        xDirs = []
-        yDirs = []
 
         if tiledScanPath == -1:
             return -1
@@ -417,29 +415,14 @@ class Scanner(object):
         tileTranslationX_uM = -int(tileTranslationX_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
         tileTranslationY_uM = int(tileTranslationY_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
 
-        # Generate the directory structure that TeraStitcher requires.
-        for x in range(0, self.TILE_SCAN_DIMENSIONS[0]):
-
-            xCoord = int(x * tileTranslationX_uM * 10)
-            xDir = self.gen_scan_directory(self.SCAN_NAME + "_tiled\\" + "{:06d}".format(xCoord))
-            xDirs.append(xDir)
-
-            for y in range(0, self.TILE_SCAN_DIMENSIONS[1]):
-
-                yCoord = int(y * tileTranslationY_uM * 10)
-                yDir = self.gen_scan_directory(self.SCAN_NAME + "_tiled\\" + "{:06d".format(xCoord) + "\\" + "{:06d".format(xCoord) + "_" + "{:06d".format(yCoord))
-                yDirs.append(yDir)
-
-
-        print(xDirs)
-        print(yDirs)
 
 
         displacementFromStartingPositionX = 0
         displacementFromStartingPositionY = 0
 
-
         for y in range(0, self.TILE_SCAN_DIMENSIONS[1]):
+
+
 
             for x in range(0, self.TILE_SCAN_DIMENSIONS[0]):
 
@@ -447,9 +430,14 @@ class Scanner(object):
                 if y % 2 == 1:
                     tileIndex_x = self.TILE_SCAN_DIMENSIONS[0] - x
 
+                xCoordDir = os.getcwd() + '\\..\\scans\\' + self.SCAN_NAME + "_tiled\\" + "{:06d}".format(abs(int(displacementFromStartingPositionX)) * 10)
+                if not os.path.isdir(xCoordDir):
+                    os.mkdir(xCoordDir)
 
                 sleep(7)
-                stackPath = self.scan_stack(self.SCAN_NAME + "_tiled\\" + self.SCAN_NAME + "_tiled_X" + str(tileIndex_x) + "_Y=" + str(y), self.SCAN_NAME + "_tiled_X=" + str(tileIndex_x) + "_Y=" + str(y))
+                scanPath = self.SCAN_NAME + "_tiled\\" + "{:06d}".format(abs(int(displacementFromStartingPositionX)) * 10) + \
+                                            "\\" + "{:06d}".format(abs(int(displacementFromStartingPositionX)) * 10) + "_" + "{:06d}".format(abs(int(displacementFromStartingPositionY)) * 10)
+                stackPath = self.scan_stack(scanPath, "000000.tif")
                 sleep(4)
 
 
