@@ -26,10 +26,8 @@ uint32_t cmdParserTimeout = 10000;
 
 
 
-// Arduino LED
-const int LED = 13;
 // Laser Enable
-const int LASER_ENABLE = 3;
+const int LASER_ENABLE = 14;
 const int LASER_SHUTTER_SERVO_PIN = 13;
 const int IMAGING_LED_PIN = 42;
 
@@ -58,9 +56,22 @@ const int STEPPER3_SPEED = 30.0;
 const int STEPPER3_ACCELERATION = 450.0;
 int STEPPER_JOG_INCREMENT = 10;
 
+// Limit Switch Config
+const int LSX_P1 = 19;
+const int LSX_P2 = 18;
+const int LSY_P1 = 20;
+const int LSY_P2 = 21;
+const int LSZ_P1 = 2;
+const int LSZ_P2 = 3;
+bool x_homed = false;
+bool y_homed = false;
+
 // Steppers
+// STEPPER1 = Y-AXIS
 AccelStepper STEPPER1(AccelStepper::DRIVER, DRIVER1_PUL, DRIVER1_DIR);
+// STEPPER2 = Z-AXIS
 AccelStepper STEPPER2(AccelStepper::DRIVER, DRIVER2_PUL, DRIVER2_DIR);
+// STEPPER3 = X-AXIS
 AccelStepper STEPPER3(AccelStepper::DRIVER, DRIVER3_PUL, DRIVER3_DIR);
 Encoder STEPPER1_ENCODER(2,3);
 //Encoder STEPPER2_ENCODER(??,??);
@@ -78,10 +89,15 @@ void setup() {
   while(!Serial) {
     delay(100);
   }
-  Serial.write("ARDUINO READY\n");
-  pinMode(LED, OUTPUT);
+  Serial.write("ARDUINO READY\n");\ 
   pinMode(LASER_ENABLE, OUTPUT);
   pinMode(IMAGING_LED_PIN, OUTPUT);
+  pinMode(LSX_P1, INPUT_PULLUP);
+  pinMode(LSX_P2, INPUT_PULLUP);
+  pinMode(LSY_P1, INPUT_PULLUP);
+  pinMode(LSY_P2, INPUT_PULLUP);
+  pinMode(LSZ_P1, INPUT_PULLUP);
+  pinMode(LSZ_P2, INPUT_PULLUP);
   digitalWrite(LASER_ENABLE, LOW);
   digitalWrite(IMAGING_LED_PIN, LOW);
   laserShutter.attach(LASER_SHUTTER_SERVO_PIN);
@@ -106,9 +122,87 @@ void setup() {
   STEPPER3.setAcceleration(STEPPER3_ACCELERATION);
   STEPPER3.setEnablePin(DRIVER3_ENA);
   STEPPER3.setPinsInverted(false,false,true);
+
+  delay(500);
+  attachInterrupt(digitalPinToInterrupt(LSX_P1), LSX_backoff_front, LOW);
+  attachInterrupt(digitalPinToInterrupt(LSX_P2), LSX_backoff_rear, LOW);
+  attachInterrupt(digitalPinToInterrupt(LSY_P1), LSY_backoff_front, LOW);
+  attachInterrupt(digitalPinToInterrupt(LSY_P2), LSY_backoff_rear, LOW);
+
+  startup_homing();
 }
 
+// Left side of stage
+void LSX_backoff_front(){
 
+  x_homed = true;
+  STEPPER3.enableOutputs();
+  moveStepper(&STEPPER3, -1000, 1000);
+
+}
+
+// Right side of stage
+void LSX_backoff_rear(){
+  
+  STEPPER3.enableOutputs();
+  moveStepper(&STEPPER3, 1000, 1000);
+}
+
+// Back of stage
+void LSY_backoff_front(){
+
+  y_homed = true;
+  STEPPER1.enableOutputs();
+  moveStepper(&STEPPER1, -1000, 1000);
+}
+
+// Front of stage
+void LSY_backoff_rear(){
+  
+  STEPPER1.enableOutputs();
+  moveStepper(&STEPPER1, 1000, 1000);
+}
+
+int startup_homing() {
+
+  // Home x
+  STEPPER3.enableOutputs();
+  while(!x_homed)
+  {
+    moveStepper(&STEPPER3, 50, 2000);
+  }
+  STEPPER3.disableOutputs();
+
+  // Home y
+  STEPPER1.enableOutputs();
+  while(!y_homed)
+  {
+    moveStepper(&STEPPER1, 50, 2000);
+  }
+  STEPPER1.disableOutputs();
+  
+}
+
+/*
+int zero_stage() {
+
+  // zero x
+  // Find limit switch
+  while(!digitalRead(LS1_P1))
+  {
+    moveStepper("CORRECT STEPPER", 50, 2000);
+  }
+
+  // Back off from limit switch a bit
+  moveStepper("CORRECT STEPPER", 800, 2000);
+
+
+  // zero y
+
+  // zero z 
+  
+}
+*/
 
 /*
     Note: The sign of <steps> determines the direction of rotation.
@@ -628,6 +722,7 @@ void sendResponse(String response) {
 
 void loop() {
 
+    
   // New command received (0), Parse error (-1), Listening timed out (1)
   int rc = listenForCommandWithTimeout();
 
