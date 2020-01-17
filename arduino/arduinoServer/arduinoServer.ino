@@ -89,7 +89,7 @@ void setup() {
   while(!Serial) {
     delay(100);
   }
-  Serial.write("ARDUINO READY\n");\ 
+  Serial.write("ARDUINO READY\n");
   pinMode(LASER_ENABLE, OUTPUT);
   pinMode(IMAGING_LED_PIN, OUTPUT);
   pinMode(LSX_P1, INPUT_PULLUP);
@@ -151,14 +151,14 @@ void LSX_backoff_rear(){
 // Back of stage
 void LSY_backoff_front(){
 
-  y_homed = true;
   STEPPER1.enableOutputs();
   moveStepper(&STEPPER1, -1000, 1000);
 }
 
 // Front of stage
 void LSY_backoff_rear(){
-  
+
+  y_homed = true;
   STEPPER1.enableOutputs();
   moveStepper(&STEPPER1, 1000, 1000);
 }
@@ -177,7 +177,7 @@ int startup_homing() {
   STEPPER1.enableOutputs();
   while(!y_homed)
   {
-    moveStepper(&STEPPER1, 50, 2000);
+    moveStepper(&STEPPER1, -50, 2000);
   }
   STEPPER1.disableOutputs();
   
