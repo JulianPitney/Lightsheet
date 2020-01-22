@@ -29,7 +29,13 @@ class Scanner(object):
         self.STACK_SIZE = 10
         self.SCAN_STEP_SPEED = 50
         self.SCAN_NAME = "default"
-        self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.25
+        self.SLEEP_DURATION_AFTER_MOVEMENT_S_2X = config.SLEEP_DURATION_AFTER_MOVEMENT_S_2X
+        self.SLEEP_DURATION_AFTER_MOVEMENT_S_5X = config.SLEEP_DURATION_AFTER_MOVEMENT_S_5X
+        self.SLEEP_DURATION_AFTER_MOVEMENT_S_10X = config.SLEEP_DURATION_AFTER_MOVEMENT_S_10X
+        self.SLEEP_DURATION_AFTER_MOVEMENT_S_20X = config.SLEEP_DURATION_AFTER_MOVEMENT_S_20X
+        self.SLEEP_DURATION_AFTER_MOVEMENT_S_40X = config.SLEEP_DURATION_AFTER_MOVEMENT_S_40X
+        self.SLEEP_DURATION_AFTER_MOVEMENT_S_63X = config.SLEEP_DURATION_AFTER_MOVEMENT_S_63X
+        self.SLEEP_DURATION_AFTER_MOVEMENT_S = self.SLEEP_DURATION_AFTER_MOVEMENT_S_5X
         self.TIMELAPSE_N = 1
         self.TIMELAPSE_INTERVAL_S = 10
         self.TILE_SCAN_DIMENSIONS = config.TILE_SCAN_DIMENSIONS
@@ -122,16 +128,22 @@ class Scanner(object):
 
         if magnification == 5:
             self.nanometersPerPixel = 714
+            self.SLEEP_DURATION_AFTER_MOVEMENT_S = self.SLEEP_DURATION_AFTER_MOVEMENT_S_5X
         elif magnification == 10:
             self.nanometersPerPixel = 345
+            self.SLEEP_DURATION_AFTER_MOVEMENT_S = self.SLEEP_DURATION_AFTER_MOVEMENT_S_10X
         elif magnification == 20:
             self.nanometersPerPixel = 181
+            self.SLEEP_DURATION_AFTER_MOVEMENT_S = self.SLEEP_DURATION_AFTER_MOVEMENT_S_20X
         elif magnification == 40:
             self.nanometersPerPixel = 90
+            self.SLEEP_DURATION_AFTER_MOVEMENT_S = self.SLEEP_DURATION_AFTER_MOVEMENT_S_40X
         elif magnification == 63:
             self.nanometersPerPixel = 59
+            self.SLEEP_DURATION_AFTER_MOVEMENT_S = self.SLEEP_DURATION_AFTER_MOVEMENT_S_63X
         elif magnification == 2:
             self.nanometersPerPixel = 1430
+            self.SLEEP_DURATION_AFTER_MOVEMENT_S = self.SLEEP_DURATION_AFTER_MOVEMENT_S_2X
 
         self.update_tiled_scan_overlap()
 
@@ -329,10 +341,6 @@ class Scanner(object):
                 self.guiLogQueue.put(self.LOG_PREFIX + "SLICE #=" + str(i))
 
 
-            # TODO: We don't care about vibration settle delay for low magnification
-            # TODO: But at high mag the vibration causes bad smearing during exposure.
-            # TODO: For high mag turn this back on and set it appropriately
-            # TODO: Wait for motor vibration to settle
             sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
 
         # Close shutter
