@@ -337,10 +337,6 @@ class Scanner(object):
             # Move motor down z
             self.mainQueue.put([2, 6, [2, self.Z_STEP_SIZE_um, True]])
 
-            if i % 10 == 0:
-                self.guiLogQueue.put(self.LOG_PREFIX + "SLICE #=" + str(i))
-
-
             sleep(self.SLEEP_DURATION_AFTER_MOVEMENT_S)
 
         # Close shutter
@@ -429,6 +425,7 @@ class Scanner(object):
 
         displacementFromStartingPositionX = 0
         displacementFromStartingPositionY = 0
+        tileNumber = 1
 
         for y in range(0, self.TILE_SCAN_DIMENSIONS[1]):
 
@@ -447,6 +444,8 @@ class Scanner(object):
                 sleep(7)
                 scanPath = self.SCAN_NAME + "_tiled\\" + "{:06d}".format(abs(int(displacementFromStartingPositionX)) * 10) + \
                                             "\\" + "{:06d}".format(abs(int(displacementFromStartingPositionX)) * 10) + "_" + "{:06d}".format(abs(int(displacementFromStartingPositionY)) * 10)
+                self.guiLogQueue.put(self.LOG_PREFIX + "Scanning Tile " + str(tileNumber) + "/" + str(self.TILE_SCAN_DIMENSIONS[1] * self.TILE_SCAN_DIMENSIONS[0]))
+                tileNumber += 1
                 stackPath = self.scan_stack(scanPath, "000000.tif")
                 sleep(4)
 

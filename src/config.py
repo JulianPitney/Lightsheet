@@ -1,4 +1,4 @@
-TILE_SCAN_DIMENSIONS = (2, 2)
+TILE_SCAN_DIMENSIONS = (3, 3)
 
 
 # Time in seconds between each slice of a stack.

@@ -453,7 +453,6 @@ class CameraController(object):
             filename = os.path.splitext(filename)[0]
             filename += randomSuffix + ".tif"
 
-        self.guiLogQueue.put(self.LOG_PREFIX + "Saving stack to disk...")
         tif.imwrite(filename, imageStack, imagej=False, metadata=metadata_dict)
         self.guiLogQueue.put(self.LOG_PREFIX + "Stack saved successfully!")
         self.mainQueue.put([5, -1, [1]])
