@@ -7,6 +7,7 @@ import numpy as np
 from skimage import io
 import tifffile as tif
 import random
+import config
 
 
 
@@ -31,7 +32,8 @@ class Scanner(object):
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = 0.25
         self.TIMELAPSE_N = 1
         self.TIMELAPSE_INTERVAL_S = 10
-        self.TILE_SCAN_DIMENSIONS = (3, 3)
+        self.TILE_SCAN_DIMENSIONS = config.TILE_SCAN_DIMENSIONS
+
 
 
 
