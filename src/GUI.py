@@ -44,6 +44,10 @@ class GUI(object):
 
         self.logQueue.put(self.LOG_PREFIX + "Initialization complete")
 
+    def __del__(self):
+
+        pass
+
     def videoLoop(self):
 
         while not self.stopEvent.is_set():
@@ -84,6 +88,8 @@ class GUI(object):
         hardwareControlFrame = Frame(self.master, borderwidth=2, relief=RIDGE, bg=self.dark_color, highlightbackground=self.frame_border_color, highlightcolor=self.frame_border_color)
         movementButtonsFrame = Frame(hardwareControlFrame, bg=self.dark_color)
         controllerPictureFrame = Frame(hardwareControlFrame, bg=self.dark_color)
+        quitButton = Button(controllerPictureFrame, text="QUIT", font=20, width=20, height=2, fg=self.text_colour, bg=self.light_color, activebackground=self.button_focus_color
+                            , command=self.quit_callback)
         self.controllerImg = ImageTk.PhotoImage(Image.open("C:\\Projects\\Lightsheet\\resources\\ps4controller.png"))
         imgPanel = Label(controllerPictureFrame, image=self.controllerImg, bg=self.dark_color)
         y_inc = Button(movementButtonsFrame, text="y+", font=20, width=4, height=2, fg=self.text_colour, bg=self.light_color,
@@ -131,6 +137,7 @@ class GUI(object):
         controllerPictureFrame.pack(side=TOP, fill="both", expand="yes")
 
         imgPanel.pack(padx=(10, 0), fill="both", expand=True)
+        quitButton.pack()
         y_inc.grid(row=1, column=7, padx=4, pady=(4,0), stick=S)
         y_dec.grid(row=3, column=7, padx=4, pady=4, stick=N)
         x_inc.grid(row=2, column=8, padx=4, pady=4)
@@ -271,6 +278,11 @@ class GUI(object):
 
 
 
+    def quit_callback(self):
+
+        msg = [0, -1, ["QUIT"]]
+        self.mainQueue.put(msg)
+        exit()
 
     def button_push_callback(self, processIndex, functionIndex, args):
         msg = [processIndex, functionIndex, args]

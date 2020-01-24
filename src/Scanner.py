@@ -69,6 +69,9 @@ class Scanner(object):
 
         self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
 
+    def __del__(self):
+        pass
+
     def set_z_step_size(self, step_size_um):
         self.Z_STEP_SIZE_um = float(step_size_um)
         #self.guiLogQueue.put(self.LOG_PREFIX + "Z_STEP_SIZE=" + str(step_size_um))
@@ -532,6 +535,8 @@ class Scanner(object):
             self.set_imaging_objective_magnification(msg[2][0])
         elif funcIndex == 17:
             self.scan("tiled", msg[2][0])
+        elif funcIndex == -1:
+            exit()
 
 def launch_scanner(queue, mainQueue, guiLogQueue):
 

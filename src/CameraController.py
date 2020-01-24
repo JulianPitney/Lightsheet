@@ -52,6 +52,9 @@ class CameraController(object):
 
         self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
 
+    def __del__(self):
+        pass
+
 #--------------------------------------------------------------------------------------------#
 #                               SPINNAKER CONFIG START                                       #
 #--------------------------------------------------------------------------------------------#
@@ -471,6 +474,8 @@ class CameraController(object):
             self.scan(msg[2][0], msg[2][1], msg[2][2], msg[2][3])
         elif functionIndex == 4:
             self.set_scalebar_size(msg[2][0])
+        elif functionIndex == -1:
+            exit()
 
     def mainloop(self):
         while True:

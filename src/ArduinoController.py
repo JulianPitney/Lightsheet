@@ -214,6 +214,8 @@ class ArduinoController(object):
 			self.reset_arduino()
 		elif funcIndex == 10:
 			self.move_motor_steps_accel(msg[2][0])
+		elif funcIndex == -1:
+			exit()
 
 	def mainloop(self):
 		while True :

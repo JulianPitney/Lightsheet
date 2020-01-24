@@ -46,6 +46,18 @@ class PS4Controller(object):
 
         self.guiLogQueue.put(self.LOG_PREFIX + "Initialization complete")
 
+    def __del__(self):
+        pass
+
+    def process_msg(self, msg):
+
+        functionIndex = msg[1]
+
+        if functionIndex == -1:
+            exit()
+        else:
+            pass
+
     def listen(self):
 
         if not self.axis_data:
@@ -63,6 +75,10 @@ class PS4Controller(object):
 
 
         while True:
+
+            if not self.queue.empty():
+                self.process_msg(self.queue.get())
+
 
             for event in pygame.event.get():
                 if event.type == pygame.JOYAXISMOTION:
