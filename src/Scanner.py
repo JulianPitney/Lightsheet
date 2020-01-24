@@ -38,7 +38,7 @@ class Scanner(object):
         self.SLEEP_DURATION_AFTER_MOVEMENT_S = self.SLEEP_DURATION_AFTER_MOVEMENT_S_5X
         self.TIMELAPSE_N = 1
         self.TIMELAPSE_INTERVAL_S = 10
-        self.TILE_SCAN_DIMENSIONS = config.TILE_SCAN_DIMENSIONS
+        self.TILE_SCAN_DIMENSIONS = (2, 2)
 
 
 
@@ -534,6 +534,8 @@ class Scanner(object):
         elif funcIndex == 16:
             self.set_imaging_objective_magnification(msg[2][0])
         elif funcIndex == 17:
+            self.TILE_SCAN_DIMENSIONS = (msg[2][1], msg[2][2])
+            print(self.TILE_SCAN_DIMENSIONS)
             self.scan("tiled", msg[2][0])
         elif funcIndex == -1:
             print(self.LOG_PREFIX + "QUIT RECEIVED")

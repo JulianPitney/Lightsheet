@@ -212,6 +212,17 @@ class GUI(object):
         magnificationDropdown.config(bg=self.light_color)
         magnificationDropdown.config(highlightbackground=self.scale_border_color)
 
+        self.tileDimensionX = IntVar()
+        self.tileDimensionX.set(2)
+        tileDimensionsLabelx = Label(scanConfigFrame, fg=self.text_colour, text="Tile X dimension", justify=LEFT, bg=self.dark_color)
+        tileDimensionsEntryx = Entry(scanConfigFrame, textvariable=self.tileDimensionX, bd=5, fg=self.text_colour, bg=self.dark_color)
+
+        self.tileDimensionY = IntVar()
+        self.tileDimensionY.set(2)
+        tileDimensionsLabely = Label(scanConfigFrame, fg=self.text_colour, text="Tile Y dimension", justify=LEFT, bg=self.dark_color)
+        tileDimensionsEntryy = Entry(scanConfigFrame, textvariable=self.tileDimensionY, bd=5, fg=self.text_colour, bg=self.dark_color)
+
+
         scanNameLabel = Label(scanConfigFrame, text="Scan Name", fg=self.text_colour, bg=self.dark_color)
         scanName = StringVar()
         scanName.set("default")
@@ -219,7 +230,7 @@ class GUI(object):
         scanButton = Button(scanConfigFrame, text="Scan Stack", fg=self.text_colour, height=3, font=16, command=lambda: self.button_push_callback(5, 0, [self.scanNameEntry.get()]), bg=self.light_color, highlightbackground=self.scale_border_color,)
         scanTimelapseButton = Button(scanConfigFrame, fg=self.text_colour, height=3, font=16, text="Scan Timelapse",
                                      command=lambda: self.button_push_callback(5, 7, [self.scanNameEntry.get()]), bg=self.light_color, highlightbackground=self.scale_border_color,)
-        scanTiledButton = Button(scanConfigFrame, text="Scan Tiles", fg=self.text_colour, height=3, font=16, command=lambda: self.button_push_callback(5, 17, [self.scanNameEntry.get()]), bg=self.light_color, highlightbackground=self.scale_border_color,)
+        scanTiledButton = Button(scanConfigFrame, text="Scan Tiles", fg=self.text_colour, height=3, font=16, command=lambda: self.button_push_callback(5, 17, [self.scanNameEntry.get(), self.tileDimensionX, self.tileDimensionY]), bg=self.light_color, highlightbackground=self.scale_border_color,)
         scanConfigFrame.pack(side=RIGHT, fill="both", expand="yes")
         scanConfigFrameLabel.pack(side=TOP, pady=(0,20))
         scanDepthScale.pack()
@@ -239,6 +250,11 @@ class GUI(object):
         magnificationLabel.pack(pady=(10, 0))
         magnificationDropdown.pack()
         self.magnification.trace('w', self.update_magnification_dropdown)
+        tileDimensionsLabelx.pack()
+        tileDimensionsEntryx.pack()
+        tileDimensionsLabely.pack()
+        tileDimensionsEntryy.pack()
+
 
         deconvolutionButton.pack(pady=(40, 0))
         richardsonLucyIterationsScale.pack()

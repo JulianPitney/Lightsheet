@@ -1,6 +1,3 @@
-TILE_SCAN_DIMENSIONS = (3, 3)
-
-
 # Time in seconds between each slice of a stack.
 # Motor vibration can cause image smearing if you
 # try to capture slices too fast. Give appropriate time
