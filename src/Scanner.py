@@ -536,6 +536,7 @@ class Scanner(object):
         elif funcIndex == 17:
             self.scan("tiled", msg[2][0])
         elif funcIndex == -1:
+            print(self.LOG_PREFIX + "QUIT RECEIVED")
             exit()
 
 def launch_scanner(queue, mainQueue, guiLogQueue):

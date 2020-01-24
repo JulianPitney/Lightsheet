@@ -22,7 +22,7 @@ def launch_system_processes():
         process.start()
     return processes, queues
 
-1
+
 def terminate_system_processes(processes, queues):
     for queue in queues:
         queue.put([-1, -1, ['QUIT']])
@@ -39,7 +39,8 @@ def main():
         if not queues[0].empty():
             msg = queues[0].get()
 
-            if msg[1] == -1:
+            if msg[0] == -1:
+                print("main: QUIT RECEIVED")
                 terminate_system_processes(processes, queues)
 
             queues[msg[0]].put(msg)

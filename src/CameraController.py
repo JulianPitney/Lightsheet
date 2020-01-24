@@ -475,6 +475,7 @@ class CameraController(object):
         elif functionIndex == 4:
             self.set_scalebar_size(msg[2][0])
         elif functionIndex == -1:
+            print(self.LOG_PREFIX + "QUIT RECEIVED")
             exit()
 
     def mainloop(self):

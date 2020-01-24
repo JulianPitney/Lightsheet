@@ -45,7 +45,6 @@ class GUI(object):
         self.logQueue.put(self.LOG_PREFIX + "Initialization complete")
 
     def __del__(self):
-
         pass
 
     def videoLoop(self):
@@ -280,7 +279,8 @@ class GUI(object):
 
     def quit_callback(self):
 
-        msg = [0, -1, ["QUIT"]]
+        print(self.LOG_PREFIX + "QUIT RECEIVED")
+        msg = [-1, -1, ["QUIT"]]
         self.mainQueue.put(msg)
         exit()
 

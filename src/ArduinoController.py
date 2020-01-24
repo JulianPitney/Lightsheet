@@ -215,6 +215,7 @@ class ArduinoController(object):
 		elif funcIndex == 10:
 			self.move_motor_steps_accel(msg[2][0])
 		elif funcIndex == -1:
+			print(self.LOG_PREFIX + "QUIT RECEIVED")
 			exit()
 
 	def mainloop(self):

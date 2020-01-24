@@ -54,6 +54,7 @@ class PS4Controller(object):
         functionIndex = msg[1]
 
         if functionIndex == -1:
+            print(self.LOG_PREFIX + "QUIT RECEIVED")
             exit()
         else:
             pass
