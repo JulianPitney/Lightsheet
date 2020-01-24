@@ -135,8 +135,9 @@ class GUI(object):
         movementButtonsFrame.pack(side=BOTTOM, fill="both", pady=50, padx=(5, 0))
         controllerPictureFrame.pack(side=TOP, fill="both", expand="yes")
 
-        imgPanel.pack(padx=(10, 0), fill="both", expand=True)
         quitButton.pack()
+        imgPanel.pack(padx=(10, 0), fill="both", expand=True)
+
         y_inc.grid(row=1, column=7, padx=4, pady=(4,0), stick=S)
         y_dec.grid(row=3, column=7, padx=4, pady=4, stick=N)
         x_inc.grid(row=2, column=8, padx=4, pady=4)
