@@ -214,23 +214,30 @@ class GUI(object):
 
         self.tileDimensionX = IntVar()
         self.tileDimensionX.set(2)
+        xDimensions = {1, 2, 3, 4, 5, 6}
         tileDimensionsLabelx = Label(scanConfigFrame, fg=self.text_colour, text="Tile X dimension", justify=LEFT, bg=self.dark_color)
-        tileDimensionsEntryx = Entry(scanConfigFrame, textvariable=self.tileDimensionX, bd=5, fg=self.text_colour, bg=self.dark_color)
+        tileXDimDropdown = OptionMenu(scanConfigFrame, self.tileDimensionX, *xDimensions)
+        tileXDimDropdown.config(bg=self.light_color)
+        tileXDimDropdown.config(highlightbackground=self.scale_border_color)
 
-        self.tileDimensionY = IntVar()
-        self.tileDimensionY.set(2)
+        self.tileDimensiony = IntVar()
+        self.tileDimensiony.set(2)
+        yDimensions = {1, 2, 3, 4, 5, 6}
         tileDimensionsLabely = Label(scanConfigFrame, fg=self.text_colour, text="Tile Y dimension", justify=LEFT, bg=self.dark_color)
-        tileDimensionsEntryy = Entry(scanConfigFrame, textvariable=self.tileDimensionY, bd=5, fg=self.text_colour, bg=self.dark_color)
+        tileYDimDropdown = OptionMenu(scanConfigFrame, self.tileDimensiony, *yDimensions)
+        tileYDimDropdown.config(bg=self.light_color)
+        tileYDimDropdown.config(highlightbackground=self.scale_border_color)
+
 
 
         scanNameLabel = Label(scanConfigFrame, text="Scan Name", fg=self.text_colour, bg=self.dark_color)
         scanName = StringVar()
         scanName.set("default")
         self.scanNameEntry = Entry(scanConfigFrame, textvariable=scanName, bd=5, fg=self.text_colour, bg=self.dark_color)
-        scanButton = Button(scanConfigFrame, text="Scan Stack", fg=self.text_colour, height=3, font=16, command=lambda: self.button_push_callback(5, 0, [self.scanNameEntry.get()]), bg=self.light_color, highlightbackground=self.scale_border_color,)
-        scanTimelapseButton = Button(scanConfigFrame, fg=self.text_colour, height=3, font=16, text="Scan Timelapse",
+        scanButton = Button(scanConfigFrame, text="Scan Stack", fg=self.text_colour, height=2, font=16, command=lambda: self.button_push_callback(5, 0, [self.scanNameEntry.get()]), bg=self.light_color, highlightbackground=self.scale_border_color,)
+        scanTimelapseButton = Button(scanConfigFrame, fg=self.text_colour, height=2, font=16, text="Scan Timelapse",
                                      command=lambda: self.button_push_callback(5, 7, [self.scanNameEntry.get()]), bg=self.light_color, highlightbackground=self.scale_border_color,)
-        scanTiledButton = Button(scanConfigFrame, text="Scan Tiles", fg=self.text_colour, height=3, font=16, command=lambda: self.button_push_callback(5, 17, [self.scanNameEntry.get(), self.tileDimensionX, self.tileDimensionY]), bg=self.light_color, highlightbackground=self.scale_border_color,)
+        scanTiledButton = Button(scanConfigFrame, text="Scan Tiles", fg=self.text_colour, height=2, font=16, command=lambda: self.button_push_callback(5, 17, [self.scanNameEntry.get(), self.tileDimensionX.get(), self.tileDimensiony.get()]), bg=self.light_color, highlightbackground=self.scale_border_color,)
         scanConfigFrame.pack(side=RIGHT, fill="both", expand="yes")
         scanConfigFrameLabel.pack(side=TOP, pady=(0,20))
         scanDepthScale.pack()
@@ -251,20 +258,20 @@ class GUI(object):
         magnificationDropdown.pack()
         self.magnification.trace('w', self.update_magnification_dropdown)
         tileDimensionsLabelx.pack()
-        tileDimensionsEntryx.pack()
+        tileXDimDropdown.pack()
         tileDimensionsLabely.pack()
-        tileDimensionsEntryy.pack()
+        tileYDimDropdown.pack()
 
 
-        deconvolutionButton.pack(pady=(40, 0))
+        deconvolutionButton.pack(pady=(4, 0))
         richardsonLucyIterationsScale.pack()
-        self.richardsonLucyIterationsLabel.pack(pady=(0, 20))
+        self.richardsonLucyIterationsLabel.pack(pady=(0, 4))
 
-        scanTiledButton.pack(side=BOTTOM, fill=X, padx=10, pady=5)
-        scanTimelapseButton.pack(side=BOTTOM, fill=X, padx=10, pady=5)
-        scanButton.pack(side=BOTTOM, fill=X, padx=10, pady=5)
+        scanTiledButton.pack(side=BOTTOM, fill=X, padx=10, pady=4)
+        scanTimelapseButton.pack(side=BOTTOM, fill=X, padx=10, pady=4)
+        scanButton.pack(side=BOTTOM, fill=X, padx=10, pady=4)
         self.scanNameEntry.pack(side=BOTTOM, fill=X, padx=10, pady=2)
-        scanNameLabel.pack(side=LEFT, padx=(10,0))
+        scanNameLabel.pack(side=LEFT, padx=(10, 0))
 
 
 

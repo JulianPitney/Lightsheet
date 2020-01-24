@@ -438,7 +438,9 @@ class CameraController(object):
 
             elif msg[2][0] == "STOP":
                 keepAlive = False
-
+            elif msg[2][0] == "QUIT":
+                print(self.LOG_PREFIX + "QUIT RECEIVED")
+                exit()
 
 
         filename = path + "\\" + SCAN_NAME + ".tif"
