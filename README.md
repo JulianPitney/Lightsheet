@@ -64,11 +64,20 @@ scikit-image | 0.15.0
 13. Install scikit-image using the command ```pip install scikit-image```
 14. Install the Spinnaker Python API by downloading [this]() folder and following the instructions in the README.txt contained within.
 15. Upload ```./arduino/arduinoServer/arduinoServer.ino``` to your arduino mega.
-16. If everything above worked correctly, navigate to ```./Lightsheet/src/``` and try to start the system with the command ```python main.py```
+16. Add ```./Lightsheet/src``` to your system path.
+17. If everything above worked correctly, open a console and type ```run```. The system should start and greet you with a GUI.
 
 # Usage
-# Contributing
-Not ready for outside contribution.
+1. Type ```run``` into a console to start the system.
+# Gallery
+![Thy1GFP](./resources/thy1gfp.gif)
+Thy1GFP infected neuron.
+![WholeSystem](./resources/whole_system.JPG)
+Our system.
+![BeamPath](./resources/laser_path.JPG)
+Laser path with dry ice.
+![DualIllum](./resources/dual_projection.JPG)
+
 # Credits
 * [Boyang Wang](jwang149@gmail.com)
 * [Bergeron Lab](jwang149@gmail.com)
