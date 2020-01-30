@@ -67,16 +67,9 @@ scikit-image | 0.15.0
 16. If everything above worked correctly, navigate to ```./Lightsheet/src/``` and try to start the system with the command ```python main.py```
 
 # Usage
-1. Open a terminal and type ``conda activate flir-env``
-2. Type ``python kinarena.py``
-3. Select ``[2] New Trial`` to record a trial. For every trial a folder will be generated under ``~/anipose/experiments/<trial_name>``. 
-4. At any time, you can select ``[3] Analyze Trials`` to automatically analyze all trials that have not yet been analyzed. Analysis takes a long time so don't do this until you're done recording and ready to walk away for the day.
-
 # Contributing
 Not ready for outside contribution.
 # Credits
-* [DeepLabCut authors](http://www.mousemotorlab.org/deeplabcut)
-* [anipose authors](https://github.com/lambdaloop)
 * [Boyang Wang](jwang149@gmail.com)
 * [Bergeron Lab](jwang149@gmail.com)
 * [Julian Pitney](www.julianpitney.com)
