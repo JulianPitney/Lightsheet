@@ -71,9 +71,12 @@ scikit-image | 0.15.0
 1. Type ```run``` into a console to start the system.
 # Gallery
 ![Thy1GFP](./resources/thy1gfp.gif)
-Thy1GFP infected neuron.
+Infected neuron.
+![WholeBrain](./resources/PT1_STROKE_MAX.png)
+Stroke.
 ![WholeSystem](./resources/whole_system.JPG)
 Our system.
+
 ![BeamPath](./resources/laser_path.JPG)
 Laser path with dry ice.
 ![DualIllum](./resources/dual_projection.JPG)
