@@ -71,16 +71,17 @@ scikit-image | 0.15.0
 1. Type ```run``` into a console to start the system.
 # Gallery
 ![Thy1GFP](./resources/thy1gfp.gif)
-Infected neuron.
+Infected neuron
 ![WholeBrain](./resources/PT1_STROKE_MAX.png)
-Stroke.
+Stroke
+![3DStroke](./resources/3DStroke.gif)
+3D Stroke
 ![WholeSystem](./resources/whole_system.JPG)
-Our system.
-
+Our system
 ![BeamPath](./resources/laser_path.JPG)
 Laser path with dry ice.
 ![DualIllum](./resources/dual_projection.JPG)
-
+Dual Illumination of Brain
 # Credits
 * [Boyang Wang](jwang149@gmail.com)
 * [Bergeron Lab](jwang149@gmail.com)
