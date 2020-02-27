@@ -392,6 +392,59 @@ class Scanner(object):
                 self.guiLogQueue.put(self.LOG_PREFIX + "Time Until Next Stack Scan: " + str(timeUntilNextStackDue) + "s")
                 sleep(timeUntilNextStackDue - 1)
 
+
+    def round_uM_to_int_multiple_of_uMPerStep(value_uM):
+        return int(value_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
+
+    def gen_tile_stage_translations():
+
+        rowTranslations = []
+        translationsX = []
+        translationsY = []
+
+        # calculate tile width and height
+        tileWidth_uM = int((self.sizeX * self.nanometersPerPixel) / 1000)
+        tileHeight_uM = int((self.sizeY * self.nanometersPerPixel) / 1000)
+
+        for x in range(0, self.TILE_SCAN_DIMENSIONS[0] - 1):
+
+            # The first translation should contain the offset for overlapping the tiles
+            if x == 0:
+                translation = tileWidth_uM - self.TILE_uM_OVERLAP_X
+                # Round down to whole number multiple of <MICROMETERS_PER_STEP> so stage can perform translation.
+                translation = -round_uM_to_int_multiple_of_uMPerStep(translation)
+                rowTranslations.append(translation)
+            else:
+                translation = tileWidth_uM
+                translation = -round_uM_to_int_multiple_of_uMPerStep(translation)
+                rowTranslations.append(translation)
+
+        for y in range(0, self.TILE_SCAN_DIMENSIONS[1]):
+            for i in range(0, len(rowTranslations)):
+                translationsX.append(rowTranslations[i])
+                rowTranslations[i] = -rowTranslations[i]
+            rowTranslations.reverse()
+
+
+
+        for y in range(0, self.TILE_SCAN_DIMENSIONS[1] - 1):
+
+            # The first translation should contain the offset for overlapping the tiles
+            if y == 0:
+                translation = tileHeight_uM - self.TILE_uM_OVERLAP_Y
+                # Round down to whole number multiple of <MICROMETERS_PER_STEP> so stage can perform translation.
+                translation = round_uM_to_int_multiple_of_uMPerStep(translation)
+                translationsY.append(translation)
+            else:
+                translation = tileHeight_uM
+                translation = round_uM_to_int_multiple_of_uMPerStep(translation)
+                translationsY.append(translation)
+
+        return translationsX, translationsY
+
+
+
+
     # TODO: The bug where the tiled scan would fail (Not perform the correct stage translations)
     # TODO: is caused by the client side not waiting for confirmation that the arduino has
     # TODO: actually finished performing a translation before moving on in the scan process.
@@ -406,53 +459,35 @@ class Scanner(object):
 
         stackPaths = []
         tiledScanPath = self.gen_scan_directory(self.SCAN_NAME + "_tiled")
-
         if tiledScanPath == -1:
             return -1
 
-        # calculate X and Y stage translations
-        tileWidth_uM = int((self.sizeX * self.nanometersPerPixel) / 1000)
-        tileHeight_uM = int((self.sizeY * self.nanometersPerPixel) / 1000)
 
-        # Subract overlap from translations
-        tileTranslationX_uM = tileWidth_uM - self.TILE_uM_OVERLAP_X
-        tileTranslationY_uM = tileHeight_uM - self.TILE_uM_OVERLAP_Y
-
-        # Round down to a whole number multiple of <MICROMETERS_PER_STEP>.
-        # We also take the negative of the translation because that's the direction the stage
-        # moves to start based on our scan pattern.
-        tileTranslationX_uM = -int(tileTranslationX_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
-        tileTranslationY_uM = int(tileTranslationY_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
-
-
-
+        tileNumber = 1
         displacementFromStartingPositionX = 0
         displacementFromStartingPositionY = 0
-        tileNumber = 1
+        translationsX, translationsY = gen_tile_stage_translations()
+        translationsXIndex = 0
+        translationsYIndex = 0
 
         for y in range(0, self.TILE_SCAN_DIMENSIONS[1]):
 
-
-
             for x in range(0, self.TILE_SCAN_DIMENSIONS[0]):
 
-                tileIndex_x = x
-                if y % 2 == 1:
-                    tileIndex_x = self.TILE_SCAN_DIMENSIONS[0] - x
-
+                # TODO: Clean up Terastitcher directory structure creation. It's hideous.
                 xCoordDir = os.getcwd() + '\\..\\scans\\' + self.SCAN_NAME + "_tiled\\" + "{:06d}".format(abs(int(displacementFromStartingPositionX)) * 10)
                 if not os.path.isdir(xCoordDir):
                     os.mkdir(xCoordDir)
-
                 sleep(7)
                 scanPath = self.SCAN_NAME + "_tiled\\" + "{:06d}".format(abs(int(displacementFromStartingPositionX)) * 10) + \
-                                            "\\" + "{:06d}".format(abs(int(displacementFromStartingPositionX)) * 10) + "_" + "{:06d}".format(abs(int(displacementFromStartingPositionY)) * 10)
+                                            "\\" + "{:06d}".format(abs(int(displacementFromStartingPositionX)) * 10) + "_" + \
+                                            "{:06d}".format(abs(int(displacementFromStartingPositionY)) * 10)
                 self.guiLogQueue.put(self.LOG_PREFIX + "Scanning Tile " + str(tileNumber) + "/" + str(self.TILE_SCAN_DIMENSIONS[1] * self.TILE_SCAN_DIMENSIONS[0]))
                 tileNumber += 1
+
+
                 stackPath = self.scan_stack(scanPath, "000000.tif")
                 sleep(4)
-
-
                 if stackPath == -1:
                     # Close shutter
                     self.mainQueue.put([2, 7, []])
@@ -460,26 +495,28 @@ class Scanner(object):
                 else:
                     stackPaths.append(stackPath)
 
+
                 if x < self.TILE_SCAN_DIMENSIONS[0] - 1:
-                    # Perform X translation
-                    self.mainQueue.put([2, 6, [3, tileTranslationX_uM, True]])
-                    displacementFromStartingPositionX += tileTranslationX_uM
+                    self.mainQueue.put([2, 6, [3, translationsX[translationsXIndex], True]])
+                    displacementFromStartingPositionX += translations[translationsXIndex]
+                    translationsXIndex += 1
                     sleep(20)
 
-            # If we just scanned the last X of the row, reverse the x translation direction
-            tileTranslationX_uM = -tileTranslationX_uM
 
             if y < self.TILE_SCAN_DIMENSIONS[1] - 1:
-                self.mainQueue.put([2, 6, [1, tileTranslationY_uM, True]])
-                displacementFromStartingPositionY += tileTranslationY_uM
+                self.mainQueue.put([2, 6, [1, translationsY[translationsYIndex], True]])
+                displacementFromStartingPositionY += translationsY[translationsYIndex]
+                translationsYIndex += 1
                 sleep(20)
 
 
         # If we're not at the origin in either x or y, go back to the origin.
         if displacementFromStartingPositionX != 0:
+            displacementFromStartingPositionX = round_uM_to_int_multiple_of_uMPerStep(displacementFromStartingPositionX)
             self.mainQueue.put([2, 6, [3, -displacementFromStartingPositionX, True]])
             sleep(20)
         if displacementFromStartingPositionY != 0:
+            displacementFromStartingPositionY = round_uM_to_int_multiple_of_uMPerStep(displacementFromStartingPositionY)
             self.mainQueue.put([2, 6, [1, -displacementFromStartingPositionY, True]])
             sleep(20)
 
