@@ -393,10 +393,10 @@ class Scanner(object):
                 sleep(timeUntilNextStackDue - 1)
 
 
-    def round_uM_to_int_multiple_of_uMPerStep(value_uM):
+    def round_uM_to_int_multiple_of_uMPerStep(self, value_uM):
         return int(value_uM / self.MICROMETERS_PER_STEP) * self.MICROMETERS_PER_STEP
 
-    def gen_tile_stage_translations():
+    def gen_tile_stage_translations(self):
 
         rowTranslations = []
         translationsX = []
@@ -408,16 +408,10 @@ class Scanner(object):
 
         for x in range(0, self.TILE_SCAN_DIMENSIONS[0] - 1):
 
-            # The first translation should contain the offset for overlapping the tiles
-            if x == 0:
-                translation = tileWidth_uM - self.TILE_uM_OVERLAP_X
-                # Round down to whole number multiple of <MICROMETERS_PER_STEP> so stage can perform translation.
-                translation = -round_uM_to_int_multiple_of_uMPerStep(translation)
-                rowTranslations.append(translation)
-            else:
-                translation = tileWidth_uM
-                translation = -round_uM_to_int_multiple_of_uMPerStep(translation)
-                rowTranslations.append(translation)
+            translation = tileWidth_uM - self.TILE_uM_OVERLAP_X
+            # Round down to whole number multiple of <MICROMETERS_PER_STEP> so stage can perform translation.
+            translation = -self.round_uM_to_int_multiple_of_uMPerStep(translation)
+            rowTranslations.append(translation)
 
         for y in range(0, self.TILE_SCAN_DIMENSIONS[1]):
             for i in range(0, len(rowTranslations)):
@@ -429,16 +423,10 @@ class Scanner(object):
 
         for y in range(0, self.TILE_SCAN_DIMENSIONS[1] - 1):
 
-            # The first translation should contain the offset for overlapping the tiles
-            if y == 0:
-                translation = tileHeight_uM - self.TILE_uM_OVERLAP_Y
-                # Round down to whole number multiple of <MICROMETERS_PER_STEP> so stage can perform translation.
-                translation = round_uM_to_int_multiple_of_uMPerStep(translation)
-                translationsY.append(translation)
-            else:
-                translation = tileHeight_uM
-                translation = round_uM_to_int_multiple_of_uMPerStep(translation)
-                translationsY.append(translation)
+            translation = tileHeight_uM - self.TILE_uM_OVERLAP_Y
+            # Round down to whole number multiple of <MICROMETERS_PER_STEP> so stage can perform translation.
+            translation = self.round_uM_to_int_multiple_of_uMPerStep(translation)
+            translationsY.append(translation)
 
         return translationsX, translationsY
 
@@ -466,7 +454,7 @@ class Scanner(object):
         tileNumber = 1
         displacementFromStartingPositionX = 0
         displacementFromStartingPositionY = 0
-        translationsX, translationsY = gen_tile_stage_translations()
+        translationsX, translationsY = self.gen_tile_stage_translations()
         translationsXIndex = 0
         translationsYIndex = 0
 
@@ -498,7 +486,7 @@ class Scanner(object):
 
                 if x < self.TILE_SCAN_DIMENSIONS[0] - 1:
                     self.mainQueue.put([2, 6, [3, translationsX[translationsXIndex], True]])
-                    displacementFromStartingPositionX += translations[translationsXIndex]
+                    displacementFromStartingPositionX += translationsX[translationsXIndex]
                     translationsXIndex += 1
                     sleep(20)
 
@@ -512,11 +500,11 @@ class Scanner(object):
 
         # If we're not at the origin in either x or y, go back to the origin.
         if displacementFromStartingPositionX != 0:
-            displacementFromStartingPositionX = round_uM_to_int_multiple_of_uMPerStep(displacementFromStartingPositionX)
+            displacementFromStartingPositionX = self.round_uM_to_int_multiple_of_uMPerStep(displacementFromStartingPositionX)
             self.mainQueue.put([2, 6, [3, -displacementFromStartingPositionX, True]])
             sleep(20)
         if displacementFromStartingPositionY != 0:
-            displacementFromStartingPositionY = round_uM_to_int_multiple_of_uMPerStep(displacementFromStartingPositionY)
+            displacementFromStartingPositionY = self.round_uM_to_int_multiple_of_uMPerStep(displacementFromStartingPositionY)
             self.mainQueue.put([2, 6, [1, -displacementFromStartingPositionY, True]])
             sleep(20)
 
