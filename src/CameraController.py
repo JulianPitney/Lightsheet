@@ -443,7 +443,7 @@ class CameraController(object):
                 exit()
 
 
-        filename = path + "\\" + SCAN_NAME + ".tif"
+        filename = path + "\\" + SCAN_NAME
         imageStack = np.asarray(imageStack, dtype=np.uint16)
 
         metadata_dict = {}
