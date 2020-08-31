@@ -185,16 +185,16 @@ class CameraController(object):
         if PySpin.IsAvailable(node_pixel_format) and PySpin.IsWritable(node_pixel_format):
 
             # Retrieve the desired entry node from the enumeration node
-            node_pixel_format_mono16 = PySpin.CEnumEntryPtr(node_pixel_format.GetEntryByName('Mono16'))
-            if PySpin.IsAvailable(node_pixel_format_mono16) and PySpin.IsReadable(node_pixel_format_mono16):
+            node_pixel_format_mono8 = PySpin.CEnumEntryPtr(node_pixel_format.GetEntryByName('Mono8'))
+            if PySpin.IsAvailable(node_pixel_format_mono8) and PySpin.IsReadable(node_pixel_format_mono8):
 
                 # Retrieve the integer value from the entry node
-                pixel_format_mono16 = node_pixel_format_mono16.GetValue()
+                pixel_format_mono8 = node_pixel_format_mono8.GetValue()
                 # Set integer as new value for enumeration node
-                node_pixel_format.SetIntValue(pixel_format_mono16)
+                node_pixel_format.SetIntValue(pixel_format_mono8)
                 #self.guiLogQueue.put(self.LOG_PREFIX + "PIXEL_FORMAT=%s" % node_pixel_format.GetCurrentEntry().GetSymbolic())
             else:
-                self.guiLogQueue.put(self.LOG_PREFIX + "Camera pixel format mono 16 not available")
+                self.guiLogQueue.put(self.LOG_PREFIX + "Camera pixel format mono 8 not available")
         else:
             self.guiLogQueue.put(self.LOG_PREFIX + "Camera pixel format not available")
 
