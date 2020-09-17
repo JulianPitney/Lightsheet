@@ -325,7 +325,7 @@ class Scanner(object):
             return -1
 
         # Put camera in scan mode
-        self.mainQueue.put([1, 3, [timelapseScanName, metadata, path, 0]])
+        self.mainQueue.put([1, 3, [timelapseScanName + ".tif", metadata, path, 0]])
         self.wait_for_confirmation(1)
         # Open shutter
         self.mainQueue.put([2, 7, []])
@@ -474,7 +474,7 @@ class Scanner(object):
                 tileNumber += 1
 
 
-                stackPath = self.scan_stack(scanPath, "000000.tif")
+                stackPath = self.scan_stack(scanPath, "000000")
                 sleep(4)
                 if stackPath == -1:
                     # Close shutter
@@ -502,6 +502,7 @@ class Scanner(object):
         if displacementFromStartingPositionX != 0:
             displacementFromStartingPositionX = self.round_uM_to_int_multiple_of_uMPerStep(displacementFromStartingPositionX)
             self.mainQueue.put([2, 6, [3, -displacementFromStartingPositionX, True]])
+
             sleep(20)
         if displacementFromStartingPositionY != 0:
             displacementFromStartingPositionY = self.round_uM_to_int_multiple_of_uMPerStep(displacementFromStartingPositionY)

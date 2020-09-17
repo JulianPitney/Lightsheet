@@ -208,7 +208,7 @@ int zero_stage() {
     Note: The sign of <steps> determines the direction of rotation.
     Note: This function blocks until the movement is completed.
  */
-void moveStepper(AccelStepper *stepper, int steps, int speed){
+void moveStepper(AccelStepper *stepper, long steps, int speed){
 
     stepper->move(steps);
     stepper->setSpeed(speed);
@@ -437,7 +437,7 @@ int moveCommand() {
   bool stepperExists = true;
   stepper = selectCorrectStepper();
 
-  int steps = command->params[2].toInt();
+  long steps = command->params[2].toInt();
   int speed = command->params[3].toInt();
   if(steps == 0)
   {

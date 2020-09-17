@@ -192,7 +192,7 @@ class CameraController(object):
                 pixel_format_mono8 = node_pixel_format_mono8.GetValue()
                 # Set integer as new value for enumeration node
                 node_pixel_format.SetIntValue(pixel_format_mono8)
-                #self.guiLogQueue.put(self.LOG_PREFIX + "PIXEL_FORMAT=%s" % node_pixel_format.GetCurrentEntry().GetSymbolic())
+                self.guiLogQueue.put(self.LOG_PREFIX + "PIXEL_FORMAT=%s" % node_pixel_format.GetCurrentEntry().GetSymbolic())
             else:
                 self.guiLogQueue.put(self.LOG_PREFIX + "Camera pixel format mono 8 not available")
         else:
@@ -444,7 +444,7 @@ class CameraController(object):
 
 
         filename = path + "\\" + SCAN_NAME
-        imageStack = np.asarray(imageStack, dtype=np.uint16)
+        imageStack = np.asarray(imageStack, dtype=np.uint8)
 
         metadata_dict = {}
         for item in metadata:

@@ -29,7 +29,7 @@ class GUI(object):
         self.frame_border_color = "#1C2833"
         self.button_focus_color = "#2E4053"
         self.gen_widgets()
-        self.master.attributes("-fullscreen", True)
+        self.master.attributes("-fullscreen", False)
 
 
         self.micrometersPerStep = 0.15625
