@@ -114,7 +114,7 @@ scikit-image | 0.15.0
 
 ## Setup Procedure (Perform In Order)
 
-1. **Laser Startup**
+### **Laser Startup**
 
   1. Ensure the laser power dial is on lowest setting.
 
@@ -130,22 +130,22 @@ scikit-image | 0.15.0
 
   7. Let the laser diode warm up and settle for ~10 minutes.
 
-2. **Stage and Motors**
+### **Stage and Motors**
 
   1. Ensure the power cable coming from the motor drivers is plugged into a surge protector.
 
 
-3. **Imaging Camera**
+### **Imaging Camera**
 
   1. Ensure the USB cable coming from the imaging camera is plugged into a USB 3.0 port on the back of the computer.
 
 
-4. **Control Electronics**
+### **Control Electronics**
 
   1. Ensure the USB cable coming from the Arduino is plugged into any USB port on the back of the computer.
 
 
-5. **Software**
+### **Software**
 
   1. Start the computer and sign in.
 
@@ -157,7 +157,7 @@ scikit-image | 0.15.0
 
   5. The PS4 controller and GUI are now active and can be used to control the microscope.
 
-6. **Sample Chamber Prep**
+### **Sample Chamber Prep**
 
   1. Prepare approximately 100ml of imaging solution. Adjust RI and check with Abbe refractometer.
 
@@ -169,7 +169,7 @@ scikit-image | 0.15.0
 
   5. Place chamber onto chamber holder and tighten thumb screw to lock in place.
 
-7. **Sample Mounting:**
+### **Sample Mounting:**
 
   1. Empty contents of sample tube into a clean glass petri dish, then use a pipette to remove the clearing solution and place back into the sample tube. (clearing solution can be toxic, work under ventilated conditions.)
 
@@ -185,7 +185,7 @@ scikit-image | 0.15.0
 
   7. Using a pipette, fill the sample chamber with the imaging solution until the surface tension is able to completely cover the bottom of the glass cover.
 
-8. **Image Focus/Setup**
+### **Image Focus/Setup**
 
   1. Lower the imaging objective by loosening the thumb screw (indicated by &quot;2&quot; in reference image1), the distance from the imaging objective to the glass cover depends on the objective being used, for 2.5x it should be less than 1cm. DO NOT get oil on the objective.
 
