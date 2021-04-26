@@ -19,6 +19,7 @@ Our philosophy was "Do a small number of things really well". The goal was to ma
 * [Assembly and Installation](#Assembly-and-Installation)
 * [Standard Operating Procedure](#Standard-Operating-Procedure)
 * [Troubleshooting](#troubleshooting)
+* [Gallery](#gallery)
 * [Contact](#contact)
 * [License](#license)
 
